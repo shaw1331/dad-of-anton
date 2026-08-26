@@ -3,3 +3,4 @@ uvicorn[standard]==0.34.0
 pydantic-settings==2.7.1
 supabase==2.14.0
 python-dotenv==1.0.1
+eval_type_backport==0.2.2
