@@ -83,23 +83,29 @@ Create the `backend/app/workflow/workflow_config.py` file with the dataclass for
 
 ---
 
-### TASK-005: Create `WorkflowRunner` orchestrator class
+### TASK-005: Create `WorkflowOrchestrator` class
 
 **Description:**
-Create the `backend/app/workflow/workflow_runner.py` file with the core orchestration logic.
+Create the `BaseWorkflowOrchestrator` abstract base class and `WorkflowOrchestrator` implementation with the core orchestration logic.
 
 **Implementation:**
-- `trigger_workflow(workflow_name: str) -> str`: Creates workflow_run + task_run records in DB, returns run_id
+- `BaseWorkflowOrchestrator` ABC in `backend/app/workflow/base_workflow_orchestrator.py` with abstract methods: `resolve_config`, `trigger_workflow`, `run_workflow`
+- `WorkflowOrchestrator` in `backend/app/workflow/workflow_orchestrator.py` implementing the dict-registry based orchestrator
+- `trigger_workflow(workflow_name: str, background_tasks: BackgroundTasks) -> str`: Creates workflow_run + task_run records in DB, kicks off background task, returns run_id
 - `run_workflow(run_id: str)`: Iterates through tasks, updates DB status, catches exceptions
-- Uses `supabase` client from `app.core.database` for DB operations
+- `resolve_config(workflow_name) -> BaseWorkflowConfig`: Resolves workflow config from registry
+- `resolve_task_name(task_cls)` helper for task name resolution
+- Uses repository classes for DB operations
 - Uses FastAPI `BackgroundTasks` for async execution
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/workflow/workflow_runner.py`
-- [ ] `trigger_workflow` creates DB records and kicks off background task
-- [ ] `run_workflow` updates status at each step (pending -> running -> completed/failed)
-- [ ] Error handling: if a task fails, workflow status becomes 'failed' with error message
-- [ ] `current_task_index` is updated as tasks progress
+- [x] `base_workflow_orchestrator.py` created with `BaseWorkflowOrchestrator` ABC
+- [x] `workflow_orchestrator.py` created with `WorkflowOrchestrator` implementation
+- [x] `trigger_workflow` creates DB records and kicks off background task
+- [x] `run_workflow` updates status at each step (pending -> running -> completed/failed)
+- [x] Error handling: if a task fails, workflow status becomes 'failed' with error message
+- [x] `current_task_index` is updated as tasks progress
+- [x] Future extensible via `BaseWorkflowOrchestrator` base class
 
 ---
 
@@ -115,8 +121,8 @@ Create `backend/app/workflow/__init__.py` to export the public API of the workfl
 - `trigger_workflow`
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/workflow/__init__.py`
-- [ ] All public symbols are importable from `app.workflow`
+- [x] File created at `backend/app/workflow/__init__.py`
+- [x] All public symbols are importable from `app.workflow`
 
 ---
 
