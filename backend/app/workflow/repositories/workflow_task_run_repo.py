@@ -19,6 +19,14 @@ class WorkflowTaskRunRepository:
             .execute()
         return WorkflowTaskRun.model_validate(result.data)
 
+    def list_by_run(self, workflow_run_id: str) -> list[WorkflowTaskRun]:
+        result = supabase.table("workflow_task_runs") \
+            .select("*") \
+            .eq("workflow_run_id", workflow_run_id) \
+            .order("task_index") \
+            .execute()
+        return [WorkflowTaskRun.model_validate(row) for row in result.data]
+
     def update_status(self, task_run_id: str, status: str, error: str | None = None) -> None:
         data: dict = {
             "status": status,

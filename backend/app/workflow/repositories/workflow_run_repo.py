@@ -23,6 +23,10 @@ class WorkflowRunRepository:
             data["error"] = error
         supabase.table("workflow_runs").update(data).eq("id", run_id).execute()
 
+    def list_all(self) -> list[WorkflowRun]:
+        result = supabase.table("workflow_runs").select("*").order("created_at", desc=True).execute()
+        return [WorkflowRun.model_validate(row) for row in result.data]
+
     def update_progress(self, run_id: str, current_task_index: int) -> None:
         supabase.table("workflow_runs").update({
             "current_task_index": current_task_index,

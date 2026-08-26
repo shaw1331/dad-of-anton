@@ -138,11 +138,11 @@ Create `backend/app/api/v1/workflow_routes.py` with FastAPI endpoints for workfl
 - `GET /workflows/runs/{run_id}` - Get a single run with its task_runs
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/api/v1/workflow_routes.py`
-- [ ] Router uses `APIRouter` with appropriate prefix/tags
-- [ ] All endpoints return proper JSON responses
-- [ ] Error handling for non-existent workflow names
-- [ ] Error handling for non-existent run_ids
+- [x] File created at `backend/app/api/v1/workflow_routes.py`
+- [x] Router uses `APIRouter` with appropriate prefix/tags
+- [x] All endpoints return proper JSON responses
+- [x] Error handling for non-existent workflow names
+- [x] Error handling for non-existent run_ids
 
 ---
 
@@ -156,8 +156,8 @@ Update `backend/app/api/v1/__init__.py` to include the new workflow router.
 - Include it in the `api_router`
 
 **Acceptance Criteria:**
-- [ ] Workflow endpoints are accessible at `/api/v1/workflows/...`
-- [ ] Existing `/health` endpoint still works
+- [x] Workflow endpoints are accessible at `/api/v1/workflows/...`
+- [x] Existing `/health` endpoint still works
 - [ ] No import errors
 
 ---
