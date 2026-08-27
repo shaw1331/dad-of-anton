@@ -321,10 +321,10 @@ Display the workflow's input values in the run detail view.
 - Style consistently with existing components
 
 **Acceptance Criteria:**
-- [ ] Input section appears in run detail when input exists
-- [ ] Input is displayed as key-value pairs
-- [ ] Section is hidden when no input is present
-- [ ] Styled consistently with the rest of the detail view
+- [x] Input section appears in run detail when input exists
+- [x] Input is displayed as key-value pairs
+- [x] Section is hidden when no input is present
+- [x] Styled consistently with the rest of the detail view
 
 ---
 
@@ -341,11 +341,11 @@ Update the sample workflow to demonstrate input usage.
 - Import `BaseWorkflowContext` and `InputField`
 
 **Acceptance Criteria:**
-- [ ] Sample workflow has `input_fields` defined
-- [ ] `PrintMessageTask.run()` accepts `ctx` parameter
-- [ ] Task uses input from context when available
-- [ ] Workflow still works when triggered without input (uses default)
-- [ ] Workflow works when triggered with custom input
+- [x] Sample workflow has `input_fields` defined
+- [x] `PrintMessageTask.run()` accepts `ctx` parameter
+- [x] Task uses input from context when available
+- [x] Workflow still works when triggered without input (uses default)
+- [x] Workflow works when triggered with custom input
 
 ---
 

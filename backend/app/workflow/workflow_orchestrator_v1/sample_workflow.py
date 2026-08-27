@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING
 
-from app.workflow.base_workflow_config import BaseWorkflowConfig
+from app.workflow.base_workflow_config import BaseWorkflowConfig, InputField
 from app.workflow.base_workflow_task import BaseWorkflowTask
 from app.workflow.workflow_orchestrator_v1.workflow_registry import WORKFLOWS
 
@@ -18,7 +18,8 @@ class PrintMessageTask(BaseWorkflowTask):
         self.message = message
 
     async def run(self, ctx: BaseWorkflowContext) -> None:
-        print(self.message)
+        message = ctx.get_input("message") or self.message
+        print(message)
 
 
 class DelayTask(BaseWorkflowTask):
@@ -34,5 +35,15 @@ class DelayTask(BaseWorkflowTask):
 WORKFLOWS["sample"] = BaseWorkflowConfig(
     name="sample",
     description="A sample workflow with 3 dummy tasks",
+    input_fields=[
+        InputField(
+            name="message",
+            type="str",
+            label="Message",
+            description="Message to print",
+            required=False,
+            default="Hello from task!",
+        ),
+    ],
     tasks=[PrintMessageTask, DelayTask, PrintMessageTask],
 )
