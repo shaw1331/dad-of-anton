@@ -3,12 +3,16 @@
 import { useEffect, useState } from "react";
 import { WorkflowRunList } from "@/app/components/WorkflowRunList";
 import { getWorkflows, getWorkflowRuns, triggerWorkflow } from "@/lib/api/workflows";
+import type { WorkflowConfig, WorkflowRun, InputField } from "@/lib/types";
 
 export default function WorkflowsPage() {
-  const [workflows, setWorkflows] = useState<Array<{ name: string; description: string }>>([]);
-  const [runs, setRuns] = useState<Array<{ runId: string; workflowName: string; status: string; createdAt: string }>>([]);
+  const [workflows, setWorkflows] = useState<WorkflowConfig[]>([]);
+  const [runs, setRuns] = useState<WorkflowRun[]>([]);
   const [loading, setLoading] = useState(true);
   const [triggering, setTriggering] = useState<string | null>(null);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowConfig | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState<Record<string, any>>({});
 
   useEffect(() => {
     async function fetchData() {
@@ -23,13 +27,99 @@ export default function WorkflowsPage() {
     fetchData();
   }, []);
 
-  const handleTrigger = async (workflowName: string) => {
+  const handleTriggerClick = (wf: WorkflowConfig) => {
+    if (wf.input_fields.length === 0) {
+      handleTrigger(wf.name);
+    } else {
+      const defaults: Record<string, any> = {};
+      for (const f of wf.input_fields) {
+        defaults[f.name] = f.default ?? (f.type === "bool" ? false : "");
+      }
+      setFormData(defaults);
+      setSelectedWorkflow(wf);
+      setShowModal(true);
+    }
+  };
+
+  const handleTrigger = async (workflowName: string, input?: Record<string, any>) => {
     setTriggering(workflowName);
-    const data = await triggerWorkflow(workflowName);
+    setShowModal(false);
+    const data = await triggerWorkflow(workflowName, input);
     if (data.run_id) {
       window.location.href = `/workflows/${data.run_id}`;
     } else {
       setTriggering(null);
+    }
+  };
+
+  const handleModalSubmit = () => {
+    if (!selectedWorkflow) return;
+    for (const f of selectedWorkflow.input_fields) {
+      if (f.required && (formData[f.name] === "" || formData[f.name] === undefined || formData[f.name] === null)) {
+        alert(`Missing required field: ${f.label}`);
+        return;
+      }
+    }
+    handleTrigger(selectedWorkflow.name, formData);
+  };
+
+  const handleModalCancel = () => {
+    setShowModal(false);
+    setSelectedWorkflow(null);
+    setFormData({});
+  };
+
+  const renderInputField = (field: InputField) => {
+    const value = formData[field.name] ?? field.default ?? "";
+
+    switch (field.type) {
+      case "bool":
+        return (
+          <input
+            type="checkbox"
+            checked={!!value}
+            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.checked })}
+            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+          />
+        );
+      case "int":
+        return (
+          <input
+            type="number"
+            step="1"
+            value={value}
+            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+            className="input-field"
+          />
+        );
+      case "float":
+        return (
+          <input
+            type="number"
+            step="0.01"
+            value={value}
+            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+            className="input-field"
+          />
+        );
+      case "text":
+        return (
+          <textarea
+            value={value}
+            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+            className="input-field"
+            rows={3}
+          />
+        );
+      default:
+        return (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+            className="input-field"
+          />
+        );
     }
   };
 
@@ -101,7 +191,7 @@ export default function WorkflowsPage() {
                   {wf.description}
                 </p>
                 <button
-                  onClick={() => handleTrigger(wf.name)}
+                  onClick={() => handleTriggerClick(wf)}
                   disabled={triggering === wf.name}
                   className="btn-primary w-full"
                 >
@@ -157,6 +247,38 @@ export default function WorkflowsPage() {
         runs={runs}
         onSelect={(runId) => (window.location.href = `/workflows/${runId}`)}
       />
+
+      {showModal && selectedWorkflow && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="mx-4 w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+            <h3 className="mb-4 text-lg font-semibold text-slate-900">
+              Trigger {selectedWorkflow.name}
+            </h3>
+            <div className="space-y-4">
+              {selectedWorkflow.input_fields.map((field) => (
+                <div key={field.name}>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                    {field.label}
+                    {field.required && <span className="ml-1 text-red-500">*</span>}
+                  </label>
+                  {field.description && (
+                    <p className="mb-1 text-xs text-slate-400">{field.description}</p>
+                  )}
+                  {renderInputField(field)}
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button onClick={handleModalCancel} className="btn-secondary">
+                Cancel
+              </button>
+              <button onClick={handleModalSubmit} className="btn-primary">
+                Trigger
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

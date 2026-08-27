@@ -206,10 +206,10 @@ Update the `POST /{name}/trigger` endpoint to accept a JSON body with input data
 - Catch `ValueError` from validation and return 422 with error detail
 
 **Acceptance Criteria:**
-- [ ] Endpoint accepts POST body with `input` field
-- [ ] Missing body defaults to empty input (`{}`)
-- [ ] Validation errors return 422 with clear message
-- [ ] Existing trigger calls without body still work
+- [x] Endpoint accepts POST body with `input` field
+- [x] Missing body defaults to empty input (`{}`)
+- [x] Validation errors return 422 with clear message
+- [x] Existing trigger calls without body still work
 
 ---
 
@@ -225,9 +225,9 @@ Update `GET /workflows` to include `input_fields` in the response for each workf
 - Each field: `{"name": f.name, "type": f.type, "label": f.label, "description": f.description, "required": f.required, "default": f.default}`
 
 **Acceptance Criteria:**
-- [ ] Response includes `input_fields` array for each workflow
-- [ ] Fields are serialized correctly (no dataclass objects in JSON)
-- [ ] Workflows with no input_fields return empty array
+- [x] Response includes `input_fields` array for each workflow
+- [x] Fields are serialized correctly (no dataclass objects in JSON)
+- [x] Workflows with no input_fields return empty array
 
 ---
 
@@ -244,10 +244,10 @@ Add `InputField` interface and update existing types to include input-related fi
 - Update `RunDetail` to include `input: Record<string, any> | null`
 
 **Acceptance Criteria:**
-- [ ] `InputField` interface exists
-- [ ] `WorkflowConfig` includes `input_fields`
-- [ ] `RunDetail` includes `input`
-- [ ] No TypeScript compilation errors
+- [x] `InputField` interface exists
+- [x] `WorkflowConfig` includes `input_fields`
+- [x] `RunDetail` includes `input`
+- [x] No TypeScript compilation errors
 
 ---
 
@@ -264,9 +264,9 @@ Update `triggerWorkflow()` to accept and send input data.
 - Set `Content-Type: application/json` header
 
 **Acceptance Criteria:**
-- [ ] `triggerWorkflow` accepts optional `input` parameter
-- [ ] Input is sent as JSON body
-- [ ] Calls without input still work
+- [x] `triggerWorkflow` accepts optional `input` parameter
+- [x] Input is sent as JSON body
+- [x] Calls without input still work
 
 ---
 
@@ -297,13 +297,13 @@ When a workflow has `input_fields`, show a modal form before triggering. Workflo
   - "Cancel": close modal, reset form
 
 **Acceptance Criteria:**
-- [ ] Workflows with no inputs trigger immediately (no regression)
-- [ ] Workflows with inputs open a modal on "Trigger" click
-- [ ] Modal renders correct input types based on `input_fields`
-- [ ] Required fields are marked and validated
-- [ ] Default values are pre-filled
-- [ ] Form submission triggers the workflow with input data
-- [ ] Modal can be cancelled/closed
+- [x] Workflows with no inputs trigger immediately (no regression)
+- [x] Workflows with inputs open a modal on "Trigger" click
+- [x] Modal renders correct input types based on `input_fields`
+- [x] Required fields are marked and validated
+- [x] Default values are pre-filled
+- [x] Form submission triggers the workflow with input data
+- [x] Modal can be cancelled/closed
 
 ---
 

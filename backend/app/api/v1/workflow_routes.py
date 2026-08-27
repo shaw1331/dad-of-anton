@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from typing import Any
+
 from fastapi import APIRouter, BackgroundTasks, HTTPException
+from pydantic import BaseModel
 
 from app.workflow.workflow_orchestrator_v1.workflow_orchestrator import WorkflowOrchestrator
 from app.workflow.workflow_orchestrator_v1.workflow_registry import WORKFLOWS
@@ -10,19 +13,41 @@ router = APIRouter(prefix="/workflows", tags=["workflows"])
 orchestrator = WorkflowOrchestrator()
 
 
+class TriggerRequest(BaseModel):
+    input: dict[str, Any] = {}
+
+
 @router.get("")
 def list_workflows():
     return [
-        {"name": config.name, "description": config.description, "task_count": len(config.tasks)}
+        {
+            "name": config.name,
+            "description": config.description,
+            "task_count": len(config.tasks),
+            "input_fields": [
+                {
+                    "name": f.name,
+                    "type": f.type,
+                    "label": f.label,
+                    "description": f.description,
+                    "required": f.required,
+                    "default": f.default,
+                }
+                for f in config.input_fields
+            ],
+        }
         for config in WORKFLOWS.values()
     ]
 
 
 @router.post("/{name}/trigger")
-def trigger_workflow(name: str, background_tasks: BackgroundTasks):
+def trigger_workflow(name: str, background_tasks: BackgroundTasks, request: TriggerRequest | None = None):
+    input_data = request.input if request else {}
     try:
-        run_id = orchestrator.trigger_workflow(name, background_tasks)
+        run_id = orchestrator.trigger_workflow(name, background_tasks, input_data)
     except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
     return {"run_id": run_id}
 
