@@ -17,10 +17,10 @@ Add an `InputField` dataclass to define workflow input fields, and add an `input
 - Import `Any` from `typing`
 
 **Acceptance Criteria:**
-- [ ] `InputField` dataclass created with correct fields and defaults
-- [ ] `BaseWorkflowConfig` has `input_fields` field defaulting to `[]`
-- [ ] Existing workflow registrations (sample) still work without changes
-- [ ] No import errors
+- [x] `InputField` dataclass created with correct fields and defaults
+- [x] `BaseWorkflowConfig` has `input_fields` field defaulting to `[]`
+- [x] Existing workflow registrations (sample) still work without changes
+- [x] No import errors
 
 ---
 
@@ -39,11 +39,11 @@ Create a `BaseWorkflowContext` class that holds input data and provides a mechan
 - `_outputs: dict[str, Any]` — internal storage for task outputs
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/workflow/base_workflow_context.py`
-- [ ] `BaseWorkflowContext` can be instantiated with an input dict
-- [ ] `get_input()` returns values from the input dict
-- [ ] `set_output()` / `get_output()` work correctly
-- [ ] No circular imports
+- [x] File created at `backend/app/workflow/base_workflow_context.py`
+- [x] `BaseWorkflowContext` can be instantiated with an input dict
+- [x] `get_input()` returns values from the input dict
+- [x] `set_output()` / `get_output()` work correctly
+- [x] No circular imports
 
 ---
 
@@ -59,9 +59,9 @@ Update the abstract `run()` method to accept a `BaseWorkflowContext` parameter.
 - Change `async def run(self) -> None` to `async def run(self, ctx: BaseWorkflowContext) -> None`
 
 **Acceptance Criteria:**
-- [ ] `run()` method accepts `ctx: BaseWorkflowContext` parameter
-- [ ] Class is still abstract
-- [ ] No circular import issues
+- [x] `run()` method accepts `ctx: BaseWorkflowContext` parameter
+- [x] Class is still abstract
+- [x] No circular import issues
 
 ---
 
@@ -77,10 +77,10 @@ Add a `input` JSONB column to the `workflow_runs` table to store workflow input 
 - Add a comment to the column for documentation
 
 **Acceptance Criteria:**
-- [ ] Migration file created
-- [ ] `workflow_runs` table has `input` column of type `jsonb`
-- [ ] Column is nullable (existing rows have NULL)
-- [ ] Migration is idempotent or can be run safely
+- [x] Migration file created
+- [x] `workflow_runs` table has `input` column of type `jsonb`
+- [x] Column is nullable (existing rows have NULL)
+- [x] Migration is idempotent or can be run safely
 
 ---
 
