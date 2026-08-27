@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from app.workflow.base_workflow_config import BaseWorkflowConfig
-from app.workflow.base_workflow_task import BaseWorkflowTask
 from app.workflow.workflow_orchestrator_v1.workflow_orchestrator import WorkflowOrchestrator
+from app.workflow.workflow_orchestrator_v1.workflow_registry import WORKFLOWS
 import app.workflow.workflow_orchestrator_v1.sample_workflow  # noqa: F401
 
 __all__ = [
-    "BaseWorkflowTask",
-    "BaseWorkflowConfig",
     "WorkflowOrchestrator",
+    "WORKFLOWS",
 ]

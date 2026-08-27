@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import asyncio
 
-from app.workflow.workflow_config import BaseWorkflowConfig
-from app.workflow.workflow_registry import WORKFLOWS
-from app.workflow.workflow_task import BaseWorkflowTask
+from app.workflow.base_workflow_config import BaseWorkflowConfig
+from app.workflow.base_workflow_task import BaseWorkflowTask
+from app.workflow.workflow_orchestrator_v1.workflow_registry import WORKFLOWS
 
 
 class PrintMessageTask(BaseWorkflowTask):

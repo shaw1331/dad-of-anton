@@ -7,8 +7,8 @@ from fastapi import BackgroundTasks
 from app.workflow.base_workflow_orchestrator import BaseWorkflowOrchestrator
 from app.workflow.models import WorkflowRun, WorkflowTaskRun
 from app.workflow.repositories import WorkflowRunRepository, WorkflowTaskRunRepository
-from app.workflow.workflow_config import BaseWorkflowConfig
-from app.workflow.workflow_registry import WORKFLOWS
+from app.workflow.base_workflow_config import BaseWorkflowConfig
+from app.workflow.workflow_orchestrator_v1.workflow_registry import WORKFLOWS
 
 logger = logging.getLogger(__name__)
 
