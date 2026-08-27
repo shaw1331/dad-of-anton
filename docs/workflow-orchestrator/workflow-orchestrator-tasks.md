@@ -192,11 +192,11 @@ Create `frontend/app/workflows/page.tsx` to display all registered workflows and
 - Display runs with status badges
 
 **Acceptance Criteria:**
-- [ ] Page created at `frontend/app/workflows/page.tsx`
-- [ ] Lists all registered workflows
-- [ ] "Trigger" button calls POST endpoint and refreshes list
-- [ ] Shows recent runs with status (pending/running/completed/failed)
-- [ ] Clicking a run navigates to detail page
+- [x] Page created at `frontend/app/workflows/page.tsx`
+- [x] Lists all registered workflows
+- [x] "Trigger" button calls POST endpoint and refreshes list
+- [x] Shows recent runs with status (pending/running/completed/failed)
+- [x] Clicking a run navigates to detail page
 
 ---
 
@@ -211,11 +211,11 @@ Create `frontend/app/workflows/[runId]/page.tsx` to show detailed status of a si
 - List all tasks with individual status, start/end times
 
 **Acceptance Criteria:**
-- [ ] Page created at `frontend/app/workflows/[runId]/page.tsx`
-- [ ] Shows workflow name and overall status
-- [ ] Shows progress bar or step indicator (e.g., "Step 3/7")
-- [ ] Lists tasks with status badges
-- [ ] Auto-refreshes or polls for status updates
+- [x] Page created at `frontend/app/workflows/[runId]/page.tsx`
+- [x] Shows workflow name and overall status
+- [x] Shows progress bar or step indicator (e.g., "Step 3/7")
+- [x] Lists tasks with status badges
+- [x] Auto-refreshes or polls for status updates
 
 ---
 
@@ -229,10 +229,10 @@ Create `frontend/app/components/WorkflowList.tsx` to display the list of registe
 - `onTrigger`: Callback when trigger button is clicked
 
 **Acceptance Criteria:**
-- [ ] Component created at `frontend/app/components/WorkflowList.tsx`
-- [ ] Displays workflow name and description
-- [ ] Has a "Trigger" button per workflow
-- [ ] Accepts props for data and callbacks
+- [x] Component created at `frontend/app/components/WorkflowList.tsx`
+- [x] Displays workflow name and description
+- [x] Has a "Trigger" button per workflow
+- [x] Accepts props for data and callbacks
 
 ---
 
@@ -246,10 +246,10 @@ Create `frontend/app/components/WorkflowRunList.tsx` to display recent workflow 
 - `onSelect`: Callback when a run is clicked
 
 **Acceptance Criteria:**
-- [ ] Component created at `frontend/app/components/WorkflowRunList.tsx`
-- [ ] Displays run ID, workflow name, status, created time
-- [ ] Status shown as colored badge (green=completed, red=failed, yellow=running, gray=pending)
-- [ ] Clicking a run calls `onSelect` with the run_id
+- [x] Component created at `frontend/app/components/WorkflowRunList.tsx`
+- [x] Displays run ID, workflow name, status, created time
+- [x] Status shown as colored badge (green=completed, red=failed, yellow=running, gray=pending)
+- [x] Clicking a run calls `onSelect` with the run_id
 
 ---
 
@@ -262,11 +262,11 @@ Create `frontend/app/components/WorkflowRunDetail.tsx` to display detailed task 
 - `run`: Workflow run object with nested task_runs
 
 **Acceptance Criteria:**
-- [ ] Component created at `frontend/app/components/WorkflowRunDetail.tsx`
-- [ ] Shows workflow name and overall status
-- [ ] Lists each task with name, status, start/end times
-- [ ] Current/running task is highlighted
-- [ ] Progress indicator shows step number
+- [x] Component created at `frontend/app/components/WorkflowRunDetail.tsx`
+- [x] Shows workflow name and overall status
+- [x] Lists each task with name, status, start/end times
+- [x] Current/running task is highlighted
+- [x] Progress indicator shows step number
 
 ---
 
@@ -279,8 +279,8 @@ Update the home page or add navigation to access the workflows page.
 - Add a link to `/workflows` from the home page
 
 **Acceptance Criteria:**
-- [ ] User can navigate to workflows page from home page
-- [ ] Navigation is intuitive
+- [x] User can navigate to workflows page from home page
+- [x] Navigation is intuitive
 
 ---
 
