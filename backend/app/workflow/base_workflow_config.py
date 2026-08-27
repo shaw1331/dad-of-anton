@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from app.workflow.workflow_task import BaseWorkflowTask
+from app.workflow.base_workflow_task import BaseWorkflowTask
 
 
 @dataclass

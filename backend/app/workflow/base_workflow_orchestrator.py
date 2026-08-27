@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 from fastapi import BackgroundTasks
 
-from app.workflow.workflow_config import BaseWorkflowConfig
+from app.workflow.base_workflow_config import BaseWorkflowConfig
 
 
 class BaseWorkflowOrchestrator(ABC):

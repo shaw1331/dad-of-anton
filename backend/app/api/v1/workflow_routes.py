@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 
-from app.workflow.workflow_orchestrator import WorkflowOrchestrator
-from app.workflow.workflow_registry import WORKFLOWS
+from app.workflow.workflow_orchestrator_v1.workflow_orchestrator import WorkflowOrchestrator
+from app.workflow.workflow_orchestrator_v1.workflow_registry import WORKFLOWS
 
 router = APIRouter(prefix="/workflows", tags=["workflows"])
 
