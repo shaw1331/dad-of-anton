@@ -4,6 +4,7 @@ import logging
 
 from fastapi import BackgroundTasks
 
+from app.workflow.base_workflow_context import BaseWorkflowContext
 from app.workflow.base_workflow_orchestrator import BaseWorkflowOrchestrator
 from app.workflow.models import WorkflowRun, WorkflowTaskRun
 from app.workflow.repositories import WorkflowRunRepository, WorkflowTaskRunRepository
@@ -57,6 +58,7 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
 
         run = self.run_repo.get(run_id)
         config = self.resolve_config(run.workflow_name)
+        ctx = BaseWorkflowContext(input=getattr(run, "input", None) or {})
 
         try:
             for index, task_cls in enumerate(config.tasks):
@@ -67,7 +69,7 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
 
                 try:
                     task_instance = task_cls()
-                    await task_instance.run()
+                    await task_instance.run(ctx)
 
                     self.task_run_repo.update_status(task_run.id, "completed")
                 except Exception as e:
