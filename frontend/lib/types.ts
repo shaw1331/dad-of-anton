@@ -1,7 +1,17 @@
+export interface InputField {
+  name: string;
+  type: "str" | "int" | "float" | "bool" | "text";
+  label: string;
+  description: string;
+  required: boolean;
+  default: any | null;
+}
+
 export interface WorkflowConfig {
   name: string;
   description: string;
   task_count: number;
+  input_fields: InputField[];
 }
 
 export interface WorkflowRun {
@@ -24,4 +34,5 @@ export interface TaskRun {
 
 export interface RunDetail extends WorkflowRun {
   task_runs: TaskRun[];
+  input: Record<string, any> | null;
 }

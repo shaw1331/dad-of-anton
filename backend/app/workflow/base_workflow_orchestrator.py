@@ -13,7 +13,9 @@ class BaseWorkflowOrchestrator(ABC):
         ...
 
     @abstractmethod
-    def trigger_workflow(self, workflow_name: str, background_tasks: BackgroundTasks) -> str:
+    def trigger_workflow(
+        self, workflow_name: str, background_tasks: BackgroundTasks, input_data: dict | None = None
+    ) -> str:
         ...
 
     @abstractmethod

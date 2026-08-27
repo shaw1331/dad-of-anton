@@ -53,6 +53,8 @@ function ProgressBar({
 }
 
 export function WorkflowRunDetail({ run }: { run: RunDetail }) {
+  const hasInput = run.input && Object.keys(run.input).length > 0;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -82,6 +84,20 @@ export function WorkflowRunDetail({ run }: { run: RunDetail }) {
           </p>
         </div>
       </div>
+
+      {hasInput && (
+        <div className="card">
+          <h3 className="mb-3 text-sm font-medium text-slate-500">Input</h3>
+          <dl className="space-y-1">
+            {Object.entries(run.input!).map(([key, value]) => (
+              <div key={key} className="flex gap-2 text-sm">
+                <dt className="font-medium text-slate-700">{key}:</dt>
+                <dd className="text-slate-500">{String(value)}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
 
       <div>
         <h2 className="mb-4 text-lg font-semibold text-slate-900">Tasks</h2>

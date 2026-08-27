@@ -17,10 +17,10 @@ Add an `InputField` dataclass to define workflow input fields, and add an `input
 - Import `Any` from `typing`
 
 **Acceptance Criteria:**
-- [ ] `InputField` dataclass created with correct fields and defaults
-- [ ] `BaseWorkflowConfig` has `input_fields` field defaulting to `[]`
-- [ ] Existing workflow registrations (sample) still work without changes
-- [ ] No import errors
+- [x] `InputField` dataclass created with correct fields and defaults
+- [x] `BaseWorkflowConfig` has `input_fields` field defaulting to `[]`
+- [x] Existing workflow registrations (sample) still work without changes
+- [x] No import errors
 
 ---
 
@@ -39,11 +39,11 @@ Create a `BaseWorkflowContext` class that holds input data and provides a mechan
 - `_outputs: dict[str, Any]` — internal storage for task outputs
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/workflow/base_workflow_context.py`
-- [ ] `BaseWorkflowContext` can be instantiated with an input dict
-- [ ] `get_input()` returns values from the input dict
-- [ ] `set_output()` / `get_output()` work correctly
-- [ ] No circular imports
+- [x] File created at `backend/app/workflow/base_workflow_context.py`
+- [x] `BaseWorkflowContext` can be instantiated with an input dict
+- [x] `get_input()` returns values from the input dict
+- [x] `set_output()` / `get_output()` work correctly
+- [x] No circular imports
 
 ---
 
@@ -59,9 +59,9 @@ Update the abstract `run()` method to accept a `BaseWorkflowContext` parameter.
 - Change `async def run(self) -> None` to `async def run(self, ctx: BaseWorkflowContext) -> None`
 
 **Acceptance Criteria:**
-- [ ] `run()` method accepts `ctx: BaseWorkflowContext` parameter
-- [ ] Class is still abstract
-- [ ] No circular import issues
+- [x] `run()` method accepts `ctx: BaseWorkflowContext` parameter
+- [x] Class is still abstract
+- [x] No circular import issues
 
 ---
 
@@ -77,10 +77,10 @@ Add a `input` JSONB column to the `workflow_runs` table to store workflow input 
 - Add a comment to the column for documentation
 
 **Acceptance Criteria:**
-- [ ] Migration file created
-- [ ] `workflow_runs` table has `input` column of type `jsonb`
-- [ ] Column is nullable (existing rows have NULL)
-- [ ] Migration is idempotent or can be run safely
+- [x] Migration file created
+- [x] `workflow_runs` table has `input` column of type `jsonb`
+- [x] Column is nullable (existing rows have NULL)
+- [x] Migration is idempotent or can be run safely
 
 ---
 
@@ -95,10 +95,10 @@ Add `input` field to the `WorkflowRun` Pydantic model.
 - Add `input: dict | None = None` field to `WorkflowRun`
 
 **Acceptance Criteria:**
-- [ ] `WorkflowRun` model has `input` field
-- [ ] Field defaults to `None`
-- [ ] `model_dump()` includes `input` (handles None correctly)
-- [ ] `model_validate()` can parse existing DB rows (no `input` column → None)
+- [x] `WorkflowRun` model has `input` field
+- [x] Field defaults to `None`
+- [x] `model_dump()` includes `input` (handles None correctly)
+- [x] `model_validate()` can parse existing DB rows (no `input` column → None)
 
 ---
 
@@ -113,9 +113,9 @@ Update the `trigger_workflow` abstract method to accept optional input data.
 - Change signature: `trigger_workflow(self, workflow_name: str, background_tasks: BackgroundTasks, input_data: dict | None = None) -> str`
 
 **Acceptance Criteria:**
-- [ ] `trigger_workflow` signature updated with `input_data` parameter
-- [ ] Default value is `None`
-- [ ] No other changes to the ABC
+- [x] `trigger_workflow` signature updated with `input_data` parameter
+- [x] Default value is `None`
+- [x] No other changes to the ABC
 
 ---
 
@@ -141,11 +141,11 @@ Add a `validate_input` method that validates user-provided input against the wor
 - Return the validated/coerced dict
 
 **Acceptance Criteria:**
-- [ ] `validate_input` method exists on `WorkflowOrchestrator`
-- [ ] Raises `ValueError` with clear message for missing required fields
-- [ ] Coerces types correctly (str→int, str→float, etc.)
-- [ ] Uses default values when field is missing and has a default
-- [ ] Returns only validated fields (extra fields are ignored)
+- [x] `validate_input` method exists on `WorkflowOrchestrator`
+- [x] Raises `ValueError` with clear message for missing required fields
+- [x] Coerces types correctly (str→int, str→float, etc.)
+- [x] Uses default values when field is missing and has a default
+- [x] Returns only validated fields (extra fields are ignored)
 
 ---
 
@@ -163,11 +163,11 @@ Update `trigger_workflow` to accept, validate, and persist input data.
 - Pass validated input to `run_workflow` via DB (already done — `run_workflow` reads from DB)
 
 **Acceptance Criteria:**
-- [ ] `trigger_workflow` accepts `input_data` parameter
-- [ ] Input is validated before creating DB records
-- [ ] Invalid input raises an error with a clear message
-- [ ] Validated input is stored in the `WorkflowRun` record
-- [ ] Existing calls without `input_data` still work (defaults to `{}`)
+- [x] `trigger_workflow` accepts `input_data` parameter
+- [x] Input is validated before creating DB records
+- [x] Invalid input raises an error with a clear message
+- [x] Validated input is stored in the `WorkflowRun` record
+- [x] Existing calls without `input_data` still work (defaults to `{}`)
 
 ---
 
@@ -185,10 +185,10 @@ Update `run_workflow` to create a `BaseWorkflowContext` and pass it to each task
 - Pass `ctx` to each task in the loop
 
 **Acceptance Criteria:**
-- [ ] `BaseWorkflowContext` is created with the run's input data
-- [ ] Each task receives `ctx` as a parameter to `run()`
-- [ ] Tasks can access input via `ctx.get_input("field_name")`
-- [ ] Existing behavior preserved (tasks that don't use ctx still work)
+- [x] `BaseWorkflowContext` is created with the run's input data
+- [x] Each task receives `ctx` as a parameter to `run()`
+- [x] Tasks can access input via `ctx.get_input("field_name")`
+- [x] Existing behavior preserved (tasks that don't use ctx still work)
 
 ---
 
@@ -206,10 +206,10 @@ Update the `POST /{name}/trigger` endpoint to accept a JSON body with input data
 - Catch `ValueError` from validation and return 422 with error detail
 
 **Acceptance Criteria:**
-- [ ] Endpoint accepts POST body with `input` field
-- [ ] Missing body defaults to empty input (`{}`)
-- [ ] Validation errors return 422 with clear message
-- [ ] Existing trigger calls without body still work
+- [x] Endpoint accepts POST body with `input` field
+- [x] Missing body defaults to empty input (`{}`)
+- [x] Validation errors return 422 with clear message
+- [x] Existing trigger calls without body still work
 
 ---
 
@@ -225,9 +225,9 @@ Update `GET /workflows` to include `input_fields` in the response for each workf
 - Each field: `{"name": f.name, "type": f.type, "label": f.label, "description": f.description, "required": f.required, "default": f.default}`
 
 **Acceptance Criteria:**
-- [ ] Response includes `input_fields` array for each workflow
-- [ ] Fields are serialized correctly (no dataclass objects in JSON)
-- [ ] Workflows with no input_fields return empty array
+- [x] Response includes `input_fields` array for each workflow
+- [x] Fields are serialized correctly (no dataclass objects in JSON)
+- [x] Workflows with no input_fields return empty array
 
 ---
 
@@ -244,10 +244,10 @@ Add `InputField` interface and update existing types to include input-related fi
 - Update `RunDetail` to include `input: Record<string, any> | null`
 
 **Acceptance Criteria:**
-- [ ] `InputField` interface exists
-- [ ] `WorkflowConfig` includes `input_fields`
-- [ ] `RunDetail` includes `input`
-- [ ] No TypeScript compilation errors
+- [x] `InputField` interface exists
+- [x] `WorkflowConfig` includes `input_fields`
+- [x] `RunDetail` includes `input`
+- [x] No TypeScript compilation errors
 
 ---
 
@@ -264,9 +264,9 @@ Update `triggerWorkflow()` to accept and send input data.
 - Set `Content-Type: application/json` header
 
 **Acceptance Criteria:**
-- [ ] `triggerWorkflow` accepts optional `input` parameter
-- [ ] Input is sent as JSON body
-- [ ] Calls without input still work
+- [x] `triggerWorkflow` accepts optional `input` parameter
+- [x] Input is sent as JSON body
+- [x] Calls without input still work
 
 ---
 
@@ -297,13 +297,13 @@ When a workflow has `input_fields`, show a modal form before triggering. Workflo
   - "Cancel": close modal, reset form
 
 **Acceptance Criteria:**
-- [ ] Workflows with no inputs trigger immediately (no regression)
-- [ ] Workflows with inputs open a modal on "Trigger" click
-- [ ] Modal renders correct input types based on `input_fields`
-- [ ] Required fields are marked and validated
-- [ ] Default values are pre-filled
-- [ ] Form submission triggers the workflow with input data
-- [ ] Modal can be cancelled/closed
+- [x] Workflows with no inputs trigger immediately (no regression)
+- [x] Workflows with inputs open a modal on "Trigger" click
+- [x] Modal renders correct input types based on `input_fields`
+- [x] Required fields are marked and validated
+- [x] Default values are pre-filled
+- [x] Form submission triggers the workflow with input data
+- [x] Modal can be cancelled/closed
 
 ---
 
@@ -321,10 +321,10 @@ Display the workflow's input values in the run detail view.
 - Style consistently with existing components
 
 **Acceptance Criteria:**
-- [ ] Input section appears in run detail when input exists
-- [ ] Input is displayed as key-value pairs
-- [ ] Section is hidden when no input is present
-- [ ] Styled consistently with the rest of the detail view
+- [x] Input section appears in run detail when input exists
+- [x] Input is displayed as key-value pairs
+- [x] Section is hidden when no input is present
+- [x] Styled consistently with the rest of the detail view
 
 ---
 
@@ -341,11 +341,11 @@ Update the sample workflow to demonstrate input usage.
 - Import `BaseWorkflowContext` and `InputField`
 
 **Acceptance Criteria:**
-- [ ] Sample workflow has `input_fields` defined
-- [ ] `PrintMessageTask.run()` accepts `ctx` parameter
-- [ ] Task uses input from context when available
-- [ ] Workflow still works when triggered without input (uses default)
-- [ ] Workflow works when triggered with custom input
+- [x] Sample workflow has `input_fields` defined
+- [x] `PrintMessageTask.run()` accepts `ctx` parameter
+- [x] Task uses input from context when available
+- [x] Workflow still works when triggered without input (uses default)
+- [x] Workflow works when triggered with custom input
 
 ---
 

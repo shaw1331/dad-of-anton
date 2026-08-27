@@ -6,9 +6,14 @@ export async function getWorkflows(): Promise<WorkflowConfig[]> {
 }
 
 export async function triggerWorkflow(
-  workflowName: string
+  workflowName: string,
+  input?: Record<string, any>
 ): Promise<{ run_id: string }> {
-  return request(`/workflows/${workflowName}/trigger`, { method: "POST" });
+  return request(`/workflows/${workflowName}/trigger`, {
+    method: "POST",
+    body: JSON.stringify({ input: input ?? {} }),
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 export async function getWorkflowRuns(): Promise<WorkflowRun[]> {
