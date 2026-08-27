@@ -18,6 +18,20 @@ def resolve_task_name(task_cls: type) -> str:
     return task_cls.name if hasattr(task_cls, "name") else task_cls.__name__
 
 
+def _coerce_type(value: object, field_type: str) -> object:
+    if field_type == "str":
+        return str(value)
+    elif field_type == "int":
+        return int(value)
+    elif field_type == "float":
+        return float(value)
+    elif field_type == "bool":
+        return str(value).lower() in ("true", "1", "yes")
+    elif field_type == "text":
+        return str(value)
+    return value
+
+
 class WorkflowOrchestrator(BaseWorkflowOrchestrator):
     def __init__(self) -> None:
         self.run_repo = WorkflowRunRepository()
@@ -29,14 +43,29 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
             raise ValueError(f"Unknown workflow: {workflow_name}")
         return config
 
-    def trigger_workflow(self, workflow_name: str, background_tasks: BackgroundTasks) -> str:
+    def validate_input(self, config: BaseWorkflowConfig, input_data: dict) -> dict:
+        validated: dict = {}
+        for field in config.input_fields:
+            if field.name in input_data:
+                validated[field.name] = _coerce_type(input_data[field.name], field.type)
+            elif field.required and field.default is None:
+                raise ValueError(f"Missing required field: {field.name}")
+            elif field.default is not None:
+                validated[field.name] = field.default
+        return validated
+
+    def trigger_workflow(
+        self, workflow_name: str, background_tasks: BackgroundTasks, input_data: dict | None = None
+    ) -> str:
         config = self.resolve_config(workflow_name)
+        validated_input = self.validate_input(config, input_data or {})
 
         run = WorkflowRun(
             workflow_name=workflow_name,
             status="pending",
             current_task_index=0,
             total_tasks=len(config.tasks),
+            input=validated_input,
         )
         self.run_repo.create(run)
 
@@ -58,7 +87,7 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
 
         run = self.run_repo.get(run_id)
         config = self.resolve_config(run.workflow_name)
-        ctx = BaseWorkflowContext(input=getattr(run, "input", None) or {})
+        ctx = BaseWorkflowContext(input=run.input or {})
 
         try:
             for index, task_cls in enumerate(config.tasks):

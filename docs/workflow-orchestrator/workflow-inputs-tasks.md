@@ -95,10 +95,10 @@ Add `input` field to the `WorkflowRun` Pydantic model.
 - Add `input: dict | None = None` field to `WorkflowRun`
 
 **Acceptance Criteria:**
-- [ ] `WorkflowRun` model has `input` field
-- [ ] Field defaults to `None`
-- [ ] `model_dump()` includes `input` (handles None correctly)
-- [ ] `model_validate()` can parse existing DB rows (no `input` column → None)
+- [x] `WorkflowRun` model has `input` field
+- [x] Field defaults to `None`
+- [x] `model_dump()` includes `input` (handles None correctly)
+- [x] `model_validate()` can parse existing DB rows (no `input` column → None)
 
 ---
 
@@ -113,9 +113,9 @@ Update the `trigger_workflow` abstract method to accept optional input data.
 - Change signature: `trigger_workflow(self, workflow_name: str, background_tasks: BackgroundTasks, input_data: dict | None = None) -> str`
 
 **Acceptance Criteria:**
-- [ ] `trigger_workflow` signature updated with `input_data` parameter
-- [ ] Default value is `None`
-- [ ] No other changes to the ABC
+- [x] `trigger_workflow` signature updated with `input_data` parameter
+- [x] Default value is `None`
+- [x] No other changes to the ABC
 
 ---
 
@@ -141,11 +141,11 @@ Add a `validate_input` method that validates user-provided input against the wor
 - Return the validated/coerced dict
 
 **Acceptance Criteria:**
-- [ ] `validate_input` method exists on `WorkflowOrchestrator`
-- [ ] Raises `ValueError` with clear message for missing required fields
-- [ ] Coerces types correctly (str→int, str→float, etc.)
-- [ ] Uses default values when field is missing and has a default
-- [ ] Returns only validated fields (extra fields are ignored)
+- [x] `validate_input` method exists on `WorkflowOrchestrator`
+- [x] Raises `ValueError` with clear message for missing required fields
+- [x] Coerces types correctly (str→int, str→float, etc.)
+- [x] Uses default values when field is missing and has a default
+- [x] Returns only validated fields (extra fields are ignored)
 
 ---
 
@@ -163,11 +163,11 @@ Update `trigger_workflow` to accept, validate, and persist input data.
 - Pass validated input to `run_workflow` via DB (already done — `run_workflow` reads from DB)
 
 **Acceptance Criteria:**
-- [ ] `trigger_workflow` accepts `input_data` parameter
-- [ ] Input is validated before creating DB records
-- [ ] Invalid input raises an error with a clear message
-- [ ] Validated input is stored in the `WorkflowRun` record
-- [ ] Existing calls without `input_data` still work (defaults to `{}`)
+- [x] `trigger_workflow` accepts `input_data` parameter
+- [x] Input is validated before creating DB records
+- [x] Invalid input raises an error with a clear message
+- [x] Validated input is stored in the `WorkflowRun` record
+- [x] Existing calls without `input_data` still work (defaults to `{}`)
 
 ---
 
@@ -185,10 +185,10 @@ Update `run_workflow` to create a `BaseWorkflowContext` and pass it to each task
 - Pass `ctx` to each task in the loop
 
 **Acceptance Criteria:**
-- [ ] `BaseWorkflowContext` is created with the run's input data
-- [ ] Each task receives `ctx` as a parameter to `run()`
-- [ ] Tasks can access input via `ctx.get_input("field_name")`
-- [ ] Existing behavior preserved (tasks that don't use ctx still work)
+- [x] `BaseWorkflowContext` is created with the run's input data
+- [x] Each task receives `ctx` as a parameter to `run()`
+- [x] Tasks can access input via `ctx.get_input("field_name")`
+- [x] Existing behavior preserved (tasks that don't use ctx still work)
 
 ---
 

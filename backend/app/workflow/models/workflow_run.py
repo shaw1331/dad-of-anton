@@ -9,3 +9,4 @@ class WorkflowRun(BaseModel):
     current_task_index: int
     total_tasks: int
     error: str | None = None
+    input: dict | None = None
