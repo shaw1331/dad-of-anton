@@ -9,5 +9,5 @@ from pydantic import BaseModel as PydanticBaseModel, Field
 
 class BaseModel(PydanticBaseModel):
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)

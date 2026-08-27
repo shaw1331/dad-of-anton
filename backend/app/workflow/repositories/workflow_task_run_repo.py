@@ -8,7 +8,7 @@ from app.workflow.models.workflow_task_run import WorkflowTaskRun
 
 class WorkflowTaskRunRepository:
     def create(self, task_run: WorkflowTaskRun) -> None:
-        supabase.table("workflow_task_runs").insert(task_run.model_dump()).execute()
+        supabase.table("workflow_task_runs").insert(task_run.model_dump(mode="json")).execute()
 
     def get(self, workflow_run_id: str, task_index: int) -> WorkflowTaskRun:
         result = supabase.table("workflow_task_runs") \

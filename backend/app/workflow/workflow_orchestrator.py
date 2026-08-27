@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import logging
 
 from fastapi import BackgroundTasks
@@ -53,7 +52,7 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
 
         return run.id
 
-    def run_workflow(self, run_id: str) -> None:
+    async def run_workflow(self, run_id: str) -> None:
         self.run_repo.update_status(run_id, "running")
 
         run = self.run_repo.get(run_id)
@@ -68,7 +67,7 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
 
                 try:
                     task_instance = task_cls()
-                    asyncio.run(task_instance.run())
+                    await task_instance.run()
 
                     self.task_run_repo.update_status(task_run.id, "completed")
                 except Exception as e:
