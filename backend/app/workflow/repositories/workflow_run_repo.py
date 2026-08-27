@@ -8,7 +8,7 @@ from app.workflow.models.workflow_run import WorkflowRun
 
 class WorkflowRunRepository:
     def create(self, run: WorkflowRun) -> None:
-        supabase.table("workflow_runs").insert(run.model_dump()).execute()
+        supabase.table("workflow_runs").insert(run.model_dump(mode="json")).execute()
 
     def get(self, run_id: str) -> WorkflowRun:
         result = supabase.table("workflow_runs").select("*").eq("id", run_id).single().execute()

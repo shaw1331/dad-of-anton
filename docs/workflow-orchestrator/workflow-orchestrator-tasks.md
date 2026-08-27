@@ -158,7 +158,7 @@ Update `backend/app/api/v1/__init__.py` to include the new workflow router.
 **Acceptance Criteria:**
 - [x] Workflow endpoints are accessible at `/api/v1/workflows/...`
 - [x] Existing `/health` endpoint still works
-- [ ] No import errors
+- [x] No import errors
 
 ---
 
@@ -173,10 +173,10 @@ Create a sample workflow with 2-3 dummy tasks to verify the end-to-end flow.
 - Register the workflow in `WORKFLOWS`
 
 **Acceptance Criteria:**
-- [ ] Sample workflow file created
-- [ ] Tasks inherit from `BaseWorkflowTask`
-- [ ] Workflow is registered in `WORKFLOWS`
-- [ ] Can trigger via API and see tasks execute in sequence
+- [x] Sample workflow file created
+- [x] Tasks inherit from `BaseWorkflowTask`
+- [x] Workflow is registered in `WORKFLOWS`
+- [x] Can trigger via API and see tasks execute in sequence
 
 ---
 
