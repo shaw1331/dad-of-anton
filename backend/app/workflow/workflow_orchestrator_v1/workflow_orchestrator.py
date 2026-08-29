@@ -96,13 +96,17 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
                 task_run = self.task_run_repo.get(run_id, index)
                 self.task_run_repo.update_running(task_run.id)
 
+                task_name = resolve_task_name(task_cls)
                 try:
                     task_instance = task_cls()
                     task_instance.run(ctx)
 
+                    task_output = ctx.get_output(task_name)
+                    if task_output is not None:
+                        self.task_run_repo.update_output(task_run.id, task_output)
+
                     self.task_run_repo.update_status(task_run.id, "completed")
                 except Exception as e:
-                    task_name = resolve_task_name(task_cls)
                     logger.error("Task %s failed: %s", task_name, e)
                     self.task_run_repo.update_status(task_run.id, "failed", str(e))
                     self.run_repo.update_status(
@@ -113,6 +117,11 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
                     return
 
             self.run_repo.update_status(run_id, "completed")
+
+            final_task_name = resolve_task_name(config.tasks[-1])
+            final_output = ctx.get_output(final_task_name)
+            if final_output is not None:
+                self.run_repo.update_output(run_id, final_output)
         except Exception as e:
             logger.error("Workflow %s failed unexpectedly: %s", run_id, e)
             self.run_repo.update_status(run_id, "failed", f"Unexpected error: {e}")

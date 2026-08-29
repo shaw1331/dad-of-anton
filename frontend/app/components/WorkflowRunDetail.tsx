@@ -1,6 +1,7 @@
 "use client";
 
-import type { RunDetail } from "@/lib/types";
+import { useState } from "react";
+import type { RunDetail, TaskRun } from "@/lib/types";
 
 function StatusBadge({ status }: { status: string }) {
   const classes =
@@ -52,7 +53,44 @@ function ProgressBar({
   );
 }
 
+function OutputModal({
+  task,
+  onClose,
+}: {
+  task: TaskRun;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="mx-4 flex max-h-[80vh] w-full max-w-2xl flex-col rounded-xl bg-white p-6 shadow-xl">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-slate-900">
+            {task.task_name} — Output
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <pre className="flex-1 overflow-auto rounded-lg bg-slate-100 p-4 text-sm text-slate-800">
+          {JSON.stringify(task.output, null, 2)}
+        </pre>
+        <div className="mt-4 flex justify-end">
+          <button onClick={onClose} className="btn-secondary">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function WorkflowRunDetail({ run }: { run: RunDetail }) {
+  const [outputModal, setOutputModal] = useState<TaskRun | null>(null);
   const hasInput = run.input && Object.keys(run.input).length > 0;
 
   return (
@@ -134,7 +172,17 @@ export function WorkflowRunDetail({ run }: { run: RunDetail }) {
                     {task.task_name}
                   </span>
                 </div>
-                <StatusBadge status={task.status} />
+                <div className="flex items-center gap-2">
+                  {task.output && (
+                    <button
+                      onClick={() => setOutputModal(task)}
+                      className="text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      Output
+                    </button>
+                  )}
+                  <StatusBadge status={task.status} />
+                </div>
               </div>
 
               <div className="mt-2 ml-10 space-y-1">
@@ -158,6 +206,10 @@ export function WorkflowRunDetail({ run }: { run: RunDetail }) {
           ))}
         </div>
       </div>
+
+      {outputModal && (
+        <OutputModal task={outputModal} onClose={() => setOutputModal(null)} />
+      )}
     </div>
   );
 }

@@ -2,15 +2,17 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from app.core.database import supabase
+from app.core.database import get_supabase_client
 from app.workflow.models.workflow_task_run import WorkflowTaskRun
 
 
 class WorkflowTaskRunRepository:
     def create(self, task_run: WorkflowTaskRun) -> None:
+        supabase = get_supabase_client()
         supabase.table("workflow_task_runs").insert(task_run.model_dump(mode="json")).execute()
 
     def get(self, workflow_run_id: str, task_index: int) -> WorkflowTaskRun:
+        supabase = get_supabase_client()
         result = supabase.table("workflow_task_runs") \
             .select("*") \
             .eq("workflow_run_id", workflow_run_id) \
@@ -20,6 +22,7 @@ class WorkflowTaskRunRepository:
         return WorkflowTaskRun.model_validate(result.data)
 
     def list_by_run(self, workflow_run_id: str) -> list[WorkflowTaskRun]:
+        supabase = get_supabase_client()
         result = supabase.table("workflow_task_runs") \
             .select("*") \
             .eq("workflow_run_id", workflow_run_id) \
@@ -28,6 +31,7 @@ class WorkflowTaskRunRepository:
         return [WorkflowTaskRun.model_validate(row) for row in result.data]
 
     def update_status(self, task_run_id: str, status: str, error: str | None = None) -> None:
+        supabase = get_supabase_client()
         data: dict = {
             "status": status,
             "completed_at": datetime.now(timezone.utc).isoformat(),
@@ -37,7 +41,15 @@ class WorkflowTaskRunRepository:
         supabase.table("workflow_task_runs").update(data).eq("id", task_run_id).execute()
 
     def update_running(self, task_run_id: str) -> None:
+        supabase = get_supabase_client()
         supabase.table("workflow_task_runs").update({
             "status": "running",
             "started_at": datetime.now(timezone.utc).isoformat(),
+        }).eq("id", task_run_id).execute()
+
+    def update_output(self, task_run_id: str, output: dict) -> None:
+        supabase = get_supabase_client()
+        supabase.table("workflow_task_runs").update({
+            "output": output,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
         }).eq("id", task_run_id).execute()

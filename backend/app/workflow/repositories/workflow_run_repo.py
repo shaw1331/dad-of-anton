@@ -2,19 +2,22 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from app.core.database import supabase
+from app.core.database import get_supabase_client
 from app.workflow.models.workflow_run import WorkflowRun
 
 
 class WorkflowRunRepository:
     def create(self, run: WorkflowRun) -> None:
+        supabase = get_supabase_client()
         supabase.table("workflow_runs").insert(run.model_dump(mode="json")).execute()
 
     def get(self, run_id: str) -> WorkflowRun:
+        supabase = get_supabase_client()
         result = supabase.table("workflow_runs").select("*").eq("id", run_id).single().execute()
         return WorkflowRun.model_validate(result.data)
 
     def update_status(self, run_id: str, status: str, error: str | None = None) -> None:
+        supabase = get_supabase_client()
         data: dict = {
             "status": status,
             "updated_at": datetime.now(timezone.utc).isoformat(),
@@ -24,11 +27,20 @@ class WorkflowRunRepository:
         supabase.table("workflow_runs").update(data).eq("id", run_id).execute()
 
     def list_all(self) -> list[WorkflowRun]:
+        supabase = get_supabase_client()
         result = supabase.table("workflow_runs").select("*").order("created_at", desc=True).execute()
         return [WorkflowRun.model_validate(row) for row in result.data]
 
     def update_progress(self, run_id: str, current_task_index: int) -> None:
+        supabase = get_supabase_client()
         supabase.table("workflow_runs").update({
             "current_task_index": current_task_index,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }).eq("id", run_id).execute()
+
+    def update_output(self, run_id: str, output: dict) -> None:
+        supabase = get_supabase_client()
+        supabase.table("workflow_runs").update({
+            "output": output,
             "updated_at": datetime.now(timezone.utc).isoformat(),
         }).eq("id", run_id).execute()

@@ -10,3 +10,4 @@ class WorkflowRun(BaseModel):
     total_tasks: int
     error: str | None = None
     input: dict | None = None
+    output: dict | None = None

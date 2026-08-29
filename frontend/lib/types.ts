@@ -27,6 +27,7 @@ export interface TaskRun {
   task_name: string;
   task_index: number;
   status: "pending" | "running" | "completed" | "failed";
+  output: Record<string, any> | null;
   started_at: string | null;
   completed_at: string | null;
   error: string | null;
@@ -35,4 +36,5 @@ export interface TaskRun {
 export interface RunDetail extends WorkflowRun {
   task_runs: TaskRun[];
   input: Record<string, any> | null;
+  output: Record<string, any> | null;
 }
