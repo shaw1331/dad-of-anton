@@ -286,10 +286,10 @@ Update `backend/app/stock_analyser/tasks/scrape_stocks.py` to use the ScraperFac
   6. Store results in `ctx.set_output()`
 
 **Acceptance Criteria:**
-- [ ] File updated at `backend/app/stock_analyser/tasks/scrape_stocks.py`
-- [ ] Uses `ScraperFactory` to get scrapers
-- [ ] Handles `ScraperResult.success` / error cases
-- [ ] Stores stocks in context for next task
+- [x] File updated at `backend/app/stock_analyser/tasks/scrape_stocks.py`
+- [x] Uses `ScraperFactory` to get scrapers
+- [x] Handles `ScraperResult.success` / error cases
+- [x] Stores stocks in context for next task
 
 ---
 
@@ -304,10 +304,10 @@ Update `backend/app/stock_analyser/workflow.py` to fix workflow registration.
 - Register in `WORKFLOWS["stock_analyser"]`
 
 **Acceptance Criteria:**
-- [ ] File updated at `backend/app/stock_analyser/workflow.py`
-- [ ] Workflow has proper `name`, `description`, `input_fields`
-- [ ] Tasks list includes `ScrapeStocksTask`
-- [ ] Registered in `WORKFLOWS`
+- [x] File updated at `backend/app/stock_analyser/workflow.py`
+- [x] Workflow has proper `name`, `description`, `input_fields`
+- [x] Tasks list includes `ScrapeStocksTask`
+- [x] Registered in `WORKFLOWS`
 
 ---
 
@@ -320,9 +320,9 @@ Update `backend/app/workflow/workflow_orchestrator_v1/__init__.py` to import sto
 - Add import: `import app.stock_analyser.workflow  # noqa: F401`
 
 **Acceptance Criteria:**
-- [ ] File updated at `backend/app/workflow/workflow_orchestrator_v1/__init__.py`
-- [ ] Stock analyser workflow is registered on app startup
-- [ ] Workflow appears in `GET /workflows` endpoint
+- [x] File updated at `backend/app/workflow/workflow_orchestrator_v1/__init__.py`
+- [x] Stock analyser workflow is registered on app startup
+- [x] Workflow appears in `GET /workflows` endpoint
 
 ---
 
