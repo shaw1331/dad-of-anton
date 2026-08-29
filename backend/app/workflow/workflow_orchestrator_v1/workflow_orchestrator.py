@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 
 from fastapi import BackgroundTasks
@@ -82,49 +83,50 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
 
         return run.id
 
-    def run_workflow(self, run_id: str) -> None:
-        self.run_repo.update_status(run_id, "running")
+    async def run_workflow(self, run_id: str) -> None:
+        await asyncio.to_thread(self.run_repo.update_status, run_id, "running")
 
-        run = self.run_repo.get(run_id)
+        run = await asyncio.to_thread(self.run_repo.get, run_id)
         config = self.resolve_config(run.workflow_name)
         ctx = BaseWorkflowContext(input=run.input or {})
 
         try:
             for index, task_cls in enumerate(config.tasks):
-                self.run_repo.update_progress(run_id, index)
+                await asyncio.to_thread(self.run_repo.update_progress, run_id, index)
 
-                task_run = self.task_run_repo.get(run_id, index)
-                self.task_run_repo.update_running(task_run.id)
+                task_run = await asyncio.to_thread(self.task_run_repo.get, run_id, index)
+                await asyncio.to_thread(self.task_run_repo.update_running, task_run.id)
 
                 task_name = resolve_task_name(task_cls)
                 try:
                     task_instance = task_cls()
-                    task_instance.run(ctx)
+                    await asyncio.to_thread(task_instance.run, ctx)
 
                     task_output = ctx.get_output(task_name)
                     if task_output is not None:
-                        self.task_run_repo.update_output(task_run.id, task_output)
+                        await asyncio.to_thread(self.task_run_repo.update_output, task_run.id, task_output)
 
-                    self.task_run_repo.update_status(task_run.id, "completed")
+                    await asyncio.to_thread(self.task_run_repo.update_status, task_run.id, "completed")
                 except Exception as e:
                     logger.error("Task %s failed: %s", task_name, e)
-                    self.task_run_repo.update_status(task_run.id, "failed", str(e))
-                    self.run_repo.update_status(
+                    await asyncio.to_thread(self.task_run_repo.update_status, task_run.id, "failed", str(e))
+                    await asyncio.to_thread(
+                        self.run_repo.update_status,
                         run_id,
                         "failed",
                         f"Task '{task_name}' failed: {e}",
                     )
                     return
 
-            self.run_repo.update_status(run_id, "completed")
+            await asyncio.to_thread(self.run_repo.update_status, run_id, "completed")
 
             final_task_name = resolve_task_name(config.tasks[-1])
             final_output = ctx.get_output(final_task_name)
             if final_output is not None:
-                self.run_repo.update_output(run_id, final_output)
+                await asyncio.to_thread(self.run_repo.update_output, run_id, final_output)
         except Exception as e:
             logger.error("Workflow %s failed unexpectedly: %s", run_id, e)
-            self.run_repo.update_status(run_id, "failed", f"Unexpected error: {e}")
+            await asyncio.to_thread(self.run_repo.update_status, run_id, "failed", f"Unexpected error: {e}")
 
 
 orchestrator = WorkflowOrchestrator()
