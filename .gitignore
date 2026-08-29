@@ -6,3 +6,5 @@ frontend/.next/
 frontend/next-env.d.ts
 *.pyc
 .env.local
+analysis-out/
+.claude/skills/stock-analyst/.venv/
