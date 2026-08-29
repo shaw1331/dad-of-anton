@@ -26,10 +26,10 @@ export default function HealthCheck() {
           }`}
         />
         <div>
-          <p className="text-sm font-medium text-slate-900">Backend Status</p>
-          <p className="text-xs text-slate-500">
+          <p className="text-sm font-medium text-slate-900 dark:text-dark-text">Backend Status</p>
+          <p className="text-xs text-slate-500 dark:text-dark-muted">
             {error ? (
-              <span className="text-red-600">{error}</span>
+              <span className="text-red-600 dark:text-red-400">{error}</span>
             ) : status === "checking" ? (
               "Connecting..."
             ) : (
