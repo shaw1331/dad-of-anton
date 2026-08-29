@@ -17,9 +17,9 @@ Create `backend/app/ai/exceptions.py` with custom exception classes for the AI m
 - `ConfigError(AnalysisError)` — Raised when there is a configuration error
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/ai/exceptions.py`
-- [ ] All exceptions inherit from `AnalysisError`
-- [ ] Exceptions have descriptive error messages
+- [x] File created at `backend/app/ai/exceptions.py`
+- [x] All exceptions inherit from `AnalysisError`
+- [x] Exceptions have descriptive error messages
 
 ---
 
@@ -33,10 +33,10 @@ Create `backend/app/ai/models.py` with generic return types and configuration mo
 - `AgentConfig` — LLM provider configuration (provider, model, temperature, timeout)
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/ai/models.py`
-- [ ] `AgentResult[T]` is Generic and type-safe
-- [ ] All DTOs use Pydantic BaseModel
-- [ ] All DTOs have proper type hints
+- [x] File created at `backend/app/ai/models.py`
+- [x] `AgentResult[T]` is Generic and type-safe
+- [x] All DTOs use Pydantic BaseModel
+- [x] All DTOs have proper type hints
 
 ---
 
@@ -65,10 +65,10 @@ class AgentGraph(ABC):
 ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/ai/interfaces.py`
-- [ ] `AgentGraph` is abstract (cannot be instantiated)
-- [ ] All methods have proper type hints
-- [ ] Methods raise `NotImplementedError` if not overridden
+- [x] File created at `backend/app/ai/interfaces.py`
+- [x] `AgentGraph` is abstract (cannot be instantiated)
+- [x] All methods have proper type hints
+- [x] Methods raise `NotImplementedError` if not overridden
 
 ---
 
@@ -115,11 +115,11 @@ class AgentFactory:
 ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/ai/factory.py`
-- [ ] Factory has class methods for registration and retrieval
-- [ ] Uses `init_chat_model` for provider-agnostic LLM creation
-- [ ] Reads `LLM_PROVIDER`, `LLM_MODEL`, `LLM_TEMPERATURE` from settings
-- [ ] Raises `ConfigError` if graph name not registered
+- [x] File created at `backend/app/ai/factory.py`
+- [x] Factory has class methods for registration and retrieval
+- [x] Uses `init_chat_model` for provider-agnostic LLM creation
+- [x] Reads `LLM_PROVIDER`, `LLM_MODEL`, `LLM_TEMPERATURE` from settings
+- [x] Raises `ConfigError` if graph name not registered
 
 ---
 
@@ -194,15 +194,15 @@ class StockAnalysisAgent(AgentGraph):
 ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/ai/graph.py`
-- [ ] `StockAnalysisAgent` accepts `BaseChatModel` via constructor (dependency injection)
-- [ ] Uses LangGraph's `StateGraph` to define the workflow graph
-- [ ] Graph compiles successfully
-- [ ] `analyze_node` calls LLM with system_prompt + analysis_prompt
-- [ ] Response parsing handles valid JSON
-- [ ] Response parsing handles invalid JSON gracefully (returns raw text)
-- [ ] `StockAnalysisAgent` implements `AgentGraph` interface
-- [ ] `StockAnalysisAgent.name` returns `"stock_analysis"`
+- [x] File created at `backend/app/ai/graph.py`
+- [x] `StockAnalysisAgent` accepts `BaseChatModel` via constructor (dependency injection)
+- [x] Uses LangGraph's `StateGraph` to define the workflow graph
+- [x] Graph compiles successfully
+- [x] `analyze_node` calls LLM with system_prompt + analysis_prompt
+- [x] Response parsing handles valid JSON
+- [x] Response parsing handles invalid JSON gracefully (returns raw text)
+- [x] `StockAnalysisAgent` implements `AgentGraph` interface
+- [x] `StockAnalysisAgent.name` returns `"stock_analysis"`
 
 ---
 
@@ -219,8 +219,8 @@ Create `backend/app/ai/__init__.py` with module exports.
 - Export `AgentGraph` interface
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/ai/__init__.py`
-- [ ] All public symbols are importable from `app.ai`
+- [x] File created at `backend/app/ai/__init__.py`
+- [x] All public symbols are importable from `app.ai`
 
 ---
 
