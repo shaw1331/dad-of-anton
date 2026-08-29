@@ -19,10 +19,10 @@ Create `backend/app/scraper/models.py` with the generic return types and DTOs fo
 - `TechnicalDataDTO` - Technical analysis data
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/scraper/models.py`
-- [ ] All DTOs use Pydantic BaseModel
-- [ ] `ScraperResult[T]` is Generic and type-safe
-- [ ] All DTOs have proper type hints
+- [x] File created at `backend/app/scraper/models.py`
+- [x] All DTOs use Pydantic BaseModel
+- [x] `ScraperResult[T]` is Generic and type-safe
+- [x] All DTOs have proper type hints
 
 ---
 
@@ -39,10 +39,10 @@ Create `backend/app/scraper/interfaces.py` with abstract base classes for scrape
   - `get_multiple(tickers: list[str]) -> ScraperResult[list[StockDTO]]`
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/scraper/interfaces.py`
-- [ ] Both classes are abstract (cannot be instantiated)
-- [ ] All methods have proper type hints
-- [ ] Methods raise `NotImplementedError` if not overridden
+- [x] File created at `backend/app/scraper/interfaces.py`
+- [x] Both classes are abstract (cannot be instantiated)
+- [x] All methods have proper type hints
+- [x] Methods raise `NotImplementedError` if not overridden
 
 ---
 
@@ -58,9 +58,9 @@ Create `backend/app/scraper/exceptions.py` with custom exception classes.
 - `ConfigError(ScraperError)` - Invalid configuration
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/scraper/exceptions.py`
-- [ ] All exceptions inherit from `ScraperError`
-- [ ] Exceptions have descriptive error messages
+- [x] File created at `backend/app/scraper/exceptions.py`
+- [x] All exceptions inherit from `ScraperError`
+- [x] Exceptions have descriptive error messages
 
 ---
 
@@ -75,9 +75,9 @@ Create `backend/app/scraper/config.py` with shared configuration.
 - `REQUEST_DELAY = 1.5` (seconds between requests)
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/scraper/config.py`
-- [ ] Configuration values are constants
-- [ ] Values match screener_scraper/config.py where appropriate
+- [x] File created at `backend/app/scraper/config.py`
+- [x] Configuration values are constants
+- [x] Values match screener_scraper/config.py where appropriate
 
 ---
 
@@ -106,10 +106,10 @@ class ScraperFactory:
 ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/scraper/factory.py`
-- [ ] Factory has class methods for registration and retrieval
-- [ ] Raises `ValueError` if source not registered
-- [ ] Default source is "screener"
+- [x] File created at `backend/app/scraper/factory.py`
+- [x] Factory has class methods for registration and retrieval
+- [x] Raises `ConfigError` if source not registered
+- [x] Default source is "screener"
 
 ---
 
@@ -124,8 +124,8 @@ Create `backend/app/scraper/__init__.py` with module exports.
 - Export all exceptions from `exceptions.py`
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/scraper/__init__.py`
-- [ ] All public symbols are importable from `app.scraper`
+- [x] File created at `backend/app/scraper/__init__.py`
+- [x] All public symbols are importable from `app.scraper`
 
 ---
 
@@ -143,9 +143,9 @@ Create `backend/app/scraper/screener_scraper/config.py` with Screener.in-specifi
 - `COMPANY_DATA_POINTS` - Data points to scrape (from screener_scraper/config.py)
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/scraper/screener_scraper/config.py`
-- [ ] Config matches existing `screener_scraper/config.py`
-- [ ] All required constants are defined
+- [x] File created at `backend/app/scraper/screener_scraper/config.py`
+- [x] Config matches existing `screener_scraper/config.py`
+- [x] All required constants are defined
 
 ---
 
@@ -161,10 +161,10 @@ Create `backend/app/scraper/screener_scraper/http.py` with HTTP session manageme
 - Exponential backoff on failures
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/scraper/screener_scraper/http.py`
-- [ ] Session reuses TCP connections
-- [ ] Handles rate limiting gracefully
-- [ ] Implements exponential backoff
+- [x] File created at `backend/app/scraper/screener_scraper/http.py`
+- [x] Session reuses TCP connections
+- [x] Handles rate limiting gracefully
+- [x] Implements exponential backoff
 
 ---
 
@@ -181,10 +181,10 @@ Create `backend/app/scraper/screener_scraper/mappers.py` with parsing logic extr
 - `map_company_page(soup: BeautifulSoup, ticker: str) -> StockDTO` - Map all data
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/scraper/screener_scraper/mappers.py`
-- [ ] Mappers handle missing data gracefully
-- [ ] Returns empty strings/dicts for missing values
-- [ ] All mappers have proper type hints
+- [x] File created at `backend/app/scraper/screener_scraper/mappers.py`
+- [x] Mappers handle missing data gracefully
+- [x] Returns empty strings/dicts for missing values
+- [x] All mappers have proper type hints
 
 ---
 
@@ -207,10 +207,10 @@ class ScreenerIndexScraper(IndexScraper):
 ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/scraper/screener_scraper/index_scraper.py`
-- [ ] Implements `IndexScraper` interface
-- [ ] Handles pagination (if multiple pages)
-- [ ] Returns `ScraperResult` with success/error status
+- [x] File created at `backend/app/scraper/screener_scraper/index_scraper.py`
+- [x] Implements `IndexScraper` interface
+- [x] Handles pagination (if multiple pages)
+- [x] Returns `ScraperResult` with success/error status
 
 ---
 
@@ -238,11 +238,11 @@ class ScreenerStockScraper(StockScraper):
 ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/scraper/screener_scraper/stock_scraper.py`
-- [ ] Implements `StockScraper` interface
-- [ ] `get_multiple` handles individual stock failures
-- [ ] Respects rate limiting between requests
-- [ ] Returns `ScraperResult` with success/error status
+- [x] File created at `backend/app/scraper/screener_scraper/stock_scraper.py`
+- [x] Implements `StockScraper` interface
+- [x] `get_multiple` handles individual stock failures
+- [x] Respects rate limiting between requests
+- [x] Returns `ScraperResult` with success/error status
 
 ---
 
@@ -262,9 +262,9 @@ Create `backend/app/scraper/screener_scraper/__init__.py` with auto-registration
   ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/scraper/screener_scraper/__init__.py`
-- [ ] Adapters are registered when module is imported
-- [ ] No duplicate registrations
+- [x] File created at `backend/app/scraper/screener_scraper/__init__.py`
+- [x] Adapters are registered when module is imported
+- [x] No duplicate registrations
 
 ---
 
@@ -342,9 +342,9 @@ lxml>=4.9.0
 ```
 
 **Acceptance Criteria:**
-- [ ] File updated at `backend/requirements.txt`
-- [ ] All dependencies are added with version constraints
-- [ ] Run `pip install -r requirements.txt` to install
+- [x] File updated at `backend/requirements.txt`
+- [x] All dependencies are added with version constraints
+- [x] Run `pip install -r requirements.txt` to install
 
 ---
 
