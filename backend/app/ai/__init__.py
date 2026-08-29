@@ -2,6 +2,7 @@ from app.ai.exceptions import AnalysisError, ConfigError, GraphError
 from app.ai.factory import AgentFactory
 from app.ai.interfaces import AgentGraph
 from app.ai.models import AgentConfig, AgentResult
+import app.ai.graph  # noqa: F401 — register StockAnalysisAgent with factory
 
 __all__ = [
     "AnalysisError",

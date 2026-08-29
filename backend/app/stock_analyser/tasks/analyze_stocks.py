@@ -26,32 +26,34 @@ class AnalyzeStocksTask:
         index = scrape_output["index"]
         strategy_name = ctx.get_input("strategy") or "value_investing"
 
+        logger.info("Starting analysis for %d stocks in %s using '%s' strategy",
+                     len(stocks), index, strategy_name)
+
         strategy = AnalysisFactory.get(strategy_name)
         graph = AgentFactory.get("stock_analysis")
 
         analyses = []
-        for stock in stocks:
-            try:
-                result = graph.run({
-                    "stock_data": stock,
-                    "system_prompt": strategy.get_system_prompt(),
-                    "analysis_prompt": strategy.get_analysis_prompt(stock),
-                })
+        for i, stock in enumerate(stocks, 1):
+            ticker = stock.get("ticker", "UNKNOWN")
+            logger.info("[%d/%d] Analyzing %s...", i, len(stocks), ticker)
 
-                if result.success:
-                    analyses.append(result.data)
-                else:
-                    logger.warning("Analysis failed for %s: %s", stock.get("ticker"), result.error)
-                    analyses.append({
-                        "ticker": stock.get("ticker", "UNKNOWN"),
-                        "error": result.error,
-                    })
-            except Exception as e:
-                logger.error("Error analyzing %s: %s", stock.get("ticker"), e)
-                analyses.append({
-                    "ticker": stock.get("ticker", "UNKNOWN"),
-                    "error": str(e),
-                })
+            result = graph.run({
+                "stock_data": stock,
+                "system_prompt": strategy.get_system_prompt(),
+                "analysis_prompt": strategy.get_analysis_prompt(stock),
+            })
+
+            if result.success:
+                recommendation = result.data.get("recommendation", "N/A")
+                confidence = result.data.get("confidence", "N/A")
+                logger.info("[%d/%d] %s — %s (confidence: %s)",
+                            i, len(stocks), ticker, recommendation, confidence)
+                analyses.append(result.data)
+            else:
+                raise Exception(f"Analysis failed for {ticker}: {result.error}")
+
+        logger.info("Analysis complete: %d/%d stocks analyzed successfully",
+                     len(analyses), len(stocks))
 
         ctx.set_output(self.name, {
             "index": index,

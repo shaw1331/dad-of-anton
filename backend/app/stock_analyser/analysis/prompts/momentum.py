@@ -21,7 +21,8 @@ class MomentumStrategy(AnalysisStrategy):
             "- Relative strength vs market/sector\n"
             "- Moving average alignment\n"
             "- Breakout/breakdown patterns\n\n"
-            'Output a JSON object with:\n'
+            "IMPORTANT: Output ONLY a valid JSON object. No extra text, no explanation, "
+            "no markdown, no code blocks. Just the raw JSON.\n\n"
             "{\n"
             '  "recommendation": "BUY" | "HOLD" | "SELL",\n'
             '  "confidence": 0.0-1.0,\n'
@@ -36,7 +37,8 @@ class MomentumStrategy(AnalysisStrategy):
         return (
             f"Analyze this stock for momentum trading potential:\n\n"
             f"{summary}\n\n"
-            "Provide your analysis as a JSON object with the following fields:\n"
+            "Output ONLY a valid JSON object. No extra text, no explanation, "
+            "no markdown, no code blocks. Just the raw JSON with these fields:\n"
             '- recommendation: "BUY", "HOLD", or "SELL"\n'
             "- confidence: A number between 0.0 and 1.0\n"
             "- reasoning: Detailed analysis (2-3 paragraphs)\n"

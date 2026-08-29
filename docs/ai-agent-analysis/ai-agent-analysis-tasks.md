@@ -630,12 +630,12 @@ langchain-openai>=0.2.0    # OpenAI provider (optional, paid)
 ```
 
 **Acceptance Criteria:**
-- [ ] File updated at `backend/requirements.txt`
-- [ ] All dependencies are added with version constraints
-- [ ] `langgraph` is included for graph workflow engine
-- [ ] `langchain-core` is included for BaseChatModel interface
-- [ ] At least one provider package is included (langchain-ollama by default)
-- [ ] Run `pip install -r requirements.txt` to install
+- [x] File updated at `backend/requirements.txt`
+- [x] All dependencies are added with version constraints
+- [x] `langgraph` is included for graph workflow engine
+- [x] `langchain-core` is included for BaseChatModel interface
+- [x] At least one provider package is included (langchain-ollama by default)
+- [x] Run `pip install -r requirements.txt` to install
 
 ---
 
@@ -655,10 +655,10 @@ LLM_TIMEOUT: int = 120                 # Timeout in seconds
 ```
 
 **Acceptance Criteria:**
-- [ ] File updated at `backend/app/core/config.py`
-- [ ] Settings have sensible defaults (Ollama/llama3)
-- [ ] Settings are loaded from environment variables
-- [ ] `LLM_PROVIDER` supports all LangChain providers
+- [x] File updated at `backend/app/core/config.py`
+- [x] Settings have sensible defaults (Ollama/llama3)
+- [x] Settings are loaded from environment variables
+- [x] `LLM_PROVIDER` supports all LangChain providers
 
 ---
 
@@ -679,15 +679,15 @@ LLM_TEMPERATURE=0.3
 # Provider-specific API keys (only needed if using that provider)
 # OLLAMA_BASE_URL=http://localhost:11434   # Only for remote Ollama
 # GROQ_API_KEY=gsk_...                     # If using Groq
-# OPENAI_API_KEY=sk-...                    # If using OpenAI
+# OPENAI_API_KEY=sk_...                    # If using OpenAI
 # GOOGLE_API_KEY=...                       # If using Google Gemini
 ```
 
 **Acceptance Criteria:**
-- [ ] File updated at `backend/.env.example`
-- [ ] Variables match `config.py` settings
-- [ ] Default values are documented
-- [ ] Provider-specific keys are commented out (optional)
+- [x] File updated at `backend/.env.example`
+- [x] Variables match `config.py` settings
+- [x] Default values are documented
+- [x] Provider-specific keys are commented out (optional)
 
 ---
 
