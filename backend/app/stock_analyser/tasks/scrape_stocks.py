@@ -33,5 +33,5 @@ class ScrapeStocksTask(BaseWorkflowTask):
 
         ctx.set_output(self.name, {
             "index": index,
-            "stocks": [s.model_dump() for s in technical_result.data],
+            "stocks": [s.model_dump(mode="json") for s in technical_result.data],
         })
