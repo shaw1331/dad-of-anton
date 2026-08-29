@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     LLM_TEMPERATURE: float = 0.3
     LLM_TIMEOUT: int = 120
     
+    GOOGLE_API_KEY: str = ""
+    
     class Config:
         case_sensitive = True
         env_file = ".env"
