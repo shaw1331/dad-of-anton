@@ -531,13 +531,13 @@ class AnalyzeStocksTask(BaseWorkflowTask):
 ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/stock_analyser/tasks/analyze_stocks.py`
-- [ ] Task reads from `ctx.get_output("scrape_stocks")`
-- [ ] Task uses `AnalysisFactory` to get strategy
-- [ ] Task uses `AgentFactory` to get agent graph (LLM created automatically)
-- [ ] Task handles individual stock failures gracefully
-- [ ] Task sets output via `ctx.set_output()`
-- [ ] Task extends `BaseWorkflowTask`
+- [x] File created at `backend/app/stock_analyser/tasks/analyze_stocks.py`
+- [x] Task reads from `ctx.get_output("scrape_stocks")`
+- [x] Task uses `AnalysisFactory` to get strategy
+- [x] Task uses `AgentFactory` to get agent graph (LLM created automatically)
+- [x] Task handles individual stock failures gracefully
+- [x] Task sets output via `ctx.set_output()`
+- [x] Task extends `BaseWorkflowTask`
 
 ---
 
@@ -561,9 +561,9 @@ def __getattr__(name: str):
 ```
 
 **Acceptance Criteria:**
-- [ ] File updated at `backend/app/stock_analyser/tasks/__init__.py`
-- [ ] `AnalyzeStocksTask` is importable from `app.stock_analyser.tasks`
-- [ ] Lazy import pattern is maintained
+- [x] File updated at `backend/app/stock_analyser/tasks/__init__.py`
+- [x] `AnalyzeStocksTask` is importable from `app.stock_analyser.tasks`
+- [x] Lazy import pattern is maintained
 
 ---
 
@@ -605,10 +605,10 @@ WORKFLOWS["stock_analyser"] = STOCK_ANALYSER_WORKFLOW
 ```
 
 **Acceptance Criteria:**
-- [ ] File updated at `backend/app/stock_analyser/workflow.py`
-- [ ] `AnalyzeStocksTask` is in tasks list after `ScrapeStocksTask`
-- [ ] `strategy` InputField is added with default value
-- [ ] Workflow description is updated
+- [x] File updated at `backend/app/stock_analyser/workflow.py`
+- [x] `AnalyzeStocksTask` is in tasks list after `ScrapeStocksTask`
+- [x] `strategy` InputField is added with default value
+- [x] Workflow description is updated
 
 ---
 
