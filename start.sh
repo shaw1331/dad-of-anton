@@ -11,7 +11,7 @@ if [ ! -d "venv" ]; then
 fi
 source venv/bin/activate
 pip install -q -r requirements.txt
-uvicorn app.main:app --reload --port 8000 &
+PYTHONUNBUFFERED=1 uvicorn app.main:app --reload --port 8000 &
 BACKEND_PID=$!
 cd ..
 
