@@ -2,12 +2,6 @@ from __future__ import annotations
 
 BASE_URL = "https://www.screener.in"
 
-INDEXES: dict[str, str] = {
-    "SMALLCAP50": "SMALLCAP50",
-    "LMIDCAP250": "LMIDCAP250",
-    "NIF500MO50": "NIF500MO50",
-}
-
 REQUEST_TIMEOUT = 30
 MAX_RETRIES = 3
 REQUEST_DELAY = 1.5

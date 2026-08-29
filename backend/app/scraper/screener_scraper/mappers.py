@@ -4,8 +4,18 @@ from datetime import datetime, timezone
 
 from bs4 import BeautifulSoup
 
+from pydantic import BaseModel, Field
+
 from app.scraper.models import StockDTO
 from app.scraper.screener_scraper.config import COMPANY_DATA_POINTS
+
+
+class ScreenerStockData(BaseModel):
+    ratios: dict[str, str] = Field(default_factory=dict)
+    quarterly: dict[str, str] = Field(default_factory=dict)
+    shareholding: dict[str, str] = Field(default_factory=dict)
+    pros: list[str] = Field(default_factory=list)
+    cons: list[str] = Field(default_factory=list)
 
 
 def map_ratios(soup: BeautifulSoup) -> dict[str, str]:
@@ -109,17 +119,22 @@ def map_company_page(soup: BeautifulSoup, ticker: str, url: str) -> StockDTO:
         sector = sector_links[0].get_text(strip=True) if len(sector_links) > 0 else None
         industry = sector_links[-1].get_text(strip=True) if len(sector_links) > 1 else None
 
+    screener_data = ScreenerStockData(
+        ratios=ratios,
+        quarterly=quarterly,
+        shareholding=shareholding,
+        pros=pros,
+        cons=cons,
+    )
+
     return StockDTO(
         ticker=ticker,
         name=company_name,
         company_name=company_name,
         sector=sector,
         industry=industry,
-        ratios=ratios,
-        quarterly=quarterly,
-        shareholding=shareholding,
-        pros=pros,
-        cons=cons,
+        source="screener",
+        data=screener_data.model_dump(),
         url=url,
         scraped_at=datetime.now(timezone.utc),
     )
