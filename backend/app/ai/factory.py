@@ -41,11 +41,16 @@ class AgentFactory:
 
         from app.core.config import settings
 
-        llm = init_chat_model(
-            model=settings.LLM_MODEL,
-            model_provider=settings.LLM_PROVIDER,
-            temperature=settings.LLM_TEMPERATURE,
-        )
+        kwargs = {
+            "model": settings.LLM_MODEL,
+            "model_provider": settings.LLM_PROVIDER,
+            "temperature": settings.LLM_TEMPERATURE,
+        }
+
+        if settings.LLM_PROVIDER == "google_genai":
+            kwargs["google_api_key"] = settings.GOOGLE_API_KEY
+
+        llm = init_chat_model(**kwargs)
 
         graph_cls = cls._graphs.get(name)
         if graph_cls is None:

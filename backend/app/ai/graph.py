@@ -43,17 +43,29 @@ class StockAnalysisAgent(AgentGraph):
             ]
             response = self.llm.invoke(messages)
 
+            content = response.content
+            if isinstance(content, list):
+                parts = []
+                for part in content:
+                    if hasattr(part, "text"):
+                        parts.append(part.text)
+                    elif isinstance(part, dict) and "text" in part:
+                        parts.append(part["text"])
+                    else:
+                        parts.append(str(part))
+                content = "\n".join(parts)
+
             try:
-                parsed = json.loads(response.content)
-            except json.JSONDecodeError:
-                logger.debug("Raw LLM response:\n%s", response.content[:500])
-                parsed = _extract_json(response.content)
+                parsed = json.loads(content)
+            except (json.JSONDecodeError, TypeError):
+                logger.debug("Raw LLM response:\n%s", content[:500])
+                parsed = _extract_json(content)
                 if parsed is None:
                     logger.warning("Failed to parse LLM response for %s",
                                    state["stock_data"].get("ticker"))
 
             return {
-                "raw_response": response.content,
+                "raw_response": content,
                 "parsed_analysis": parsed,
             }
 
