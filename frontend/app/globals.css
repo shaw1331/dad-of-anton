@@ -7,6 +7,11 @@
   --foreground: #0f172a;
 }
 
+.dark {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -14,7 +19,7 @@ body {
 
 @layer components {
   .card {
-    @apply rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md;
+    @apply rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-dark-border dark:bg-dark-surface;
   }
 
   .badge {
@@ -22,19 +27,19 @@ body {
   }
 
   .badge-success {
-    @apply bg-emerald-50 text-emerald-700;
+    @apply bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400;
   }
 
   .badge-danger {
-    @apply bg-red-50 text-red-700;
+    @apply bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400;
   }
 
   .badge-warning {
-    @apply bg-amber-50 text-amber-700;
+    @apply bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400;
   }
 
   .badge-muted {
-    @apply bg-slate-100 text-slate-600;
+    @apply bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-dark-muted;
   }
 
   .btn-primary {
@@ -42,14 +47,14 @@ body {
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:bg-slate-100;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:bg-slate-100 dark:border-dark-border dark:bg-dark-surface dark:text-dark-text dark:hover:bg-slate-700;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-dark-text dark:hover:bg-slate-700;
   }
 
   .input-field {
-    @apply w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm transition-colors placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500;
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition-colors placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface dark:text-dark-text dark:placeholder:text-dark-muted;
   }
 }
