@@ -82,7 +82,7 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
 
         return run.id
 
-    async def run_workflow(self, run_id: str) -> None:
+    def run_workflow(self, run_id: str) -> None:
         self.run_repo.update_status(run_id, "running")
 
         run = self.run_repo.get(run_id)
@@ -98,7 +98,7 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
 
                 try:
                     task_instance = task_cls()
-                    await task_instance.run(ctx)
+                    task_instance.run(ctx)
 
                     self.task_run_repo.update_status(task_run.id, "completed")
                 except Exception as e:
