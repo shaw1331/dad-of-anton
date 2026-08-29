@@ -33,10 +33,7 @@ class StockDTO(BaseModel):
     company_name: str = ""
     sector: str | None = None
     industry: str | None = None
-    ratios: dict[str, str] = Field(default_factory=dict)
-    quarterly: dict[str, str] = Field(default_factory=dict)
-    shareholding: dict[str, str] = Field(default_factory=dict)
-    pros: list[str] = Field(default_factory=list)
-    cons: list[str] = Field(default_factory=list)
+    source: str
+    data: dict[str, Any] = Field(default_factory=dict)
     url: str = ""
     scraped_at: datetime | None = None

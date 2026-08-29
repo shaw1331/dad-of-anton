@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 from app.scraper.interfaces import IndexScraper
 from app.scraper.models import ScraperResult, StockSummaryDTO
-from app.scraper.screener_scraper.config import BASE_URL, INDEXES, REQUEST_DELAY
+from app.scraper.screener_scraper.config import BASE_URL, REQUEST_DELAY
 from app.scraper.screener_scraper.http import get_page
 
 logger = logging.getLogger(__name__)
@@ -75,14 +75,7 @@ class ScreenerIndexScraper(IndexScraper):
         Returns:
             ScraperResult containing a list of StockSummaryDTO on success.
         """
-        slug = INDEXES.get(index_name.upper())
-        if not slug:
-            available = list(INDEXES.keys())
-            return ScraperResult(
-                success=False,
-                error=f"Index '{index_name}' not found. Available: {available}",
-                source="screener",
-            )
+        slug = index_name.upper()
 
         all_companies: list[dict[str, str]] = []
         page = 1
