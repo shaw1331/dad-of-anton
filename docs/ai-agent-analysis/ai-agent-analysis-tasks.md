@@ -256,9 +256,9 @@ class AnalysisStrategy(ABC):
 ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/stock_analyser/analysis/interfaces.py`
-- [ ] `AnalysisStrategy` is abstract (cannot be instantiated)
-- [ ] All methods have proper type hints
+- [x] File created at `backend/app/stock_analyser/analysis/interfaces.py`
+- [x] `AnalysisStrategy` is abstract (cannot be instantiated)
+- [x] All methods have proper type hints
 
 ---
 
@@ -297,10 +297,10 @@ class AnalysisFactory:
 ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/stock_analyser/analysis/factory.py`
-- [ ] Factory has class methods for registration and retrieval
-- [ ] Raises `ConfigError` if strategy name not registered
-- [ ] Default strategy is `"value_investing"`
+- [x] File created at `backend/app/stock_analyser/analysis/factory.py`
+- [x] Factory has class methods for registration and retrieval
+- [x] Raises `ConfigError` if strategy name not registered
+- [x] Default strategy is `"value_investing"`
 
 ---
 
@@ -317,9 +317,9 @@ Create `backend/app/stock_analyser/analysis/prompts/base.py` with shared prompt 
 - `format_pros_cons(stock_data: dict) -> str` — Format pros and cons lists
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/stock_analyser/analysis/prompts/base.py`
-- [ ] All formatters handle missing data gracefully
-- [ ] Output is readable and well-structured
+- [x] File created at `backend/app/stock_analyser/analysis/prompts/base.py`
+- [x] All formatters handle missing data gracefully
+- [x] Output is readable and well-structured
 
 ---
 
@@ -369,11 +369,11 @@ Provide your analysis as a JSON object with the following fields:
 ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/stock_analyser/analysis/prompts/value_investing.py`
-- [ ] System prompt defines the analyst persona and output format
-- [ ] Analysis prompt includes formatted stock data
-- [ ] Prompt requests structured JSON output
-- [ ] Class implements `AnalysisStrategy` interface
+- [x] File created at `backend/app/stock_analyser/analysis/prompts/value_investing.py`
+- [x] System prompt defines the analyst persona and output format
+- [x] Analysis prompt includes formatted stock data
+- [x] Prompt requests structured JSON output
+- [x] Class implements `AnalysisStrategy` interface
 
 ---
 
@@ -423,11 +423,11 @@ Provide your analysis as a JSON object with the following fields:
 ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/stock_analyser/analysis/prompts/momentum.py`
-- [ ] System prompt defines momentum analyst persona
-- [ ] Analysis prompt includes formatted stock data
-- [ ] Prompt requests structured JSON output
-- [ ] Class implements `AnalysisStrategy` interface
+- [x] File created at `backend/app/stock_analyser/analysis/prompts/momentum.py`
+- [x] System prompt defines momentum analyst persona
+- [x] Analysis prompt includes formatted stock data
+- [x] Prompt requests structured JSON output
+- [x] Class implements `AnalysisStrategy` interface
 
 ---
 
@@ -447,9 +447,9 @@ AnalysisFactory.register("momentum", MomentumStrategy)
 ```
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/stock_analyser/analysis/prompts/__init__.py`
-- [ ] Both strategies are registered when module is imported
-- [ ] No duplicate registrations
+- [x] File created at `backend/app/stock_analyser/analysis/prompts/__init__.py`
+- [x] Both strategies are registered when module is imported
+- [x] No duplicate registrations
 
 ---
 
@@ -463,8 +463,8 @@ Create `backend/app/stock_analyser/analysis/__init__.py` with module exports.
 - Export `AnalysisStrategy` interface
 
 **Acceptance Criteria:**
-- [ ] File created at `backend/app/stock_analyser/analysis/__init__.py`
-- [ ] All public symbols are importable from `app.stock_analyser.analysis`
+- [x] File created at `backend/app/stock_analyser/analysis/__init__.py`
+- [x] All public symbols are importable from `app.stock_analyser.analysis`
 
 ---
 
