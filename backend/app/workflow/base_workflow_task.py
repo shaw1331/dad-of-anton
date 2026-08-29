@@ -11,5 +11,5 @@ class BaseWorkflowTask(ABC):
     name: str
 
     @abstractmethod
-    async def run(self, ctx: BaseWorkflowContext) -> None:
+    def run(self, ctx: BaseWorkflowContext) -> None:
         pass

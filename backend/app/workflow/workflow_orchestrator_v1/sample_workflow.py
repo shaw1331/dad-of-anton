@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import asyncio
+import time
 from typing import TYPE_CHECKING
 
 from app.workflow.base_workflow_config import BaseWorkflowConfig, InputField
@@ -17,7 +17,7 @@ class PrintMessageTask(BaseWorkflowTask):
     def __init__(self, message: str = "Hello from task!") -> None:
         self.message = message
 
-    async def run(self, ctx: BaseWorkflowContext) -> None:
+    def run(self, ctx: BaseWorkflowContext) -> None:
         message = ctx.get_input("message") or self.message
         print(message)
 
@@ -25,11 +25,11 @@ class PrintMessageTask(BaseWorkflowTask):
 class DelayTask(BaseWorkflowTask):
     name = "delay"
 
-    def __init__(self, seconds: float = 60.0) -> None:
+    def __init__(self, seconds: float = 600.0) -> None:
         self.seconds = seconds
 
-    async def run(self, ctx: BaseWorkflowContext) -> None:
-        await asyncio.sleep(self.seconds)
+    def run(self, ctx: BaseWorkflowContext) -> None:
+        time.sleep(self.seconds)
 
 
 WORKFLOWS["sample"] = BaseWorkflowConfig(
