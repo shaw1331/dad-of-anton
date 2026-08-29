@@ -1,21 +1,22 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import Any
 
 from app.scraper.factory import ScraperFactory
-from app.workflow.base_workflow_task import BaseWorkflowTask
-
-if TYPE_CHECKING:
-    from app.workflow.base_workflow_context import BaseWorkflowContext
 
 
-class ScrapeStocksTask(BaseWorkflowTask):
+class ScrapeStocksTask:
+    """Scrapes stock data for a given index.
+
+    Compatible with BaseWorkflowTask interface (name, run(ctx)).
+    """
+
     name = "scrape_stocks"
 
     def __init__(self, source: str = "screener") -> None:
         self.source = source
 
-    def run(self, ctx: BaseWorkflowContext) -> None:
+    def run(self, ctx: Any) -> None:
         index = ctx.get_input("index")
 
         index_scraper = ScraperFactory.get_index_scraper(self.source)

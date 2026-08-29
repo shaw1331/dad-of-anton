@@ -10,6 +10,12 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_ANON_KEY: str = ""
     
+    # LLM Provider Configuration
+    LLM_PROVIDER: str = "ollama"
+    LLM_MODEL: str = "llama3"
+    LLM_TEMPERATURE: float = 0.3
+    LLM_TIMEOUT: int = 120
+    
     class Config:
         case_sensitive = True
         env_file = ".env"
