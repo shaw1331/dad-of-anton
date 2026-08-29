@@ -5,6 +5,7 @@ export interface InputField {
   description: string;
   required: boolean;
   default: any | null;
+  choices?: string[] | null;
 }
 
 export interface WorkflowConfig {

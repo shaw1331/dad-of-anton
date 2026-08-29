@@ -14,6 +14,7 @@ class InputField:
     description: str = ""
     required: bool = True
     default: Any = None
+    choices: list[str] | None = None
 
 
 @dataclass
