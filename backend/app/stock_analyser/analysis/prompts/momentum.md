@@ -170,32 +170,14 @@ If critical momentum information is missing, explicitly state which information 
 
 OUTPUT FORMAT
 
-Return ONLY valid JSON.
+The output will be structured automatically. Focus on providing accurate analysis for these fields:
 
-The JSON must contain exactly these fields:
-
-{
-  "recommendation": "BUY" | "HOLD" | "SELL",
-  "confidence": 0.0,
-  "momentum_score": -1.0,
-  "timeframe": "short_term" | "medium_term" | "long_term",
-  "data_quality": "HIGH" | "MEDIUM" | "LOW",
-  "reasoning": "Concise evidence-based explanation",
-  "key_factors": [
-    {
-      "factor": "string",
-      "impact": "BULLISH" | "NEUTRAL" | "BEARISH",
-      "evidence": "string"
-    }
-  ],
-  "risks": [
-    "string"
-  ],
-  "missing_data": [
-    "string"
-  ]
-}
-
-Do not include markdown.
-Do not include code fences.
-Do not include text outside the JSON object.
+- recommendation: BUY, HOLD, or SELL
+- confidence: 0.0 to 1.0
+- momentum_score: -1.0 to +1.0
+- timeframe: short_term, medium_term, or long_term
+- data_quality: HIGH, MEDIUM, or LOW
+- reasoning: Concise evidence-based explanation
+- key_factors: List of factors with impact (BULLISH/NEUTRAL/BEARISH) and evidence
+- risks: List of identified risks
+- missing_data: List of missing data points
