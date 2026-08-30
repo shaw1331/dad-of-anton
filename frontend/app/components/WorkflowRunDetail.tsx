@@ -76,7 +76,7 @@ function OutputModal({
             </svg>
           </button>
         </div>
-        <pre className="flex-1 overflow-auto rounded-lg bg-slate-100 p-4 text-sm text-slate-800 dark:bg-slate-800 dark:text-dark-text">
+        <pre className="flex-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-slate-100 p-4 text-sm text-slate-800 dark:bg-slate-800 dark:text-dark-text">
           {JSON.stringify(task.output, null, 2)}
         </pre>
         <div className="mt-4 flex justify-end">
