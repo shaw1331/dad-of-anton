@@ -48,7 +48,8 @@ class AnalyzeStocksTask:
                 confidence = result.data.get("confidence", "N/A")
                 logger.info("[%d/%d] %s — %s (confidence: %s)",
                             i, len(stocks), ticker, recommendation, confidence)
-                analyses.append(result.data)
+                analysis = {**result.data, "ticker": ticker, "name": stock.get("name", "")}
+                analyses.append(analysis)
             else:
                 raise Exception(f"Analysis failed for {ticker}: {result.error}")
 
