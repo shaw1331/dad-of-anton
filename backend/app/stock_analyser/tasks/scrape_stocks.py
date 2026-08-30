@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from app.scraper.factory import ScraperFactory
+
+logger = logging.getLogger(__name__)
 
 
 class ScrapeStocksTask:
@@ -32,7 +35,15 @@ class ScrapeStocksTask:
         if not technical_result.success:
             raise Exception(technical_result.error)
 
+        stocks = technical_result.data
+        tickers = [s.ticker for s in stocks]
+        names = [getattr(s, "name", s.ticker) for s in stocks]
+
+        logger.info("Scraped %d stocks for index '%s': %s", len(stocks), index, ", ".join(tickers))
+        for i, (ticker, name) in enumerate(zip(tickers, names), 1):
+            logger.info("  [%d/%d] %s — %s", i, len(stocks), ticker, name)
+
         ctx.set_output(self.name, {
             "index": index,
-            "stocks": [s.model_dump(mode="json") for s in technical_result.data],
+            "stocks": [s.model_dump(mode="json") for s in stocks],
         })
