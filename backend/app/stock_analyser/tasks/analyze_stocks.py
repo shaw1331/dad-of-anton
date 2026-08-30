@@ -30,7 +30,7 @@ class AnalyzeStocksTask:
                      len(stocks), index, strategy_name)
 
         strategy = AnalysisFactory.get(strategy_name)
-        graph = AgentFactory.get("stock_analysis")
+        graph = AgentFactory.get("stock_analysis", output_model=strategy.get_output_model())
 
         analyses = []
         for i, stock in enumerate(stocks, 1):
@@ -48,7 +48,8 @@ class AnalyzeStocksTask:
                 confidence = result.data.get("confidence", "N/A")
                 logger.info("[%d/%d] %s — %s (confidence: %s)",
                             i, len(stocks), ticker, recommendation, confidence)
-                analyses.append(result.data)
+                analysis = {**result.data, "ticker": ticker, "name": stock.get("name", "")}
+                analyses.append(analysis)
             else:
                 raise Exception(f"Analysis failed for {ticker}: {result.error}")
 

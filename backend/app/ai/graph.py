@@ -1,19 +1,18 @@
 from __future__ import annotations
 
-import json
 import logging
-import re
 from typing import Any, Optional, TypedDict
-
-logger = logging.getLogger(__name__)
 
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import END, StateGraph
+from pydantic import BaseModel
 
 from app.ai.factory import AgentFactory
 from app.ai.interfaces import AgentGraph
 from app.ai.models import AgentResult
+
+logger = logging.getLogger(__name__)
 
 
 class StockAnalysisState(TypedDict):
@@ -23,7 +22,7 @@ class StockAnalysisState(TypedDict):
     system_prompt: str
     analysis_prompt: str
     raw_response: str
-    parsed_analysis: Optional[dict]
+    parsed_analysis: Optional[BaseModel]
 
 
 class StockAnalysisAgent(AgentGraph):
@@ -31,42 +30,23 @@ class StockAnalysisAgent(AgentGraph):
 
     name = "stock_analysis"
 
-    def __init__(self, llm: BaseChatModel) -> None:
+    def __init__(self, llm: BaseChatModel, output_model: type[BaseModel]) -> None:
         self.llm = llm
+        self.output_model = output_model
         self._graph = self._build_graph()
 
     def _build_graph(self):
+        structured_llm = self.llm.with_structured_output(self.output_model)
+
         def analyze_node(state: StockAnalysisState) -> dict:
             messages = [
                 SystemMessage(content=state["system_prompt"]),
                 HumanMessage(content=state["analysis_prompt"]),
             ]
-            response = self.llm.invoke(messages)
-
-            content = response.content
-            if isinstance(content, list):
-                parts = []
-                for part in content:
-                    if hasattr(part, "text"):
-                        parts.append(part.text)
-                    elif isinstance(part, dict) and "text" in part:
-                        parts.append(part["text"])
-                    else:
-                        parts.append(str(part))
-                content = "\n".join(parts)
-
-            try:
-                parsed = json.loads(content)
-            except (json.JSONDecodeError, TypeError):
-                logger.debug("Raw LLM response:\n%s", content[:500])
-                parsed = _extract_json(content)
-                if parsed is None:
-                    logger.warning("Failed to parse LLM response for %s",
-                                   state["stock_data"].get("ticker"))
-
+            result = structured_llm.invoke(messages)
             return {
-                "raw_response": content,
-                "parsed_analysis": parsed,
+                "raw_response": result.model_dump_json(),
+                "parsed_analysis": result,
             }
 
         graph = StateGraph(StockAnalysisState)
@@ -86,34 +66,13 @@ class StockAnalysisAgent(AgentGraph):
 
         result = self._graph.invoke(initial_state)
 
+        parsed = result["parsed_analysis"]
         return AgentResult(
-            success=result["parsed_analysis"] is not None,
-            data=result["parsed_analysis"] or {"raw": result["raw_response"]},
-            error=None if result["parsed_analysis"] else "Failed to parse LLM response",
+            success=parsed is not None,
+            data=parsed.model_dump() if parsed else {"raw": result["raw_response"]},
+            error=None if parsed else "Failed to parse LLM response",
             graph_name=self.name,
         )
 
 
 AgentFactory.register("stock_analysis", StockAnalysisAgent)
-
-
-def _extract_json(text: str) -> Optional[dict]:
-    """Extract JSON from text, handling markdown code blocks and trailing text."""
-    # Try markdown code blocks first
-    match = re.search(r"```(?:json)?\s*\n?(.*?)\n?\s*```", text, re.DOTALL)
-    if match:
-        try:
-            return json.loads(match.group(1))
-        except json.JSONDecodeError:
-            pass
-
-    # Try extracting from first { to last }
-    start = text.find("{")
-    end = text.rfind("}")
-    if start != -1 and end > start:
-        try:
-            return json.loads(text[start:end + 1])
-        except json.JSONDecodeError:
-            pass
-
-    return None

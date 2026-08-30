@@ -79,7 +79,7 @@ def test_analysis_pipeline() -> None:
     logger.info("Step 2: Loading agent graph...")
     from app.ai.factory import AgentFactory
 
-    graph = AgentFactory.get("stock_analysis")
+    graph = AgentFactory.get("stock_analysis", output_model=strategy.get_output_model())
     logger.info("Agent graph loaded: %s", graph.name)
 
     # 3. Run analysis
