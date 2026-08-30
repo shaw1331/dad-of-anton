@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Type
 
+from pydantic import BaseModel
+
 from app.ai.exceptions import ConfigError
 from app.ai.interfaces import AgentGraph
 
@@ -22,7 +24,7 @@ class AgentFactory:
         cls._graphs[name] = graph_cls
 
     @classmethod
-    def get(cls, name: str) -> AgentGraph:
+    def get(cls, name: str, output_model: type[BaseModel] | None = None) -> AgentGraph:
         """Get an AgentGraph instance with configured LLM.
 
         Uses init_chat_model to create provider-agnostic LLM.
@@ -30,6 +32,7 @@ class AgentFactory:
 
         Args:
             name: The registered graph name.
+            output_model: Optional Pydantic model for structured LLM output.
 
         Returns:
             An AgentGraph instance with an LLM attached.
@@ -60,4 +63,6 @@ class AgentFactory:
                 f"Available graphs: {available}"
             )
 
+        if output_model is not None:
+            return graph_cls(llm=llm, output_model=output_model)
         return graph_cls(llm=llm)

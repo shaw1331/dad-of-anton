@@ -30,7 +30,7 @@ class AnalyzeStocksTask:
                      len(stocks), index, strategy_name)
 
         strategy = AnalysisFactory.get(strategy_name)
-        graph = AgentFactory.get("stock_analysis")
+        graph = AgentFactory.get("stock_analysis", output_model=strategy.get_output_model())
 
         analyses = []
         for i, stock in enumerate(stocks, 1):

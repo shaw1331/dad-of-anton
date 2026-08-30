@@ -1,11 +1,32 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
+
+from pydantic import BaseModel, Field
 
 from app.stock_analyser.analysis.interfaces import AnalysisStrategy
 from app.stock_analyser.analysis.prompts.base import format_stock_summary
 
 _PROMPT_DIR = Path(__file__).parent
+
+
+class KeyFactor(BaseModel):
+    factor: str
+    impact: Literal["BULLISH", "NEUTRAL", "BEARISH"]
+    evidence: str
+
+
+class MomentumAnalysis(BaseModel):
+    recommendation: Literal["BUY", "HOLD", "SELL"]
+    confidence: float = Field(ge=0.0, le=1.0)
+    momentum_score: float = Field(ge=-1.0, le=1.0)
+    timeframe: Literal["short_term", "medium_term", "long_term"]
+    data_quality: Literal["HIGH", "MEDIUM", "LOW"]
+    reasoning: str
+    key_factors: list[KeyFactor]
+    risks: list[str]
+    missing_data: list[str]
 
 
 class MomentumStrategy(AnalysisStrategy):
@@ -31,6 +52,8 @@ class MomentumStrategy(AnalysisStrategy):
             - Fundamentals are secondary context and must not override technical momentum.
             - If critical momentum data is missing, prefer HOLD and reduce confidence.
             - Explicitly identify missing data.
-            - Return ONLY the required JSON object.
             """
         return analysis_prompt
+
+    def get_output_model(self) -> type[MomentumAnalysis]:
+        return MomentumAnalysis

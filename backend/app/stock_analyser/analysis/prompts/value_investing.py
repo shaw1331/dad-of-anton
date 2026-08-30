@@ -1,7 +1,20 @@
 from __future__ import annotations
 
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
 from app.stock_analyser.analysis.interfaces import AnalysisStrategy
 from app.stock_analyser.analysis.prompts.base import format_stock_summary
+
+
+class ValueInvestingAnalysis(BaseModel):
+    recommendation: Literal["BUY", "HOLD", "SELL"]
+    confidence: float = Field(ge=0.0, le=1.0)
+    reasoning: str
+    key_factors: list[str]
+    risks: list[str]
+    margin_of_safety: str | None = None
 
 
 class ValueInvestingStrategy(AnalysisStrategy):
@@ -20,16 +33,7 @@ class ValueInvestingStrategy(AnalysisStrategy):
             "- Valuation metrics (P/E, P/B, EV/EBITDA relative to peers)\n"
             "- Earnings quality and consistency\n"
             "- Competitive moat and business quality\n"
-            "- Margin of safety (current price vs intrinsic value)\n\n"
-            "IMPORTANT: Output ONLY a valid JSON object. No extra text, no explanation, "
-            "no markdown, no code blocks. Just the raw JSON.\n\n"
-            "{\n"
-            '  "recommendation": "BUY" | "HOLD" | "SELL",\n'
-            '  "confidence": 0.0-1.0,\n'
-            '  "reasoning": "detailed analysis...",\n'
-            '  "key_factors": ["factor1", "factor2", ...],\n'
-            '  "risks": ["risk1", "risk2", ...]\n'
-            "}"
+            "- Margin of safety (current price vs intrinsic value)"
         )
 
     def get_analysis_prompt(self, stock_data: dict) -> str:
@@ -37,11 +41,9 @@ class ValueInvestingStrategy(AnalysisStrategy):
         return (
             f"Analyze this stock for value investing potential:\n\n"
             f"{summary}\n\n"
-            "Output ONLY a valid JSON object. No extra text, no explanation, "
-            "no markdown, no code blocks. Just the raw JSON with these fields:\n"
-            '- recommendation: "BUY", "HOLD", or "SELL"\n'
-            "- confidence: A number between 0.0 and 1.0\n"
-            "- reasoning: Detailed analysis (2-3 paragraphs)\n"
-            "- key_factors: List of 3-5 key factors influencing your decision\n"
-            "- risks: List of 2-3 risks to consider"
+            "Determine recommendation, confidence, reasoning, key factors, "
+            "risks, and margin of safety."
         )
+
+    def get_output_model(self) -> type[ValueInvestingAnalysis]:
+        return ValueInvestingAnalysis
