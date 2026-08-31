@@ -23,6 +23,23 @@ STOCK_ANALYSER_WORKFLOW = BaseWorkflowConfig(
             required=False,
             default="value_investing",
         ),
+        InputField(
+            name="num_stocks",
+            type="int",
+            label="Number of Stocks",
+            description="How many top stocks to analyze (leave empty for all)",
+            required=False,
+            default=None,
+        ),
+        InputField(
+            name="selection_criteria",
+            type="str",
+            label="Selection Criteria",
+            description="How to pick stocks when number is specified",
+            required=False,
+            default="all",
+            choices=["top", "bottom", "random", "all"],
+        ),
     ],
     tasks=[ScrapeStocksTask, AnalyzeStocksTask],
 )

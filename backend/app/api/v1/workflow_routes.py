@@ -32,6 +32,7 @@ def list_workflows():
                     "description": f.description,
                     "required": f.required,
                     "default": f.default,
+                    "choices": f.choices,
                 }
                 for f in config.input_fields
             ],

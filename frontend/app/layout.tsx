@@ -19,6 +19,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.theme==='dark'||(!localStorage.theme&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark')}catch(e){}`,
+          }}
+        />
+      </head>
       <body className={`${inter.className}`} suppressHydrationWarning>
         <ThemeProvider>
           <div className="min-h-screen bg-slate-50 transition-colors dark:bg-dark-bg">

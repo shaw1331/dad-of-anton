@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { WorkflowRunList } from "@/app/components/WorkflowRunList";
 import { getWorkflows, getWorkflowRuns, triggerWorkflow } from "@/lib/api/workflows";
 import type { WorkflowConfig, WorkflowRun, InputField } from "@/lib/types";
@@ -66,17 +66,48 @@ export default function WorkflowsPage() {
         return;
       }
     }
-    handleTrigger(selectedWorkflow.name, formData);
+    const cleaned: Record<string, any> = {};
+    for (const f of selectedWorkflow.input_fields) {
+      const val = formData[f.name];
+      if (val === "" || val === undefined || val === null) continue;
+      cleaned[f.name] = val;
+    }
+    handleTrigger(selectedWorkflow.name, cleaned);
   };
 
-  const handleModalCancel = () => {
+  const handleModalCancel = useCallback(() => {
     setShowModal(false);
     setSelectedWorkflow(null);
     setFormData({});
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!showModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleModalCancel();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [showModal, handleModalCancel]);
 
   const renderInputField = (field: InputField) => {
     const value = formData[field.name] ?? field.default ?? "";
+
+    if (field.choices && field.choices.length > 0) {
+      return (
+        <select
+          value={value}
+          onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+          className="input-field"
+        >
+          {field.choices.map((c) => (
+            <option key={c} value={c}>
+              {c.charAt(0).toUpperCase() + c.slice(1).replace(/_/g, " ")}
+            </option>
+          ))}
+        </select>
+      );
+    }
 
     switch (field.type) {
       case "bool":
@@ -93,8 +124,10 @@ export default function WorkflowsPage() {
           <input
             type="number"
             step="1"
+            min="1"
             value={value}
-            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+            placeholder={field.required ? "" : "Leave empty for all"}
+            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value === "" ? "" : Number(e.target.value) })}
             className="input-field"
           />
         );
@@ -260,8 +293,14 @@ export default function WorkflowsPage() {
       />
 
       {showModal && selectedWorkflow && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="mx-4 w-full max-w-lg rounded-xl bg-white p-6 shadow-xl dark:bg-dark-surface">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={handleModalCancel}
+        >
+          <div
+            className="mx-4 w-full max-w-lg rounded-xl bg-white p-6 shadow-xl dark:bg-dark-surface"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="mb-4 text-lg font-semibold text-slate-900 dark:text-dark-text">
               Trigger {selectedWorkflow.name}
             </h3>
@@ -283,8 +322,22 @@ export default function WorkflowsPage() {
               <button onClick={handleModalCancel} className="btn-secondary">
                 Cancel
               </button>
-              <button onClick={handleModalSubmit} className="btn-primary">
-                Trigger
+              <button
+                onClick={handleModalSubmit}
+                disabled={triggering !== null}
+                className="btn-primary"
+              >
+                {triggering !== null ? (
+                  <>
+                    <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Triggering...
+                  </>
+                ) : (
+                  "Trigger"
+                )}
               </button>
             </div>
           </div>
