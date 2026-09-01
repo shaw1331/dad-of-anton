@@ -1,6 +1,6 @@
 "use client";
 
-import type { WorkflowRun } from "@/lib/types";
+import type { WorkflowRun, TriggerType } from "@/lib/types";
 
 function StatusBadge({ status }: { status: string }) {
   const classes =
@@ -13,6 +13,17 @@ function StatusBadge({ status }: { status: string }) {
           : "badge-muted";
 
   return <span className={classes}>{status}</span>;
+}
+
+function TriggerTypeBadge({ triggerType }: { triggerType: TriggerType }) {
+  const classes =
+    triggerType === "scheduled"
+      ? "badge-purple"
+      : triggerType === "testing"
+        ? "badge-orange"
+        : "badge-info";
+
+  return <span className={classes}>{triggerType}</span>;
 }
 
 export function WorkflowRunList({
@@ -82,6 +93,7 @@ export function WorkflowRunList({
                 </div>
               </button>
               <div className="flex items-center gap-2 pr-1">
+                <TriggerTypeBadge triggerType={run.trigger_type} />
                 <StatusBadge status={run.status} />
                 {onDelete && (
                   <button
