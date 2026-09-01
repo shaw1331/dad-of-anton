@@ -1,4 +1,4 @@
-const BASE_URL = "/api/v1";
+﻿const BASE_URL = "/api/v1";
 
 export async function request<T>(
   path: string,
