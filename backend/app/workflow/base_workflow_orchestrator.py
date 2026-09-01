@@ -21,3 +21,7 @@ class BaseWorkflowOrchestrator(ABC):
     @abstractmethod
     def run_workflow(self, run_id: str) -> None:
         ...
+
+    @abstractmethod
+    def delete_run(self, run_id: str) -> None:
+        ...

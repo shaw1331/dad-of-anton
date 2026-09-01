@@ -79,3 +79,13 @@ def get_run(run_id: str):
         **run.model_dump(),
         "task_runs": [tr.model_dump() for tr in task_runs],
     }
+
+
+@router.delete("/runs/{run_id}", status_code=204)
+def delete_run(run_id: str):
+    try:
+        orchestrator.delete_run(run_id)
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=404, detail=f"Run not found: {run_id}")

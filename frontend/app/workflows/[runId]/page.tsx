@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useCallback } from "react";
 import Link from "next/link";
 import { WorkflowRunDetail } from "@/app/components/WorkflowRunDetail";
-import { getWorkflowRun } from "@/lib/api/workflows";
+import { getWorkflowRun, deleteWorkflowRun } from "@/lib/api/workflows";
 import type { RunDetail } from "@/lib/types";
 
 export default function WorkflowRunDetailPage({
@@ -14,6 +14,19 @@ export default function WorkflowRunDetailPage({
   const { runId } = use(params);
   const [run, setRun] = useState<RunDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = useCallback(async () => {
+    if (!window.confirm("Delete this workflow run? This cannot be undone.")) return;
+    setDeleting(true);
+    try {
+      await deleteWorkflowRun(runId);
+      window.location.href = "/workflows";
+    } catch (err: any) {
+      setError(err.message || "Failed to delete run");
+      setDeleting(false);
+    }
+  }, [runId]);
 
   useEffect(() => {
     async function fetchRun() {
@@ -102,7 +115,7 @@ export default function WorkflowRunDetailPage({
         </svg>
         Back to workflows
       </Link>
-      <WorkflowRunDetail run={run} />
+      <WorkflowRunDetail run={run} onDelete={handleDelete} deleting={deleting} />
     </div>
   );
 }

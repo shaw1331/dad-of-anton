@@ -131,5 +131,11 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
             logger.error("Workflow %s failed unexpectedly: %s", run_id, e)
             await asyncio.to_thread(self.run_repo.update_status, run_id, "failed", f"Unexpected error: {e}")
 
+    def delete_run(self, run_id: str) -> None:
+        run = self.run_repo.get(run_id)
+        if run.status == "running":
+            raise ValueError("Cannot delete a running workflow")
+        self.run_repo.delete(run_id)
+
 
 orchestrator = WorkflowOrchestrator()
