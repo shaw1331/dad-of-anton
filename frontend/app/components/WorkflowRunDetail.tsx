@@ -2,29 +2,42 @@
 
 import { useState, useEffect } from "react";
 import type { RunDetail, TaskRun, TriggerType } from "@/lib/types";
+import { Trash2, X, FileText, Copy, Check } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 function StatusBadge({ status }: { status: string }) {
-  const classes =
+  const variant =
     status === "completed"
-      ? "badge-success"
+      ? "success"
       : status === "failed"
-        ? "badge-danger"
+        ? "destructive"
         : status === "running"
-          ? "badge-warning"
-          : "badge-muted";
+          ? "warning"
+          : "muted";
 
-  return <span className={classes}>{status}</span>;
+  return <Badge variant={variant}>{status}</Badge>;
 }
 
 function TriggerTypeBadge({ triggerType }: { triggerType: TriggerType }) {
-  const classes =
+  const variant =
     triggerType === "scheduled"
-      ? "badge-purple"
+      ? "purple"
       : triggerType === "testing"
-        ? "badge-orange"
-        : "badge-info";
+        ? "orange"
+        : "info";
 
-  return <span className={classes}>{triggerType}</span>;
+  return <Badge variant={variant}>{triggerType}</Badge>;
 }
 
 function ProgressBar({
@@ -41,19 +54,19 @@ function ProgressBar({
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-3xl font-bold text-slate-900 dark:text-dark-text">
+        <span className="text-3xl font-bold text-foreground">
           {current + 1}/{total}
         </span>
-        <span className="text-sm text-slate-500 dark:text-dark-muted">{pct}% complete</span>
+        <span className="text-sm text-muted-foreground">{pct}% complete</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
+      <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div
           className={`h-full rounded-full transition-all duration-500 ${
             status === "completed"
               ? "bg-emerald-500"
               : status === "failed"
-                ? "bg-red-500"
-                : "bg-blue-600"
+                ? "bg-destructive"
+                : "bg-primary"
           }`}
           style={{
             width: status === "completed" ? "100%" : `${pct}%`,
@@ -66,48 +79,42 @@ function ProgressBar({
 
 function OutputModal({
   task,
+  open,
   onClose,
 }: {
   task: TaskRun;
+  open: boolean;
   onClose: () => void;
 }) {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  const [copied, setCopied] = useState(false);
+  const json = JSON.stringify(task.output, null, 2);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(json);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div
-        className="mx-4 flex max-h-[80vh] w-full max-w-2xl flex-col rounded-xl bg-white p-6 shadow-xl dark:bg-dark-surface"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-dark-text">
-            {task.task_name} — Output
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 dark:text-dark-muted dark:hover:text-dark-text"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        <pre className="flex-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-slate-100 p-4 text-sm text-slate-800 dark:bg-slate-800 dark:text-dark-text">
-          {JSON.stringify(task.output, null, 2)}
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="flex max-h-[85vh] max-w-2xl flex-col">
+        <DialogHeader>
+          <DialogTitle>{task.task_name} — Output</DialogTitle>
+        </DialogHeader>
+        <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-muted p-4 text-sm font-mono text-foreground">
+          {json}
         </pre>
-        <div className="mt-4 flex justify-end">
-          <button onClick={onClose} className="btn-secondary">
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={handleCopy}>
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {copied ? "Copied" : "Copy"}
+          </Button>
+          <Button variant="secondary" onClick={onClose}>
             Close
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -127,75 +134,80 @@ export function WorkflowRunDetail({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-dark-text">
+        <h1 className="text-2xl font-bold text-foreground">
           {run.workflow_name}
         </h1>
         <TriggerTypeBadge triggerType={run.trigger_type} />
         <StatusBadge status={run.status} />
         <div className="ml-auto">
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onDelete}
             disabled={!canDelete || deleting}
             title={canDelete ? "Delete this run" : "Cannot delete a running workflow"}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-dark-border dark:bg-dark-surface dark:text-red-400 dark:hover:bg-red-900/30"
+            className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
           >
-            {deleting ? (
-              <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-            ) : (
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-              </svg>
-            )}
+            {deleting ? <Spinner size="sm" /> : <Trash2 className="h-4 w-4" />}
             Delete
-          </button>
+          </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="card">
-          <h3 className="mb-3 text-sm font-medium text-slate-500 dark:text-dark-muted">Progress</h3>
-          <ProgressBar
-            current={run.current_task_index}
-            total={run.total_tasks}
-            status={run.status}
-          />
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Progress</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ProgressBar
+              current={run.current_task_index}
+              total={run.total_tasks}
+              status={run.status}
+            />
+          </CardContent>
+        </Card>
 
-        <div className="card">
-          <h3 className="mb-3 text-sm font-medium text-slate-500 dark:text-dark-muted">Started</h3>
-          <p className="text-sm text-slate-700 dark:text-dark-text">
-            {new Date(run.created_at).toLocaleString()}
-          </p>
-          <p className="mt-1 text-xs text-slate-500 dark:text-dark-muted">
-            Run ID: {run.id.slice(0, 8)}
-          </p>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Started</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-foreground">
+              {new Date(run.created_at).toLocaleString()}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Run ID: {run.id.slice(0, 8)}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {hasInput && (
-        <div className="card">
-          <h3 className="mb-3 text-sm font-medium text-slate-500 dark:text-dark-muted">Input</h3>
-          <dl className="space-y-1">
-            {Object.entries(run.input!).map(([key, value]) => (
-              <div key={key} className="flex gap-2 text-sm">
-                <dt className="font-medium text-slate-700 dark:text-dark-text">{key}:</dt>
-                <dd className="text-slate-500 dark:text-dark-muted">{String(value)}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Input</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="space-y-1">
+              {Object.entries(run.input!).map(([key, value]) => (
+                <div key={key} className="flex gap-2 text-sm">
+                  <dt className="font-medium text-foreground">{key}:</dt>
+                  <dd className="text-muted-foreground">{String(value)}</dd>
+                </div>
+              ))}
+            </dl>
+          </CardContent>
+        </Card>
       )}
 
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-dark-text">Tasks</h2>
+        <h2 className="mb-4 text-lg font-semibold text-foreground">Tasks</h2>
         <div className="space-y-3">
           {run.task_runs.map((task) => (
-            <div
+            <Card
               key={task.task_index}
-              className={`card ${
+              className={
                 task.status === "running"
                   ? "border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-900/20"
                   : task.status === "completed"
@@ -203,64 +215,69 @@ export function WorkflowRunDetail({
                     : task.status === "failed"
                       ? "border-red-200 dark:border-red-800"
                       : ""
-              }`}
+              }
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
-                      task.status === "completed"
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                        : task.status === "failed"
-                          ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                          : task.status === "running"
-                            ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                            : "bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-dark-muted"
-                    }`}
-                  >
-                    {task.task_index + 1}
-                  </div>
-                  <span className="text-sm font-medium text-slate-900 dark:text-dark-text">
-                    {task.task_name}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {task.output && (
-                    <button
-                      onClick={() => setOutputModal(task)}
-                      className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
+                        task.status === "completed"
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                          : task.status === "failed"
+                            ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                            : task.status === "running"
+                              ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                              : "bg-muted text-muted-foreground"
+                      }`}
                     >
-                      Output
-                    </button>
-                  )}
-                  <StatusBadge status={task.status} />
+                      {task.task_index + 1}
+                    </div>
+                    <span className="text-sm font-medium text-foreground">
+                      {task.task_name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {task.output && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setOutputModal(task)}
+                        className="h-7 gap-1 text-xs"
+                      >
+                        <FileText className="h-3 w-3" />
+                        Output
+                      </Button>
+                    )}
+                    <StatusBadge status={task.status} />
+                  </div>
                 </div>
-              </div>
 
-              <div className="mt-2 ml-10 space-y-1">
-                {task.started_at && (
-                  <p className="text-xs text-slate-500 dark:text-dark-muted">
-                    Started: {new Date(task.started_at).toLocaleString()}
-                  </p>
-                )}
-                {task.completed_at && (
-                  <p className="text-xs text-slate-500 dark:text-dark-muted">
-                    Completed: {new Date(task.completed_at).toLocaleString()}
-                  </p>
-                )}
-                {task.error && (
-                  <p className="rounded bg-red-50 px-2 py-1 text-xs text-red-600 dark:bg-red-900/30 dark:text-red-400">
-                    {task.error}
-                  </p>
-                )}
-              </div>
-            </div>
+                <div className="mt-2 ml-10 space-y-1">
+                  {task.started_at && (
+                    <p className="text-xs text-muted-foreground">
+                      Started: {new Date(task.started_at).toLocaleString()}
+                    </p>
+                  )}
+                  {task.completed_at && (
+                    <p className="text-xs text-muted-foreground">
+                      Completed: {new Date(task.completed_at).toLocaleString()}
+                    </p>
+                  )}
+                  {task.error && (
+                    <p className="rounded bg-destructive/10 px-2 py-1 text-xs text-destructive">
+                      {task.error}
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
 
       {outputModal && (
-        <OutputModal task={outputModal} onClose={() => setOutputModal(null)} />
+        <OutputModal task={outputModal} open={true} onClose={() => setOutputModal(null)} />
       )}
     </div>
   );

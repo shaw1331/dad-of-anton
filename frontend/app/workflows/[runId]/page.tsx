@@ -2,9 +2,13 @@
 
 import { useEffect, useState, use, useCallback } from "react";
 import Link from "next/link";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
 import { WorkflowRunDetail } from "@/app/components/WorkflowRunDetail";
 import { getWorkflowRun, deleteWorkflowRun } from "@/lib/api/workflows";
 import type { RunDetail } from "@/lib/types";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export default function WorkflowRunDetailPage({
   params,
@@ -15,9 +19,9 @@ export default function WorkflowRunDetailPage({
   const [run, setRun] = useState<RunDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleDelete = useCallback(async () => {
-    if (!window.confirm("Delete this workflow run? This cannot be undone.")) return;
     setDeleting(true);
     try {
       await deleteWorkflowRun(runId);
@@ -53,23 +57,19 @@ export default function WorkflowRunDetailPage({
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-24">
-        <svg
-          className="mb-4 h-12 w-12 text-red-300 dark:text-red-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
-          />
-        </svg>
-        <p className="mb-4 text-sm text-slate-600 dark:text-dark-muted">{error}</p>
-        <Link href="/workflows" className="btn-ghost">
-          Back to workflows
-        </Link>
+        <Card className="w-full max-w-sm">
+          <CardContent className="flex flex-col items-center gap-4 p-6">
+            <AlertTriangle className="h-10 w-10 text-destructive" />
+            <p className="text-sm text-muted-foreground">{error}</p>
+            <Link
+              href="/workflows"
+              className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to workflows
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -78,16 +78,16 @@ export default function WorkflowRunDetailPage({
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-48 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-          <div className="h-6 w-16 animate-pulse rounded-full bg-slate-200 dark:bg-slate-700" />
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-6 w-16 rounded-full" />
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="card h-32 animate-pulse" />
-          <div className="card h-32 animate-pulse" />
+          <Card className="h-32"><CardContent className="p-0"><Skeleton className="h-full" /></CardContent></Card>
+          <Card className="h-32"><CardContent className="p-0"><Skeleton className="h-full" /></CardContent></Card>
         </div>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="card h-20 animate-pulse" />
+            <Card key={i} className="h-20"><CardContent className="p-0"><Skeleton className="h-full" /></CardContent></Card>
           ))}
         </div>
       </div>
@@ -98,24 +98,20 @@ export default function WorkflowRunDetailPage({
     <div className="space-y-6">
       <Link
         href="/workflows"
-        className="inline-flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-900 dark:text-dark-muted dark:hover:text-dark-text"
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
-        <svg
-          className="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 19.5L8.25 12l7.5-7.5"
-          />
-        </svg>
+        <ArrowLeft className="h-4 w-4" />
         Back to workflows
       </Link>
-      <WorkflowRunDetail run={run} onDelete={handleDelete} deleting={deleting} />
+      <WorkflowRunDetail run={run} onDelete={() => setShowDeleteDialog(true)} deleting={deleting} />
+      <ConfirmDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Delete workflow run?"
+        description="This action cannot be undone. The run and all its data will be permanently removed."
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }
