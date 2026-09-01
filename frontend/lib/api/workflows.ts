@@ -23,3 +23,13 @@ export async function getWorkflowRuns(): Promise<WorkflowRun[]> {
 export async function getWorkflowRun(runId: string): Promise<RunDetail> {
   return request(`/workflows/runs/${runId}`);
 }
+
+export async function deleteWorkflowRun(runId: string): Promise<void> {
+  const res = await fetch(`/api/v1/workflows/runs/${runId}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.detail ?? `API error: ${res.status}`);
+  }
+}

@@ -44,3 +44,7 @@ class WorkflowRunRepository:
             "output": output,
             "updated_at": datetime.now(timezone.utc).isoformat(),
         }).eq("id", run_id).execute()
+
+    def delete(self, run_id: str) -> None:
+        supabase = get_supabase_client()
+        supabase.table("workflow_runs").delete().eq("id", run_id).execute()

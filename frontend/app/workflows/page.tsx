@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { WorkflowRunList } from "@/app/components/WorkflowRunList";
-import { getWorkflows, getWorkflowRuns, triggerWorkflow } from "@/lib/api/workflows";
+import { getWorkflows, getWorkflowRuns, triggerWorkflow, deleteWorkflowRun } from "@/lib/api/workflows";
 import type { WorkflowConfig, WorkflowRun, InputField } from "@/lib/types";
 
 export default function WorkflowsPage() {
@@ -14,6 +14,7 @@ export default function WorkflowsPage() {
   const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowConfig | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState<Record<string, any>>({});
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -79,6 +80,19 @@ export default function WorkflowsPage() {
     setShowModal(false);
     setSelectedWorkflow(null);
     setFormData({});
+  }, []);
+
+  const handleDelete = useCallback(async (runId: string) => {
+    if (!window.confirm("Delete this workflow run? This cannot be undone.")) return;
+    setDeletingId(runId);
+    try {
+      await deleteWorkflowRun(runId);
+      setRuns((prev) => prev.filter((r) => r.id !== runId));
+    } catch (err: any) {
+      setError(err.message || "Failed to delete run");
+    } finally {
+      setDeletingId(null);
+    }
   }, []);
 
   useEffect(() => {
@@ -290,6 +304,8 @@ export default function WorkflowsPage() {
       <WorkflowRunList
         runs={runs}
         onSelect={(runId) => (window.location.href = `/workflows/${runId}`)}
+        onDelete={handleDelete}
+        deletingId={deletingId}
       />
 
       {showModal && selectedWorkflow && (
