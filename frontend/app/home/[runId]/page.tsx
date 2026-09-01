@@ -53,7 +53,7 @@ export default function WorkflowRunDetailPage({
             d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
           />
         </svg>
-        <p className="mb-4 text-sm text-slate-600 dark:text-dark-muted">{error}</p>
+        <p className="mb-4 text-sm text-slate-600 dark:text-[#888888]">{error}</p>
         <Link href="/home" className="btn-ghost">
           Back to workflows
         </Link>
@@ -65,8 +65,8 @@ export default function WorkflowRunDetailPage({
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-48 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-          <div className="h-6 w-16 animate-pulse rounded-full bg-slate-200 dark:bg-slate-700" />
+          <div className="h-8 w-48 animate-pulse rounded bg-slate-200 dark:bg-[#111111]" />
+          <div className="h-6 w-16 animate-pulse rounded-full bg-slate-200 dark:bg-[#111111]" />
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="card h-32 animate-pulse" />
@@ -85,7 +85,7 @@ export default function WorkflowRunDetailPage({
     <div className="space-y-6">
       <Link
         href="/home"
-        className="inline-flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-900 dark:text-dark-muted dark:hover:text-dark-text"
+        className="inline-flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-900 dark:text-[#888888] dark:hover:text-[#EDEDED]"
       >
         <svg
           className="h-4 w-4"

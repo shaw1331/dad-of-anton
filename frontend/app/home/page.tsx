@@ -116,7 +116,7 @@ export default function WorkflowsPage() {
             type="checkbox"
             checked={!!value}
             onChange={(e) => setFormData({ ...formData, [field.name]: e.target.checked })}
-            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-dark-border dark:bg-dark-surface"
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-[rgba(255,255,255,0.08)] dark:bg-[#0a0a0a]"
           />
         );
       case "int":
@@ -165,14 +165,14 @@ export default function WorkflowsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-dark-text">Workflows</h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-dark-muted">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-[#EDEDED]">Workflows</h1>
+        <p className="mt-1 text-sm text-gray-500 dark:text-[#888888]">
           Trigger and monitor your workflows
         </p>
       </div>
 
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-dark-text">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-[#EDEDED]">
           Available Workflows
         </h2>
         {error && (
@@ -205,7 +205,7 @@ export default function WorkflowsPage() {
                 d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
               />
             </svg>
-            <p className="text-sm text-slate-500 dark:text-dark-muted">No workflows found</p>
+            <p className="text-sm text-gray-500 dark:text-[#888888]">No workflows found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -227,11 +227,11 @@ export default function WorkflowsPage() {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-base font-semibold text-slate-900 dark:text-dark-text">
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-[#EDEDED]">
                     {wf.name}
                   </h3>
                 </div>
-                <p className="mb-4 ml-10 text-sm text-slate-500 dark:text-dark-muted">
+                <p className="mb-4 ml-10 text-sm text-gray-500 dark:text-[#888888]">
                   {wf.description}
                 </p>
                 <button
@@ -298,16 +298,16 @@ export default function WorkflowsPage() {
           onClick={handleModalCancel}
         >
           <div
-            className="mx-4 w-full max-w-lg rounded-xl bg-white p-6 shadow-xl dark:bg-dark-surface"
+            className="mx-4 w-full max-w-lg rounded-xl bg-white p-6 shadow-xl dark:bg-[#0a0a0a] dark:border dark:border-[rgba(255,255,255,0.06)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="mb-4 text-lg font-semibold text-slate-900 dark:text-dark-text">
+              <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-[#EDEDED]">
               Trigger {selectedWorkflow.name}
             </h3>
             <div className="space-y-4">
               {selectedWorkflow.input_fields.map((field) => (
                 <div key={field.name}>
-                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-dark-muted">
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-[#888888]">
                     {field.label}
                     {field.required && <span className="ml-1 text-red-500">*</span>}
                   </label>

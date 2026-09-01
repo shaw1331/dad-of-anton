@@ -8,7 +8,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 dark:border-dark-border dark:bg-dark-surface dark:text-dark-muted dark:hover:bg-slate-700 dark:hover:text-dark-text"
+      className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-all hover:bg-gray-50 hover:text-gray-900 dark:border-[rgba(255,255,255,0.08)] dark:bg-[#0a0a0a] dark:text-[#888888] dark:hover:bg-[#111111] dark:hover:text-[#EDEDED]"
       aria-label="Toggle dark mode"
     >
       <svg

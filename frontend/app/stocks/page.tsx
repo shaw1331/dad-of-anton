@@ -36,21 +36,21 @@ export default function StocksPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-dark-text">
+      <div className="page-header">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-[#EDEDED]">
           Stock Scraper
         </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-dark-muted">
+        <p className="mt-1 text-sm text-gray-500 dark:text-[#888888]">
           Enter stock tickers to scrape data from screener.in
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="card max-w-lg">
-        <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-dark-muted">
+        <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-[#888888]">
           Stock Tickers
           <span className="ml-1 text-red-500">*</span>
         </label>
-        <p className="mb-2 text-xs text-slate-400 dark:text-slate-500">
+        <p className="mb-3 text-xs text-slate-400 dark:text-slate-500">
           Comma-separated list (e.g. RELIANCE, TCS, INFY)
         </p>
         <input
@@ -66,7 +66,7 @@ export default function StocksPage() {
         <button
           type="submit"
           disabled={loading}
-          className="btn-primary mt-4 w-full"
+          className="btn-primary mt-5 w-full"
         >
           {loading ? (
             <>
@@ -92,7 +92,22 @@ export default function StocksPage() {
               Scraping...
             </>
           ) : (
-            "Scrape Stocks"
+            <>
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                />
+              </svg>
+              Scrape Stocks
+            </>
           )}
         </button>
       </form>

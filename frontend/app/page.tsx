@@ -20,10 +20,10 @@ export default function Home() {
             />
           </svg>
         </div>
-        <h1 className="mb-3 text-4xl font-bold tracking-tight text-slate-900 dark:text-dark-text">
+        <h1 className="mb-3 text-4xl font-bold tracking-tight text-gray-900 dark:text-[#EDEDED]">
           Dad of Anton
         </h1>
-        <p className="mb-8 text-lg text-slate-500 dark:text-dark-muted">
+        <p className="mb-8 text-lg text-gray-500 dark:text-[#888888]">
           Workflow orchestration dashboard
         </p>
         <div className="flex items-center justify-center gap-3">

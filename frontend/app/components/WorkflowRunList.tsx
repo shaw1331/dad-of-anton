@@ -5,12 +5,12 @@ import type { WorkflowRun, TriggerType } from "@/lib/types";
 function StatusBadge({ status }: { status: string }) {
   const classes =
     status === "completed"
-      ? "badge-success"
+      ? "badge badge-success"
       : status === "failed"
-        ? "badge-danger"
+        ? "badge badge-danger"
         : status === "running"
-          ? "badge-warning"
-          : "badge-muted";
+          ? "badge badge-warning"
+          : "badge badge-muted";
 
   return <span className={classes}>{status}</span>;
 }
@@ -18,10 +18,10 @@ function StatusBadge({ status }: { status: string }) {
 function TriggerTypeBadge({ triggerType }: { triggerType: TriggerType }) {
   const classes =
     triggerType === "scheduled"
-      ? "badge-purple"
+      ? "badge badge-purple"
       : triggerType === "testing"
-        ? "badge-orange"
-        : "badge-info";
+        ? "badge badge-orange"
+        : "badge badge-info";
 
   return <span className={classes}>{triggerType}</span>;
 }
@@ -39,7 +39,7 @@ export function WorkflowRunList({
 }) {
   return (
     <div>
-      <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-dark-text">Recent Runs</h2>
+      <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-[#EDEDED]">Recent Runs</h2>
       {runs.length === 0 ? (
         <div className="card flex flex-col items-center justify-center py-12 text-center">
           <svg
@@ -55,7 +55,7 @@ export function WorkflowRunList({
               d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <p className="text-sm text-slate-500 dark:text-dark-muted">No runs yet</p>
+          <p className="text-sm text-slate-500 dark:text-[#888888]">No runs yet</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -68,9 +68,9 @@ export function WorkflowRunList({
                 onClick={() => onSelect(run.id)}
                 className="flex flex-1 items-center gap-3 text-left"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-[#111111]">
                   <svg
-                    className="h-4 w-4 text-slate-600 dark:text-dark-muted"
+                    className="h-4 w-4 text-slate-600 dark:text-[#888888]"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={2}
@@ -84,10 +84,10 @@ export function WorkflowRunList({
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-900 dark:text-dark-text">
+                  <p className="text-sm font-medium text-slate-900 dark:text-[#EDEDED]">
                     {run.workflow_name}
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-dark-muted">
+                  <p className="text-xs text-slate-500 dark:text-[#888888]">
                     {new Date(run.created_at).toLocaleString()}
                   </p>
                 </div>
@@ -103,7 +103,7 @@ export function WorkflowRunList({
                     }}
                     disabled={run.status === "running" || deletingId === run.id}
                     title={run.status === "running" ? "Cannot delete a running workflow" : "Delete this run"}
-                    className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40 dark:text-dark-muted dark:hover:bg-red-900/30 dark:hover:text-red-400"
+                    className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40 dark:text-[#888888] dark:hover:bg-red-500/10 dark:hover:text-red-400"
                   >
                     {deletingId === run.id ? (
                       <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
