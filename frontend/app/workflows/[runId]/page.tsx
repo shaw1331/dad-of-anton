@@ -8,6 +8,7 @@ import { getWorkflowRun, deleteWorkflowRun } from "@/lib/api/workflows";
 import type { RunDetail } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export default function WorkflowRunDetailPage({
   params,
@@ -18,9 +19,9 @@ export default function WorkflowRunDetailPage({
   const [run, setRun] = useState<RunDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleDelete = useCallback(async () => {
-    if (!window.confirm("Delete this workflow run? This cannot be undone.")) return;
     setDeleting(true);
     try {
       await deleteWorkflowRun(runId);
@@ -102,7 +103,15 @@ export default function WorkflowRunDetailPage({
         <ArrowLeft className="h-4 w-4" />
         Back to workflows
       </Link>
-      <WorkflowRunDetail run={run} onDelete={handleDelete} deleting={deleting} />
+      <WorkflowRunDetail run={run} onDelete={() => setShowDeleteDialog(true)} deleting={deleting} />
+      <ConfirmDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Delete workflow run?"
+        description="This action cannot be undone. The run and all its data will be permanently removed."
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,7 @@ export default function WorkflowsPage() {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteRunId, setDeleteRunId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -106,7 +108,6 @@ export default function WorkflowsPage() {
   }, []);
 
   const handleDelete = useCallback(async (runId: string) => {
-    if (!window.confirm("Delete this workflow run? This cannot be undone.")) return;
     setDeletingId(runId);
     try {
       await deleteWorkflowRun(runId);
@@ -240,7 +241,7 @@ export default function WorkflowsPage() {
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {workflows.map((wf) => (
-              <Card key={wf.name} className="group transition-all hover:shadow-md">
+              <Card key={wf.name} className="group flex flex-col transition-all hover:shadow-md">
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
@@ -249,27 +250,29 @@ export default function WorkflowsPage() {
                     <CardTitle className="text-base">{wf.name}</CardTitle>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="ml-10 text-sm text-muted-foreground">
+                <CardContent className="flex flex-1 flex-col gap-4">
+                  <p className="text-sm text-muted-foreground">
                     {wf.description}
                   </p>
-                  <Button
-                    onClick={() => handleTriggerClick(wf)}
-                    disabled={triggering === wf.name}
-                    className="w-full"
-                  >
-                    {triggering === wf.name ? (
-                      <>
-                        <Spinner size="sm" className="text-primary-foreground" />
-                        Triggering...
-                      </>
-                    ) : (
-                      <>
-                        <Play className="h-4 w-4" />
-                        Trigger
-                      </>
-                    )}
-                  </Button>
+                  <div className="mt-auto pt-2">
+                    <Button
+                      onClick={() => handleTriggerClick(wf)}
+                      disabled={triggering === wf.name}
+                      className="w-full"
+                    >
+                      {triggering === wf.name ? (
+                        <>
+                          <Spinner size="sm" className="text-primary-foreground" />
+                          Triggering...
+                        </>
+                      ) : (
+                        <>
+                          <Play className="h-4 w-4" />
+                          Trigger
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -280,7 +283,7 @@ export default function WorkflowsPage() {
       <WorkflowRunList
         runs={runs}
         onSelect={(runId) => (window.location.href = `/workflows/${runId}`)}
-        onDelete={handleDelete}
+        onDelete={(runId) => setDeleteRunId(runId)}
         deletingId={deletingId}
       />
 
@@ -329,6 +332,18 @@ export default function WorkflowsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={deleteRunId !== null}
+        onOpenChange={(open) => { if (!open) setDeleteRunId(null); }}
+        title="Delete workflow run?"
+        description="This action cannot be undone. The run and all its data will be permanently removed."
+        confirmLabel="Delete"
+        onConfirm={() => {
+          if (deleteRunId) handleDelete(deleteRunId);
+          setDeleteRunId(null);
+        }}
+      />
     </div>
   );
 }

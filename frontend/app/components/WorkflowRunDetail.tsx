@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { RunDetail, TaskRun, TriggerType } from "@/lib/types";
-import { Trash2, X, FileText } from "lucide-react";
+import { Trash2, X, FileText, Copy, Check } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -86,16 +86,29 @@ function OutputModal({
   open: boolean;
   onClose: () => void;
 }) {
+  const [copied, setCopied] = useState(false);
+  const json = JSON.stringify(task.output, null, 2);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(json);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="flex max-h-[85vh] max-w-2xl flex-col">
         <DialogHeader>
           <DialogTitle>{task.task_name} — Output</DialogTitle>
         </DialogHeader>
-        <pre className="flex-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-muted p-4 text-sm font-mono text-foreground">
-          {JSON.stringify(task.output, null, 2)}
+        <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-muted p-4 text-sm font-mono text-foreground">
+          {json}
         </pre>
         <DialogFooter>
+          <Button variant="outline" size="sm" onClick={handleCopy}>
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {copied ? "Copied" : "Copy"}
+          </Button>
           <Button variant="secondary" onClick={onClose}>
             Close
           </Button>
