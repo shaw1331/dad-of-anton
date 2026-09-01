@@ -42,6 +42,18 @@ body {
     @apply bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-dark-muted;
   }
 
+  .badge-info {
+    @apply bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400;
+  }
+
+  .badge-purple {
+    @apply bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400;
+  }
+
+  .badge-orange {
+    @apply bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400;
+  }
+
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow active:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50;
   }

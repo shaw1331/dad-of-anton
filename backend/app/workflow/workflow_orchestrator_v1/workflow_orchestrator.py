@@ -55,13 +55,16 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
                 validated[field.name] = field.default
         return validated
 
-    def create_run(self, workflow_name: str, input_data: dict | None = None) -> str:
+    def create_run(
+        self, workflow_name: str, input_data: dict | None = None, trigger_type: str = "manual"
+    ) -> str:
         config = self.resolve_config(workflow_name)
         validated_input = self.validate_input(config, input_data or {})
 
         run = WorkflowRun(
             workflow_name=workflow_name,
             status="pending",
+            trigger_type=trigger_type,
             current_task_index=0,
             total_tasks=len(config.tasks),
             input=validated_input,

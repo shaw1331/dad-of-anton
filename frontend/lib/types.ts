@@ -15,10 +15,13 @@ export interface WorkflowConfig {
   input_fields: InputField[];
 }
 
+export type TriggerType = "manual" | "scheduled" | "testing";
+
 export interface WorkflowRun {
   id: string;
   workflow_name: string;
   status: "pending" | "running" | "completed" | "failed";
+  trigger_type: TriggerType;
   current_task_index: number;
   total_tasks: number;
   created_at: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { RunDetail, TaskRun } from "@/lib/types";
+import type { RunDetail, TaskRun, TriggerType } from "@/lib/types";
 
 function StatusBadge({ status }: { status: string }) {
   const classes =
@@ -14,6 +14,17 @@ function StatusBadge({ status }: { status: string }) {
           : "badge-muted";
 
   return <span className={classes}>{status}</span>;
+}
+
+function TriggerTypeBadge({ triggerType }: { triggerType: TriggerType }) {
+  const classes =
+    triggerType === "scheduled"
+      ? "badge-purple"
+      : triggerType === "testing"
+        ? "badge-orange"
+        : "badge-info";
+
+  return <span className={classes}>{triggerType}</span>;
 }
 
 function ProgressBar({
@@ -119,6 +130,7 @@ export function WorkflowRunDetail({
         <h1 className="text-2xl font-bold text-slate-900 dark:text-dark-text">
           {run.workflow_name}
         </h1>
+        <TriggerTypeBadge triggerType={run.trigger_type} />
         <StatusBadge status={run.status} />
         <div className="ml-auto">
           <button

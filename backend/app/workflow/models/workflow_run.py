@@ -6,6 +6,7 @@ from app.models.base import BaseModel
 class WorkflowRun(BaseModel):
     workflow_name: str
     status: str
+    trigger_type: str = "manual"
     current_task_index: int
     total_tasks: int
     error: str | None = None

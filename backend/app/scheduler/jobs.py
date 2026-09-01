@@ -20,7 +20,7 @@ async def run_scheduled_stock_analysis() -> None:
     for entry in SCHEDULED_INDICES:
         index_name = entry["index"]
         try:
-            run_id = orchestrator.create_run("stock_analyser", entry)
+            run_id = orchestrator.create_run("stock_analyser", entry, trigger_type="scheduled")
             logger.info("Starting workflow run %s for index %s", run_id, index_name)
             await orchestrator.run_workflow(run_id)
             logger.info("Completed workflow run %s for index %s", run_id, index_name)
