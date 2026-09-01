@@ -55,9 +55,7 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
                 validated[field.name] = field.default
         return validated
 
-    def trigger_workflow(
-        self, workflow_name: str, background_tasks: BackgroundTasks, input_data: dict | None = None
-    ) -> str:
+    def create_run(self, workflow_name: str, input_data: dict | None = None) -> str:
         config = self.resolve_config(workflow_name)
         validated_input = self.validate_input(config, input_data or {})
 
@@ -79,9 +77,14 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
             )
             self.task_run_repo.create(task_run)
 
-        background_tasks.add_task(self.run_workflow, run.id)
-
         return run.id
+
+    def trigger_workflow(
+        self, workflow_name: str, background_tasks: BackgroundTasks, input_data: dict | None = None
+    ) -> str:
+        run_id = self.create_run(workflow_name, input_data)
+        background_tasks.add_task(self.run_workflow, run_id)
+        return run_id
 
     async def run_workflow(self, run_id: str) -> None:
         await asyncio.to_thread(self.run_repo.update_status, run_id, "running")
