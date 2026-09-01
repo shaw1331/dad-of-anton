@@ -10,7 +10,17 @@ def _register_stock_analyser() -> None:
     import app.stock_analyser.workflow  # noqa: F401
 
 
+def _register_stock_scraper() -> None:
+    import app.stock_scraper.workflow  # noqa: F401
+
+
+def _register_screener_query() -> None:
+    import app.screener_query.workflow  # noqa: F401
+
+
 _register_stock_analyser()
+_register_stock_scraper()
+_register_screener_query()
 
 __all__ = [
     "WorkflowOrchestrator",

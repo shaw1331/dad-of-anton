@@ -8,3 +8,4 @@ frontend/next-env.d.ts
 .env.local
 analysis-out/
 .claude/skills/stock-analyst/.venv/
+__pycache__/

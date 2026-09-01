@@ -59,10 +59,22 @@ export default function RootLayout({
                     Home
                   </Link>
                   <Link
-                    href="/workflows"
+                    href="/home"
                     className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-dark-muted dark:hover:bg-slate-700 dark:hover:text-dark-text"
                   >
                     Workflows
+                  </Link>
+                  <Link
+                    href="/stocks"
+                    className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-dark-muted dark:hover:bg-slate-700 dark:hover:text-dark-text"
+                  >
+                    Stocks
+                  </Link>
+                  <Link
+                    href="/screener"
+                    className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-dark-muted dark:hover:bg-slate-700 dark:hover:text-dark-text"
+                  >
+                    Screener
                   </Link>
                   <div className="ml-2">
                     <ThemeToggle />
