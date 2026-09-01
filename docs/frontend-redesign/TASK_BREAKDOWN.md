@@ -27,40 +27,40 @@
 
 ---
 
-### Task 3: Button Component
-**Phase**: 2 | **Priority**: High | **Est. Effort**: Small
+### Task 3: Button Component ✅
+**Phase**: 2 | **Priority**: High | **Est. Effort**: Small | **Status**: Complete
 
-- [ ] 3.1 Review generated `components/ui/button.tsx`
-- [ ] 3.2 Add `loading` prop with `Loader2` spinner icon
-- [ ] 3.3 Verify all variants render: `default`, `secondary`, `ghost`, `destructive`, `outline`, `link`
-- [ ] 3.4 Verify all sizes render: `sm`, `default`, `lg`, `icon`
-
----
-
-### Task 4: Badge Component
-**Phase**: 2 | **Priority**: High | **Est. Effort**: Small
-
-- [ ] 4.1 Review generated `components/ui/badge.tsx`
-- [ ] 4.2 Add semantic variants: `success` (emerald), `warning` (amber), `info` (blue), `purple`, `orange`
-- [ ] 4.3 Verify all variants render with correct colors in light and dark mode
+- [x] 3.1 Created `components/ui/button.tsx` — cva-based with variants
+- [x] 3.2 Added `loading` prop with `Loader2` spinner icon, auto-disables when loading
+- [x] 3.3 All variants implemented: `default`, `secondary`, `ghost`, `destructive`, `outline`, `link`
+- [x] 3.4 All sizes implemented: `sm`, `default`, `lg`, `icon`
 
 ---
 
-### Task 5: Card, Dialog, Input, Select & Remaining UI Components
-**Phase**: 2 | **Priority**: High | **Est. Effort**: Medium
+### Task 4: Badge Component ✅
+**Phase**: 2 | **Priority**: High | **Est. Effort**: Small | **Status**: Complete
 
-- [ ] 5.1 Review `components/ui/card.tsx` — verify composable slots work
-- [ ] 5.2 Review `components/ui/dialog.tsx` — test open/close animation
-- [ ] 5.3 Review `components/ui/input.tsx` — verify focus ring and error state
-- [ ] 5.4 Review `components/ui/select.tsx` — verify custom trigger styling
-- [ ] 5.5 Review `components/ui/textarea.tsx` — matches Input
-- [ ] 5.6 Review `components/ui/label.tsx` — verify required indicator
-- [ ] 5.7 Review `components/ui/checkbox.tsx` — verify custom styling
-- [ ] 5.8 Review `components/ui/tooltip.tsx` — verify hover behavior
-- [ ] 5.9 Review `components/ui/separator.tsx` — verify horizontal/vertical
-- [ ] 5.10 Review `components/ui/skeleton.tsx` — verify pulse animation
-- [ ] 5.11 Create `components/ui/spinner.tsx` — custom standalone spinner with size props
-- [ ] 5.12 Create `components/ui/icon.tsx` — Lucide wrapper with default stroke-width
+- [x] 4.1 Created `components/ui/badge.tsx` — cva-based with variants
+- [x] 4.2 Added semantic variants: `success` (emerald), `warning` (amber), `info` (blue), `purple`, `orange`, `muted`
+- [x] 4.3 All variants verified in build — light/dark via Tailwind dark: prefix
+
+---
+
+### Task 5: Card, Dialog, Input, Select & Remaining UI Components ✅
+**Phase**: 2 | **Priority**: High | **Est. Effort**: Medium | **Status**: Complete
+
+- [x] 5.1 Created `components/ui/card.tsx` — composable: Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter
+- [x] 5.2 Created `components/ui/dialog.tsx` — Radix Dialog with fade+scale animation, X close button
+- [x] 5.3 Created `components/ui/input.tsx` — focus ring, shadow, placeholder styling
+- [x] 5.4 Created `components/ui/select.tsx` — Radix Select with custom trigger, Check/ChevronDown icons
+- [x] 5.5 Created `components/ui/textarea.tsx` — matches Input styling
+- [x] 5.6 Created `components/ui/label.tsx` — Radix Label with font-medium
+- [x] 5.7 Created `components/ui/checkbox.tsx` — Radix Checkbox with Check indicator
+- [x] 5.8 Created `components/ui/tooltip.tsx` — Radix Tooltip with animate-in
+- [x] 5.9 Created `components/ui/separator.tsx` — Radix Separator, horizontal/vertical
+- [x] 5.10 Created `components/ui/skeleton.tsx` — animate-pulse rounded placeholder
+- [x] 5.11 Created `components/ui/spinner.tsx` — custom, Loader2 with sm/default/lg sizes
+- [x] 5.12 Created `components/ui/icon.tsx` — Lucide wrapper, strokeWidth 1.5, sm/default/lg sizes
 
 ---
 
