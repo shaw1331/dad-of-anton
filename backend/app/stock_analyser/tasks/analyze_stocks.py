@@ -51,10 +51,16 @@ class AnalyzeStocksTask:
                 analysis = {**result.data, "ticker": ticker, "name": stock.get("name", "")}
                 analyses.append(analysis)
             else:
-                raise Exception(f"Analysis failed for {ticker}: {result.error}")
+                logger.error("[%d/%d] Analysis failed for %s: %s",
+                             i, len(stocks), ticker, result.error)
+                analyses.append({
+                    "ticker": ticker,
+                    "name": stock.get("name", ""),
+                    "error": result.error,
+                })
 
         logger.info("Analysis complete: %d/%d stocks analyzed successfully",
-                     len(analyses), len(stocks))
+                     len([a for a in analyses if "error" not in a]), len(stocks))
 
         ctx.set_output(self.name, {
             "index": index,
