@@ -1,7 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { Search } from "lucide-react";
 import { getCandles, Candle } from "@/lib/api/tradingview";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function TradingViewPage() {
   const [symbol, setSymbol] = useState("");
@@ -35,111 +49,139 @@ export default function TradingViewPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-[#EDEDED]">
-        TradingView Candles
-      </h1>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          TradingView Candles
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Fetch OHLCV candle data from TradingView for any listed symbol.
+        </p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="card flex flex-wrap items-end gap-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-[#888888]">
-            Stock Symbol
-          </label>
-          <input
-            type="text"
-            value={symbol}
-            onChange={(e) => setSymbol(e.target.value.toUpperCase())}
-            placeholder="e.g. INOXINDIA"
-            className="input-field"
-            required
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-[#888888]">
-            Exchange
-          </label>
-          <select
-            value={exchange}
-            onChange={(e) => setExchange(e.target.value)}
-            className="input-field"
-          >
-            <option value="NSE">NSE</option>
-            <option value="BSE">BSE</option>
-          </select>
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-[#888888]">
-            Interval
-          </label>
-          <select
-            value={interval}
-            onChange={(e) => setInterval(e.target.value)}
-            className="input-field"
-          >
-            <option value="1">1m</option>
-            <option value="5">5m</option>
-            <option value="15">15m</option>
-            <option value="60">1h</option>
-            <option value="240">4h</option>
-            <option value="1D">1D</option>
-            <option value="1W">1W</option>
-            <option value="1M">1M</option>
-          </select>
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-[#888888]">
-            Bars
-          </label>
-          <input
-            type="number"
-            value={bars}
-            onChange={(e) => setBars(Number(e.target.value))}
-            min={1}
-            max={500}
-            className="input-field w-20"
-          />
-        </div>
-        <button type="submit" disabled={loading} className="btn-primary">
-          {loading ? "Loading..." : "Fetch"}
-        </button>
-      </form>
+      <Card>
+        <CardContent className="p-6">
+          <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-4">
+            <div className="min-w-[200px] flex-1">
+              <Label htmlFor="symbol" className="mb-1.5">Stock Symbol</Label>
+              <Input
+                id="symbol"
+                type="text"
+                value={symbol}
+                onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+                placeholder="e.g. INOXINDIA"
+                required
+              />
+            </div>
+            <div className="min-w-[140px]">
+              <Label className="mb-1.5">Exchange</Label>
+              <Select value={exchange} onValueChange={setExchange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="NSE">NSE</SelectItem>
+                  <SelectItem value="BSE">BSE</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="min-w-[140px]">
+              <Label className="mb-1.5">Interval</Label>
+              <Select value={interval} onValueChange={setInterval}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1m</SelectItem>
+                  <SelectItem value="5">5m</SelectItem>
+                  <SelectItem value="15">15m</SelectItem>
+                  <SelectItem value="60">1h</SelectItem>
+                  <SelectItem value="240">4h</SelectItem>
+                  <SelectItem value="1D">1D</SelectItem>
+                  <SelectItem value="1W">1W</SelectItem>
+                  <SelectItem value="1M">1M</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="w-24">
+              <Label htmlFor="bars" className="mb-1.5">Bars</Label>
+              <Input
+                id="bars"
+                type="number"
+                value={bars}
+                onChange={(e) => setBars(Number(e.target.value))}
+                min={1}
+                max={500}
+              />
+            </div>
+            <Button type="submit" disabled={loading || !symbol.trim()}>
+              {loading ? (
+                <>
+                  <Spinner size="sm" className="text-primary-foreground" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <Search className="h-4 w-4" />
+                  Fetch
+                </>
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
       {error && (
-        <div className="card border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-900/20 dark:text-red-400">
-          {error}
-        </div>
+        <Card className="border-destructive bg-destructive/10">
+          <CardContent className="p-4">
+            <p className="text-sm text-destructive">{error}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {loading && !candles.length && (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-3 py-12">
+            <Spinner size="lg" />
+            <p className="text-sm text-muted-foreground">
+              Fetching candle data...
+            </p>
+          </CardContent>
+        </Card>
       )}
 
       {meta && candles.length > 0 && (
-        <div className="card">
-          <div className="mb-4 flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-[#EDEDED]">
-              {meta.exchange}:{meta.symbol}
-            </h2>
-            <span className="badge badge-info">{meta.interval}</span>
-            <span className="badge badge-muted">{candles.length} bars</span>
+        <Card>
+          <div className="px-6 pt-6">
+            <div className="mb-4 flex items-center gap-3">
+              <h2 className="text-lg font-semibold text-foreground">
+                {meta.exchange}:{meta.symbol}
+              </h2>
+              <Badge variant="info">{meta.interval}</Badge>
+              <Badge variant="muted">{candles.length} bars</Badge>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-white/10">
-                    <th className="px-3 py-2 font-medium text-slate-600 dark:text-[#888888]">
-                      Date
-                    </th>
-                    <th className="px-3 py-2 font-medium text-slate-600 dark:text-[#888888]">
-                      Open
-                    </th>
-                    <th className="px-3 py-2 font-medium text-slate-600 dark:text-[#888888]">
-                      High
-                    </th>
-                    <th className="px-3 py-2 font-medium text-slate-600 dark:text-[#888888]">
-                      Low
-                    </th>
-                    <th className="px-3 py-2 font-medium text-slate-600 dark:text-[#888888]">
-                      Close
-                    </th>
-                    <th className="px-3 py-2 font-medium text-slate-600 dark:text-[#888888]">
-                      Volume
-                    </th>
+                <tr className="border-b border-border">
+                  <th className="px-4 py-3 font-medium text-muted-foreground">
+                    Date
+                  </th>
+                  <th className="px-4 py-3 font-medium text-muted-foreground">
+                    Open
+                  </th>
+                  <th className="px-4 py-3 font-medium text-muted-foreground">
+                    High
+                  </th>
+                  <th className="px-4 py-3 font-medium text-muted-foreground">
+                    Low
+                  </th>
+                  <th className="px-4 py-3 font-medium text-muted-foreground">
+                    Close
+                  </th>
+                  <th className="px-4 py-3 font-medium text-muted-foreground">
+                    Volume
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -147,32 +189,32 @@ export default function TradingViewPage() {
                   const change = c.close - c.open;
                   const changeColor =
                     change > 0
-                      ? "text-green-600 dark:text-green-400"
+                      ? "text-emerald-600 dark:text-emerald-400"
                       : change < 0
                         ? "text-red-600 dark:text-red-400"
-                        : "text-slate-600 dark:text-[#888888]";
+                        : "";
                   return (
                     <tr
                       key={i}
-                      className="border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-white/10 dark:hover:bg-[#111111]"
+                      className="border-b border-border/50 transition-colors hover:bg-muted/50"
                     >
-                        <td className="whitespace-nowrap px-3 py-2 text-slate-900 dark:text-[#EDEDED]">
+                      <td className="whitespace-nowrap px-4 py-2.5 text-foreground">
                         {c.datetime}
                       </td>
-                        <td className="px-3 py-2 tabular-nums text-slate-700 dark:text-[#888888]">
-                          {c.open.toFixed(2)}
-                        </td>
-                        <td className="px-3 py-2 tabular-nums text-slate-700 dark:text-[#888888]">
-                          {c.high.toFixed(2)}
-                        </td>
-                        <td className="px-3 py-2 tabular-nums text-slate-700 dark:text-[#888888]">
-                          {c.low.toFixed(2)}
-                        </td>
-                      <td className={`px-3 py-2 tabular-nums font-medium ${changeColor}`}>
+                      <td className="px-4 py-2.5 tabular-nums text-muted-foreground">
+                        {c.open.toFixed(2)}
+                      </td>
+                      <td className="px-4 py-2.5 tabular-nums text-muted-foreground">
+                        {c.high.toFixed(2)}
+                      </td>
+                      <td className="px-4 py-2.5 tabular-nums text-muted-foreground">
+                        {c.low.toFixed(2)}
+                      </td>
+                      <td className={`px-4 py-2.5 tabular-nums font-medium ${changeColor || "text-muted-foreground"}`}>
                         {c.close.toFixed(2)}
                       </td>
-                        <td className="px-3 py-2 tabular-nums text-slate-700 dark:text-[#888888]">
-                          {c.volume.toLocaleString()}
+                      <td className="px-4 py-2.5 tabular-nums text-muted-foreground">
+                        {c.volume.toLocaleString()}
                       </td>
                     </tr>
                   );
@@ -180,13 +222,18 @@ export default function TradingViewPage() {
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
       )}
 
       {!loading && !error && candles.length === 0 && meta === null && (
-        <div className="card text-center text-slate-500 dark:text-[#888888]">
-          Enter a stock symbol and click Fetch to load candle data.
-        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+            <Search className="mb-3 h-10 w-10 text-muted-foreground/50" />
+            <p className="text-sm text-muted-foreground">
+              Enter a stock symbol and click Fetch to load candle data.
+            </p>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

@@ -14,4 +14,7 @@ langchain-ollama>=0.3.0
 langchain-groq>=0.2.0
 langchain-openai>=0.2.0
 langchain-google-genai>=2.0.0
+pandas>=2.0.0
+yfinance>=0.2.30
+tv_scraper_py>=0.1.0
 APScheduler>=3.10,<4
