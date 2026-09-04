@@ -40,16 +40,20 @@ class ScrapeNewsTask:
             ticker = stock.get("ticker", "UNKNOWN")
             logger.info("[%d/%d] Fetching news for %s...", i, len(stocks), ticker)
 
-            result = scraper.get_news(ticker, lookback_days)
-            if result.success and result.data:
-                articles = [a.model_dump(mode="json") for a in result.data]
-                all_news[ticker] = articles
-                total += len(articles)
-                logger.info("[%d/%d] %s — found %d articles",
-                            i, len(stocks), ticker, len(articles))
-            else:
-                logger.warning("[%d/%d] %s — no news: %s",
-                               i, len(stocks), ticker, result.error)
+            try:
+                result = scraper.get_news(ticker, lookback_days)
+                if result.success and result.data:
+                    articles = [a.model_dump(mode="json") for a in result.data]
+                    all_news[ticker] = articles
+                    total += len(articles)
+                    logger.info("[%d/%d] %s — found %d articles",
+                                i, len(stocks), ticker, len(articles))
+                else:
+                    logger.warning("[%d/%d] %s — no news: %s",
+                                   i, len(stocks), ticker, result.error)
+                    all_news[ticker] = []
+            except Exception:
+                logger.exception("[%d/%d] %s — news scraping failed", i, len(stocks), ticker)
                 all_news[ticker] = []
 
         logger.info("News scraping complete: %d articles across %d stocks",
