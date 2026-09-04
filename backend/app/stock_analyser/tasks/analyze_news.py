@@ -45,21 +45,25 @@ class AnalyzeNewsTask:
             logger.info("[%d/%d] Analyzing %d news articles for %s...",
                         i, len(news), len(articles), ticker)
 
-            result = graph.run({
-                "ticker": ticker,
-                "articles": articles,
-                "system_prompt": system_prompt,
-            })
+            try:
+                result = graph.run({
+                    "ticker": ticker,
+                    "articles": articles,
+                    "system_prompt": system_prompt,
+                })
 
-            if result.success:
-                analyzed = result.data.get("articles", [])
-                all_analyses[ticker] = analyzed
-                total += len(analyzed)
-                logger.info("[%d/%d] %s — analyzed %d articles",
-                            i, len(news), ticker, len(analyzed))
-            else:
-                logger.error("[%d/%d] News analysis failed for %s: %s",
-                             i, len(news), ticker, result.error)
+                if result.success:
+                    analyzed = result.data.get("articles", [])
+                    all_analyses[ticker] = analyzed
+                    total += len(analyzed)
+                    logger.info("[%d/%d] %s — analyzed %d articles",
+                                i, len(news), ticker, len(analyzed))
+                else:
+                    logger.error("[%d/%d] News analysis failed for %s: %s",
+                                 i, len(news), ticker, result.error)
+                    all_analyses[ticker] = []
+            except Exception:
+                logger.exception("[%d/%d] %s — news analysis crashed", i, len(news), ticker)
                 all_analyses[ticker] = []
 
         logger.info("News analysis complete: %d articles across %d stocks",
