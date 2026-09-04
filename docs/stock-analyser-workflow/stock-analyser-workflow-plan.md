@@ -324,10 +324,17 @@ class ScrapeStocksTask(BaseWorkflowTask):
 14. Update `stock_analyser/workflow.py` - Fix workflow config
 15. Update `workflow/workflow_orchestrator_v1/__init__.py` - Register stock_analyser
 
-### Phase 4: Testing & Integration
-16. Manual test: Trigger workflow via API
-17. Verify database storage
-18. Verify frontend displays results
+### Phase 4: News Analysis Feature
+16. See [news-analysis-plan.md](./news-analysis-plan.md) and [news-analysis-tasks.md](./news-analysis-tasks.md)
+    - Add `NewsImpact` enum + `AnalyzedNewsArticle` model
+    - Create `NewsAnalysisAgent` LangGraph (trafilatura + LLM)
+    - Create `ScrapeNewsTask` + `AnalyzeNewsTask`
+    - Add `enable_news` toggle to workflow
+
+### Phase 5: Testing & Integration
+17. Manual test: Trigger workflow via API
+18. Verify database storage
+19. Verify frontend displays results
 
 ---
 
@@ -370,21 +377,25 @@ class ScrapeStocksTask(BaseWorkflowTask):
 ## Sample Workflow Run
 
 ```
-Input: { "index": "NIFTY50" }
+Input: { "index": "NIFTY50", "enable_news": true }
 
 Task 1: ScrapeStocksTask
   - IndexScraper.get_stocks("NIFTY50") → 50 stocks
   - StockScraper.get_multiple(tickers) → 50 StockDTOs
   - Output: { "index": "NIFTY50", "stocks": [StockDTO, ...] }
 
-Task 2: AnalyseStocksTask (future)
+Task 2: ScrapeNewsTask (new)
+  - GrowwNewsScraper.get_news(ticker, lookback_days) per stock
+  - Output: { "news": { "RELIANCE": [...], ... }, "total_articles": 187 }
+
+Task 3: AnalyzeNewsTask (new)
+  - NewsAnalysisAgent per ticker (trafilatura + LLM)
+  - Output: { "analyses": { "RELIANCE": [...], ... }, "total_analyzed": 187 }
+
+Task 4: AnalyzeStocksTask
   - Reads stocks from ctx.get_output("scrape_stocks")
   - Generates recommendations
   - Stores in stock_analyser_recommendations
-
-Task 3: GenerateReportTask (future)
-  - Reads recommendations from previous task
-  - Generates summary report
 ```
 
 ---
