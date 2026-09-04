@@ -9,6 +9,7 @@ from app.ai.models import (
     NewsImpact,
 )
 import app.ai.graph  # noqa: F401 — register StockAnalysisAgent with factory
+import app.ai.news_agent  # noqa: F401 — register NewsAnalysisAgent with factory
 
 __all__ = [
     "AnalysisError",
@@ -19,6 +20,7 @@ __all__ = [
     "AnalyzedNewsArticle",
     "ConfigError",
     "GraphError",
+    "NewsAnalysisAgent",
     "NewsAnalysisResult",
     "NewsImpact",
     "StockAnalysisAgent",
@@ -30,4 +32,8 @@ def __getattr__(name: str):
         from app.ai.graph import StockAnalysisAgent
 
         return StockAnalysisAgent
+    if name == "NewsAnalysisAgent":
+        from app.ai.news_agent import NewsAnalysisAgent
+
+        return NewsAnalysisAgent
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -18,3 +18,5 @@ pandas>=2.0.0
 yfinance>=0.2.30
 tv_scraper_py>=0.1.0
 APScheduler>=3.10,<4
+trafilatura>=1.12.0
+lxml_html_clean>=0.1.0
