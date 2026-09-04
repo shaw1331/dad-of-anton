@@ -138,7 +138,7 @@ The `NewsAnalysisAgent` self-registers via `AgentFactory.register("news_analysis
 
 ## Phase 3: Workflow Tasks
 
-### TASK-023: Create `stock_analyser/tasks/scrape_news.py` — ScrapeNewsTask
+### TASK-023: Create `stock_analyser/tasks/scrape_news.py` — ScrapeNewsTask ✓
 
 **Description:**
 Create `backend/app/stock_analyser/tasks/scrape_news.py` with a task that fetches news articles for all stocks using `GrowwNewsScraper`.
@@ -190,7 +190,7 @@ class ScrapeNewsTask:
 
 ---
 
-### TASK-024: Create `stock_analyser/tasks/analyze_news.py` — AnalyzeNewsTask
+### TASK-024: Create `stock_analyser/tasks/analyze_news.py` — AnalyzeNewsTask ✓
 
 **Description:**
 Create `backend/app/stock_analyser/tasks/analyze_news.py` with a task that processes news articles through the `NewsAnalysisAgent` LangGraph.
@@ -265,7 +265,7 @@ class AnalyzeNewsTask:
 
 ## Phase 4: Integration
 
-### TASK-025: Update `stock_analyser/tasks/__init__.py` — Export New Tasks
+### TASK-025: Update `stock_analyser/tasks/__init__.py` — Export New Tasks ✓
 
 **Description:**
 Update `backend/app/stock_analyser/tasks/__init__.py` to export the new `ScrapeNewsTask` and `AnalyzeNewsTask`.
@@ -290,7 +290,7 @@ def __getattr__(name: str):
 
 ---
 
-### TASK-026: Update `stock_analyser/workflow.py` — Add Tasks + Input Fields
+### TASK-026: Update `stock_analyser/workflow.py` — Add Tasks + Input Fields ✓
 
 **Description:**
 Update `backend/app/stock_analyser/workflow.py` to include the new tasks and add `enable_news` and `news_lookback_days` input fields.
