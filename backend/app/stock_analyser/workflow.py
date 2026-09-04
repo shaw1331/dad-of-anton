@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from app.stock_analyser.tasks import AnalyzeStocksTask, ScrapeStocksTask
+from app.stock_analyser.tasks import (
+    AnalyzeNewsTask,
+    AnalyzeStocksTask,
+    ScrapeNewsTask,
+    ScrapeStocksTask,
+)
 from app.workflow.base_workflow_config import BaseWorkflowConfig, InputField
 from app.workflow.workflow_orchestrator_v1.workflow_registry import WORKFLOWS
 
@@ -40,8 +45,24 @@ STOCK_ANALYSER_WORKFLOW = BaseWorkflowConfig(
             default="all",
             choices=["top", "bottom", "random", "all"],
         ),
+        InputField(
+            name="enable_news",
+            type="bool",
+            label="Enable News Analysis",
+            description="Scrape and analyze news for each stock",
+            required=False,
+            default=False,
+        ),
+        InputField(
+            name="news_lookback_days",
+            type="int",
+            label="News Lookback Days",
+            description="How many days back to look for news articles",
+            required=False,
+            default=15,
+        ),
     ],
-    tasks=[ScrapeStocksTask, AnalyzeStocksTask],
+    tasks=[ScrapeStocksTask, ScrapeNewsTask, AnalyzeNewsTask, AnalyzeStocksTask],
 )
 
 WORKFLOWS["stock_analyser"] = STOCK_ANALYSER_WORKFLOW
