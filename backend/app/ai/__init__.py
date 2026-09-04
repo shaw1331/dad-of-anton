@@ -1,7 +1,13 @@
 from app.ai.exceptions import AnalysisError, ConfigError, GraphError
 from app.ai.factory import AgentFactory
 from app.ai.interfaces import AgentGraph
-from app.ai.models import AgentConfig, AgentResult
+from app.ai.models import (
+    AgentConfig,
+    AgentResult,
+    AnalyzedNewsArticle,
+    NewsAnalysisResult,
+    NewsImpact,
+)
 import app.ai.graph  # noqa: F401 — register StockAnalysisAgent with factory
 
 __all__ = [
@@ -10,8 +16,11 @@ __all__ = [
     "AgentFactory",
     "AgentGraph",
     "AgentResult",
+    "AnalyzedNewsArticle",
     "ConfigError",
     "GraphError",
+    "NewsAnalysisResult",
+    "NewsImpact",
     "StockAnalysisAgent",
 ]
 
