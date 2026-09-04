@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
 from enum import Enum
 from typing import Any, Generic, TypeVar
 
@@ -43,7 +42,7 @@ class AnalyzedNewsArticle(BaseModel):
     news_id: str
     url: str
     source: str
-    pub_date: datetime
+    pub_date: str
     raw_summary: str
     detailed_summary: str
     impact: NewsImpact
