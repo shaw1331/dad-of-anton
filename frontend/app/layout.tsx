@@ -80,6 +80,12 @@ export default function RootLayout({
                     Groww News
                   </Link>
                   <Link
+                    href="/trendlyne"
+                    className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                  >
+                    Trendlyne
+                  </Link>
+                  <Link
                     href="/tradingview"
                     className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                   >
