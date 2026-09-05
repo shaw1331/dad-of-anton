@@ -5,6 +5,7 @@ No mocking.
 """
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,7 @@ from app.ai.factory import AgentFactory
 from app.ai.models import AnalyzedNewsArticle, NewsAnalysisResult
 
 _PROMPT_DIR = Path(__file__).resolve().parent.parent / "app" / "stock_analyser" / "analysis" / "prompts"
+_FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 @pytest.fixture
@@ -23,6 +25,12 @@ def agent():
 @pytest.fixture
 def system_prompt():
     return (_PROMPT_DIR / "news_analysis.md").read_text()
+
+
+@pytest.fixture
+def sample_articles():
+    with open(_FIXTURES_DIR / "sample_articles.json") as f:
+        return json.load(f)
 
 
 class TestNewsAnalysisAgent:
@@ -40,14 +48,8 @@ class TestNewsAnalysisAgent:
         result = agent._fetch_content("")
         assert result == ""
 
-    def test_analyze_single_article(self, agent, system_prompt):
-        article = {
-            "url": "https://www.moneycontrol.com/news/business/reliance-industries",
-            "source": "Moneycontrol",
-            "summary": "Reliance Industries Q2 profit up 12% on strong retail growth.",
-            "pub_date": "2026-09-04T10:30:00Z",
-        }
-        result = agent._analyze_single(article, "RELIANCE", system_prompt)
+    def test_analyze_single_article(self, agent, system_prompt, sample_articles):
+        result = agent._analyze_single(sample_articles[0], "RELIANCE", system_prompt)
 
         assert isinstance(result, dict)
         assert result["ticker"] == "RELIANCE"
@@ -55,18 +57,10 @@ class TestNewsAnalysisAgent:
         assert "trader_sentiment" in result
         assert "detailed_summary" in result
 
-    def test_run_single_article(self, agent, system_prompt):
-        articles = [
-            {
-                "url": "https://www.moneycontrol.com/news/business/reliance-industries",
-                "source": "Moneycontrol",
-                "summary": "Reliance Industries reports strong Q2 results.",
-                "pub_date": "2026-09-04T10:30:00Z",
-            }
-        ]
+    def test_run_single_article(self, agent, system_prompt, sample_articles):
         result = agent.run({
             "ticker": "RELIANCE",
-            "articles": articles,
+            "articles": [sample_articles[0]],
             "system_prompt": system_prompt,
         })
 
@@ -74,24 +68,10 @@ class TestNewsAnalysisAgent:
         assert len(result.data["articles"]) == 1
         assert result.data["ticker"] == "RELIANCE"
 
-    def test_run_multiple_articles(self, agent, system_prompt):
-        articles = [
-            {
-                "url": "https://www.moneycontrol.com/news/business/reliance-industries",
-                "source": "Moneycontrol",
-                "summary": "Reliance Q2 profit up 12%.",
-                "pub_date": "2026-09-04T10:30:00Z",
-            },
-            {
-                "url": "https://economictimes.indiatimes.com/markets/stocks/news/reliance",
-                "source": "Economic Times",
-                "summary": "Reliance retail segment drives growth.",
-                "pub_date": "2026-09-03T15:00:00Z",
-            },
-        ]
+    def test_run_multiple_articles(self, agent, system_prompt, sample_articles):
         result = agent.run({
             "ticker": "RELIANCE",
-            "articles": articles,
+            "articles": sample_articles,
             "system_prompt": system_prompt,
         })
 

@@ -5,10 +5,15 @@ No mocking — tests the full analysis pipeline.
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pytest
 
 from app.stock_analyser.tasks.analyze_news import AnalyzeNewsTask
 from tests.utils.context import make_context
+
+_FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
 @pytest.fixture
@@ -18,18 +23,8 @@ def task():
 
 @pytest.fixture
 def real_news():
-    return {
-        "news": {
-            "RELIANCE": [
-                {
-                    "url": "https://www.moneycontrol.com/news/business/reliance-industries-q4-results",
-                    "source": "Moneycontrol",
-                    "summary": "Reliance Industries reported Q2 profit growth driven by retail segment.",
-                }
-            ]
-        },
-        "total_articles": 1,
-    }
+    with open(_FIXTURES_DIR / "sample_news.json") as f:
+        return json.load(f)
 
 
 class TestAnalyzeNewsTask:

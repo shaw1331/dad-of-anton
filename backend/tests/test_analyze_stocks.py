@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import logging
 import sys
+from pathlib import Path
 
 logging.basicConfig(
     level=logging.INFO,
@@ -14,48 +15,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Sample stock data matching the structure from screener scraper
-SAMPLE_STOCK = {
-    "ticker": "HDFCBANK",
-    "name": "HDFC Bank Ltd.",
-    "company_name": "HDFC Bank Ltd.",
-    "sector": "Finance",
-    "industry": "Banks",
-    "source": "screener",
-    "data": {
-        "ratios": {
-            "Market Cap": "₹12,50,000 Cr.",
-            "P/E": "19.2",
-            "P/B": "2.8",
-            "ROE": "16.5%",
-            "ROCE": "17.8%",
-            "Debt to equity": "0.0",
-            "EPS": "₹83.5",
-        },
-        "quarterly": {
-            "Sales": "₹68,000 Cr.",
-            "Net Profit": "₹18,500 Cr.",
-            "OPM": "42.1%",
-        },
-        "shareholding": {
-            "Promoters": "0.0%",
-            "FII": "48.2%",
-            "DII": "34.5%",
-            "Public": "17.3%",
-        },
-        "pros": [
-            "Zero promoter pledge",
-            "Healthy dividend payout",
-            "Good quarterly growth",
-        ],
-        "cons": [
-            "Low promoter holding",
-            "High PE ratio compared to peers",
-        ],
-    },
-    "url": "https://www.screener.in/company/HDFCBANK/",
-    "scraped_at": "2025-01-01T00:00:00Z",
-}
+_FIXTURES_DIR = Path(__file__).parent / "fixtures"
+
+with open(_FIXTURES_DIR / "sample_stock_detail.json") as f:
+    SAMPLE_STOCK = json.load(f)
 
 
 def test_analysis_pipeline() -> None:
