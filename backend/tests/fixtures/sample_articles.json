@@ -31,5 +31,16 @@
         "pub_date": "2026-09-02T21:23:31Z"
       }
     ]
+  },
+  {
+      "ticker": "KEC",
+      "articles": [
+          {
+              "url": "https://www.bseindia.com/stockinfo/AnnPdfOpen.aspx?Pname=c6530b4d-0ee0-4a77-a65e-c36247f9c315.pdf",
+              "source": "BSE",
+              "summary": "KEC International Ltd has redeemed commercial paper",
+              "pub_date": "2026-09-04T16:47:47Z"
+          }
+      ]
   }
 ]
