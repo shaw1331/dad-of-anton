@@ -5,6 +5,7 @@ from app.stock_analyser.tasks import (
     AnalyzeStocksTask,
     ScrapeNewsTask,
     ScrapeStocksTask,
+    ScrapeTrendlyneTask,
 )
 from app.workflow.base_workflow_config import BaseWorkflowConfig, InputField
 from app.workflow.workflow_orchestrator_v1.workflow_registry import WORKFLOWS
@@ -62,7 +63,7 @@ STOCK_ANALYSER_WORKFLOW = BaseWorkflowConfig(
             default=15,
         ),
     ],
-    tasks=[ScrapeStocksTask, ScrapeNewsTask, AnalyzeNewsTask, AnalyzeStocksTask],
+    tasks=[ScrapeStocksTask, ScrapeTrendlyneTask, ScrapeNewsTask, AnalyzeNewsTask, AnalyzeStocksTask],
 )
 
 WORKFLOWS["stock_analyser"] = STOCK_ANALYSER_WORKFLOW

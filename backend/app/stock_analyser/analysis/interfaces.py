@@ -17,7 +17,7 @@ class AnalysisStrategy(ABC):
         ...
 
     @abstractmethod
-    def get_analysis_prompt(self, stock_data: dict) -> str:
+    def get_analysis_prompt(self, stock_data: dict, analyzed_news: list[dict] | None = None) -> str:
         """Return the analysis prompt for a specific stock."""
         ...
 
