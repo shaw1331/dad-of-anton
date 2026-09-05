@@ -6,9 +6,23 @@ from app.workflow.workflow_orchestrator_v1.workflow_orchestrator import Workflow
 
 logger = logging.getLogger(__name__)
 
-SCHEDULED_INDICES: list[dict[str, str]] = [
-    {"index": "SMALLCAP50", "strategy": "momentum"},
-    {"index": "1186", "strategy": "momentum"},  # BSE Momentum Index
+SCHEDULED_INDICES: list[dict[str, object]] = [
+    {
+        "index": "SMALLCAP50",
+        "strategy": "momentum",
+        "num_stocks": None,
+        "selection_criteria": "all",
+        "enable_news": True,
+        "news_lookback_days": 3,
+    },
+    {
+        "index": "1186",
+        "strategy": "momentum",
+        "num_stocks": None,
+        "selection_criteria": "all",
+        "enable_news": True,
+        "news_lookback_days": 3,
+    },
 ]
 
 orchestrator = WorkflowOrchestrator()
