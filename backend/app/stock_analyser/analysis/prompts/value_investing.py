@@ -5,7 +5,6 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from app.stock_analyser.analysis.interfaces import AnalysisStrategy
-from app.stock_analyser.analysis.prompts.base import format_stock_summary
 
 
 class ValueInvestingAnalysis(BaseModel):
@@ -37,13 +36,13 @@ class ValueInvestingStrategy(AnalysisStrategy):
         )
 
     def get_analysis_prompt(self, stock_data: dict) -> str:
-        summary = format_stock_summary(stock_data)
-        return (
-            f"Analyze this stock for value investing potential:\n\n"
-            f"{summary}\n\n"
-            "Determine recommendation, confidence, reasoning, key factors, "
-            "risks, and margin of safety."
-        )
+        formatter = self.get_formatter()
+        return formatter.format(stock_data, [], {
+            "ticker": stock_data.get("ticker", "N/A"),
+            "company_name": stock_data.get("company_name") or stock_data.get("name", ""),
+            "sector": stock_data.get("sector"),
+            "industry": stock_data.get("industry"),
+        })
 
     def get_output_model(self) -> type[ValueInvestingAnalysis]:
         return ValueInvestingAnalysis

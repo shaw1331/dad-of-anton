@@ -6,7 +6,6 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from app.stock_analyser.analysis.interfaces import AnalysisStrategy
-from app.stock_analyser.analysis.prompts.base import format_stock_summary
 
 _PROMPT_DIR = Path(__file__).parent
 
@@ -38,22 +37,13 @@ class MomentumStrategy(AnalysisStrategy):
         return (_PROMPT_DIR / "momentum.md").read_text()
 
     def get_analysis_prompt(self, stock_data: dict) -> str:
-        summary = format_stock_summary(stock_data)
-        analysis_prompt = f"""
-            Analyze the following stock using the momentum trading framework defined in the system instructions.
-
-            STOCK DATA:
-            {summary}
-
-            Important:
-            - Use only the supplied data.
-            - Do not invent missing technical indicators.
-            - Give greater weight to recent momentum evidence.
-            - Fundamentals are secondary context and must not override technical momentum.
-            - If critical momentum data is missing, prefer HOLD and reduce confidence.
-            - Explicitly identify missing data.
-            """
-        return analysis_prompt
+        formatter = self.get_formatter()
+        return formatter.format(stock_data, [], {
+            "ticker": stock_data.get("ticker", "N/A"),
+            "company_name": stock_data.get("company_name") or stock_data.get("name", ""),
+            "sector": stock_data.get("sector"),
+            "industry": stock_data.get("industry"),
+        })
 
     def get_output_model(self) -> type[MomentumAnalysis]:
         return MomentumAnalysis
