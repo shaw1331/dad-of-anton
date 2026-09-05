@@ -37,10 +37,10 @@ class TestAnalyzeNewsTask:
 
         output = ctx.get_output("analyze_news")
         assert output["total_analyzed"] >= 1
-        assert "RELIANCE" in output["analyses"]
-        assert len(output["analyses"]["RELIANCE"]) >= 1
+        assert "ANGELONE" in output["analyses"]
+        assert len(output["analyses"]["ANGELONE"]) >= 1
 
-        article = output["analyses"]["RELIANCE"][0]
+        article = output["analyses"]["ANGELONE"][0]
         assert "impact" in article
         assert "trader_sentiment" in article
         assert "detailed_summary" in article
