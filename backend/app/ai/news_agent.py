@@ -40,18 +40,42 @@ class NewsAnalysisAgent(AgentGraph):
 
     def _is_pdf_url(self, url: str) -> bool:
         """Check if URL points to a PDF file."""
-        path = urlparse(url).path.lower()
-        return path.endswith(".pdf")
+        parsed = urlparse(url)
+        return (
+            parsed.path.lower().endswith(".pdf")
+            or ".pdf" in parsed.query.lower()
+        )
 
     def _fetch_pdf(self, url: str) -> str:
         """Fetch and extract text from a PDF URL."""
         try:
             resp = requests.get(url, headers=_HEADERS, timeout=30)
             resp.raise_for_status()
+
+            content_type = resp.headers.get("Content-Type", "").lower()
+            if "pdf" not in content_type and not resp.content.startswith(b"%PDF"):
+                logger.warning(
+                    "URL did not return a PDF: %s (Content-Type: %s)",
+                    url,
+                    content_type,
+                )
+                return ""
+
             reader = pypdf.PdfReader(BytesIO(resp.content))
-            return "".join(page.extract_text() or "" for page in reader.pages)
+
+            pages = []
+            for page_number, page in enumerate(reader.pages, start=1):
+                text = page.extract_text() or ""
+                if text.strip():
+                    pages.append(f"\n--- PAGE {page_number} ---\n{text.strip()}")
+
+            return "\n".join(pages)
+
+        except requests.RequestException:
+            logger.warning("Failed to fetch PDF from %s", url)
+            return ""
         except Exception:
-            logger.warning("Failed to extract PDF from %s", url)
+            logger.exception("Failed to extract PDF from %s", url)
             return ""
 
     def _fetch_html(self, url: str) -> str:
