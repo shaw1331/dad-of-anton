@@ -49,26 +49,35 @@ class AnalyzeStocksTask:
             stock_with_tl = {**stock, "trendlyne": trendlyne_map.get(ticker)}
             logger.info("[%d/%d] Analyzing %s...", i, len(stocks), ticker)
 
-            result = graph.run({
-                "stock_data": stock_with_tl,
-                "system_prompt": strategy.get_system_prompt(),
-                "analysis_prompt": strategy.get_analysis_prompt(stock_with_tl, stock_news),
-            })
+            try:
+                result = graph.run({
+                    "stock_data": stock_with_tl,
+                    "system_prompt": strategy.get_system_prompt(),
+                    "analysis_prompt": strategy.get_analysis_prompt(stock_with_tl, stock_news),
+                })
 
-            if result.success:
-                recommendation = result.data.get("recommendation", "N/A")
-                confidence = result.data.get("confidence", "N/A")
-                logger.info("[%d/%d] %s — %s (confidence: %s)",
-                            i, len(stocks), ticker, recommendation, confidence)
-                analysis = {**result.data, "ticker": ticker, "name": stock.get("name", "")}
-                analyses.append(analysis)
-            else:
-                logger.error("[%d/%d] Analysis failed for %s: %s",
-                             i, len(stocks), ticker, result.error)
+                if result.success:
+                    recommendation = result.data.get("recommendation", "N/A")
+                    confidence = result.data.get("confidence", "N/A")
+                    logger.info("[%d/%d] %s — %s (confidence: %s)",
+                                i, len(stocks), ticker, recommendation, confidence)
+                    analysis = {**result.data, "ticker": ticker, "name": stock.get("name", "")}
+                    analyses.append(analysis)
+                else:
+                    logger.error("[%d/%d] Analysis failed for %s: %s",
+                                 i, len(stocks), ticker, result.error)
+                    analyses.append({
+                        "ticker": ticker,
+                        "name": stock.get("name", ""),
+                        "error": result.error,
+                    })
+            except Exception as e:
+                logger.error("[%d/%d] Analysis error for %s: %s",
+                             i, len(stocks), ticker, str(e))
                 analyses.append({
                     "ticker": ticker,
                     "name": stock.get("name", ""),
-                    "error": result.error,
+                    "error": str(e),
                 })
 
         logger.info("Analysis complete: %d/%d stocks analyzed successfully",
