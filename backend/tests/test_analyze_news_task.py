@@ -1,7 +1,7 @@
 """Integration test for AnalyzeNewsTask.
 
 Edit tests/fixtures/sample_news.json to change inputs.
-Run: cd backend && python -m pytest tests/test_analyze_news_task.py -v -s
+Run all:  cd backend && python -m pytest tests/test_analyze_news_task.py -v -s
 """
 from __future__ import annotations
 

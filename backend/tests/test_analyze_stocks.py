@@ -1,6 +1,6 @@
 """Integration test for stock analysis pipeline.
 
-Run: cd backend && python -m tests.test_analyze_stocks
+Run: cd backend && python -m pytest tests/test_analyze_stocks.py -v -s
 """
 from __future__ import annotations
 

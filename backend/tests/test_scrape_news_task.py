@@ -2,6 +2,7 @@
 
 Uses real GrowwNewsScraper against live Groww API.
 No mocking — tests the full scraping pipeline end-to-end.
+Run: cd backend && python -m pytest tests/test_scrape_news_task.py -v -s
 """
 from __future__ import annotations
 

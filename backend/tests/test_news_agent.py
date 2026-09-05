@@ -1,7 +1,8 @@
 """Integration test for NewsAnalysisAgent.
 
 Edit tests/fixtures/sample_articles.json to change inputs.
-Run: cd backend && python -m pytest tests/test_news_agent.py -v -s
+Run all:  cd backend && python -m pytest tests/test_news_agent.py -v -s
+Run one:  cd backend && python -m pytest tests/test_news_agent.py -v -s -k PFC
 """
 from __future__ import annotations
 
