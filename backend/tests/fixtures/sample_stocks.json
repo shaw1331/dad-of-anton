@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Reliance Industries Ltd.",
+    "ticker": "RELIANCE",
+    "bse_code": "500325",
+    "sector": "Oil & Gas",
+    "industry": "Refineries"
+  },
+  {
+    "name": "Tata Consultancy Services Ltd.",
+    "ticker": "TCS",
+    "bse_code": "532540",
+    "sector": "IT",
+    "industry": "Software"
+  }
+]
