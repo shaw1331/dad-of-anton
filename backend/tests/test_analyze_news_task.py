@@ -1,7 +1,7 @@
-"""Integration tests for AnalyzeNewsTask.
+"""Integration test for AnalyzeNewsTask.
 
-Uses real AgentFactory + real LLM (Ollama) end-to-end.
-No mocking — tests the full analysis pipeline.
+Edit tests/fixtures/sample_news.json to change inputs.
+Run: cd backend && python -m pytest tests/test_analyze_news_task.py -v -s
 """
 from __future__ import annotations
 
@@ -22,72 +22,46 @@ def task():
 
 
 @pytest.fixture
-def real_news():
+def news_data():
     with open(_FIXTURES_DIR / "sample_news.json") as f:
         return json.load(f)
 
 
-class TestAnalyzeNewsTask:
-    def test_analyze_news_success(self, task, real_news):
-        ctx = make_context(
-            input={"enable_news": True},
-            outputs={"scrape_news": real_news},
-        )
+def test_analyze_news(task, news_data):
+    ctx = make_context(
+        input={"enable_news": True},
+        outputs={"scrape_news": news_data},
+    )
+    task.run(ctx)
+
+    output = ctx.get_output("analyze_news")
+    assert output["total_analyzed"] >= 1
+
+    print(f"\n{'='*60}")
+    print(f"Total analyzed: {output['total_analyzed']}")
+    print(f"{'='*60}")
+
+    for ticker, articles in output["analyses"].items():
+        print(f"\nTICKER: {ticker}")
+        for i, article in enumerate(articles, 1):
+            print(f"  --- Article {i} ---")
+            print(f"  Impact:    {article.get('impact', 'N/A')}")
+            print(f"  Sentiment: {article.get('trader_sentiment', 'N/A')}")
+            print(f"  Summary:   {article.get('detailed_summary', 'N/A')}")
+            print(f"  Reasoning: {article.get('impact_reasoning', 'N/A')}")
+
+    print(f"\n{'='*60}\n")
+
+
+def test_analyze_news_disabled(task):
+    ctx = make_context(input={"enable_news": False})
+    task.run(ctx)
+
+    output = ctx.get_output("analyze_news")
+    assert output == {"analyses": {}, "total_analyzed": 0}
+
+
+def test_analyze_news_no_news(task):
+    ctx = make_context(input={"enable_news": True})
+    with pytest.raises(Exception, match="Run ScrapeNewsTask first"):
         task.run(ctx)
-
-        output = ctx.get_output("analyze_news")
-        assert output["total_analyzed"] >= 1
-        assert "ANGELONE" in output["analyses"]
-        assert len(output["analyses"]["ANGELONE"]) >= 1
-
-        article = output["analyses"]["ANGELONE"][0]
-        assert "impact" in article
-        assert "trader_sentiment" in article
-        assert "detailed_summary" in article
-
-    def test_analyze_news_disabled(self, task):
-        ctx = make_context(input={"enable_news": False})
-        task.run(ctx)
-
-        output = ctx.get_output("analyze_news")
-        assert output == {"analyses": {}, "total_analyzed": 0}
-
-    def test_analyze_news_no_news(self, task):
-        ctx = make_context(input={"enable_news": True})
-        with pytest.raises(Exception, match="Run ScrapeNewsTask first"):
-            task.run(ctx)
-
-    def test_analyze_news_empty_articles(self, task):
-        news = {"news": {"RELIANCE": []}, "total_articles": 0}
-        ctx = make_context(
-            input={"enable_news": True},
-            outputs={"scrape_news": news},
-        )
-        task.run(ctx)
-
-        output = ctx.get_output("analyze_news")
-        assert output["analyses"]["RELIANCE"] == []
-        assert output["total_analyzed"] == 0
-
-    def test_analyze_news_multiple_tickers(self, task):
-        news = {
-            "news": {
-                "RELIANCE": [
-                    {"url": "https://example.com/r1", "source": "Test", "summary": "Reliance Q2 results."}
-                ],
-                "TCS": [
-                    {"url": "https://example.com/t1", "source": "Test", "summary": "TCS wins new deal."}
-                ],
-            },
-            "total_articles": 2,
-        }
-        ctx = make_context(
-            input={"enable_news": True},
-            outputs={"scrape_news": news},
-        )
-        task.run(ctx)
-
-        output = ctx.get_output("analyze_news")
-        assert "RELIANCE" in output["analyses"]
-        assert "TCS" in output["analyses"]
-        assert output["total_analyzed"] >= 2

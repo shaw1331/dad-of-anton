@@ -1,20 +1,35 @@
 [
   {
-    "url": "https://www.livemint.com/market/stock-market-news/sebi-circular-on-cas-impact-groww-angel-one-bse-shares-jump-up-to-8-what-regulator-said-and-investors-should-know-11788508903861.html",
-    "source": "Livemint",
-    "summary": "SEBI's CAS circular led to stock price jumps for Groww (+3%), Angel One (+8%), BSE (+5%), and others.\nSEBI plans changes to CAS methodology after feedback on derivative contract settlement issues.",
-    "pub_date": "2026-09-04T12:00:00Z"
+    "ticker": "ANGELONE",
+    "articles": [
+      {
+        "url": "https://www.livemint.com/market/stock-market-news/sebi-circular-on-cas-impact-groww-angel-one-bse-shares-jump-up-to-8-what-regulator-said-and-investors-should-know-11788508903861.html",
+        "source": "Livemint",
+        "summary": "SEBI's CAS circular led to stock price jumps for Groww (+3%), Angel One (+8%), BSE (+5%), and others.\nSEBI plans changes to CAS methodology after feedback on derivative contract settlement issues.",
+        "pub_date": "2026-09-04T12:00:00Z"
+      }
+    ]
   },
   {
-    "url": "https://www.business-standard.com/markets/capital-market-news/wockhardt-ltd-rises-for-third-straight-session-126090400510_1.html",
-    "source": "Business Standard",
-    "summary": "Wockhardt Ltd rises 6.6% to Rs 2079.6 on NSE...",
-    "pub_date": "2026-09-04T13:16:10Z"
+    "ticker": "WOCKPHARMA",
+    "articles": [
+      {
+        "url": "https://www.business-standard.com/markets/capital-market-news/wockhardt-ltd-rises-for-third-straight-session-126090400510_1.html",
+        "source": "Business Standard",
+        "summary": "Wockhardt Ltd rises 6.6% to Rs 2079.6 on NSE...",
+        "pub_date": "2026-09-04T13:16:10Z"
+      }
+    ]
   },
   {
-    "url": "https://www.bseindia.com/stockinfo/AnnPdfOpen.aspx?Pname=10f66ea5-df75-43b9-8a5a-27fddb3365c9.pdf",
-    "source": "BSE",
-    "summary": "Stock options granted under ESOP scheme, routine HR announcement.",
-    "pub_date": "2026-09-02T21:23:31Z"
+    "ticker": "PFC",
+    "articles": [
+      {
+        "url": "https://www.bseindia.com/stockinfo/AnnPdfOpen.aspx?Pname=10f66ea5-df75-43b9-8a5a-27fddb3365c9.pdf",
+        "source": "BSE",
+        "summary": "Stock options granted under ESOP scheme, routine HR announcement.",
+        "pub_date": "2026-09-02T21:23:31Z"
+      }
+    ]
   }
 ]
