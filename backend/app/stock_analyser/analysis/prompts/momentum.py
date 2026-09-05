@@ -36,9 +36,9 @@ class MomentumStrategy(AnalysisStrategy):
     def get_system_prompt(self) -> str:
         return (_PROMPT_DIR / "momentum.md").read_text()
 
-    def get_analysis_prompt(self, stock_data: dict) -> str:
+    def get_analysis_prompt(self, stock_data: dict, analyzed_news: list[dict] | None = None) -> str:
         formatter = self.get_formatter()
-        return formatter.format(stock_data, [], {
+        return formatter.format(stock_data, analyzed_news or [], {
             "ticker": stock_data.get("ticker", "N/A"),
             "company_name": stock_data.get("company_name") or stock_data.get("name", ""),
             "sector": stock_data.get("sector"),

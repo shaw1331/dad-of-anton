@@ -26,6 +26,10 @@ class AnalyzeStocksTask:
         index = scrape_output["index"]
         strategy_name = ctx.get_input("strategy") or "value_investing"
 
+        # Read analyzed news if available
+        news_output = ctx.get_output("analyze_news")
+        analyzed_news = news_output.get("analyses", {}) if news_output else {}
+
         logger.info("Starting analysis for %d stocks in %s using '%s' strategy",
                      len(stocks), index, strategy_name)
 
@@ -35,12 +39,13 @@ class AnalyzeStocksTask:
         analyses = []
         for i, stock in enumerate(stocks, 1):
             ticker = stock.get("ticker", "UNKNOWN")
+            stock_news = analyzed_news.get(ticker, [])
             logger.info("[%d/%d] Analyzing %s...", i, len(stocks), ticker)
 
             result = graph.run({
                 "stock_data": stock,
                 "system_prompt": strategy.get_system_prompt(),
-                "analysis_prompt": strategy.get_analysis_prompt(stock),
+                "analysis_prompt": strategy.get_analysis_prompt(stock, stock_news),
             })
 
             if result.success:
