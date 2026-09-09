@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
-import { Input } from "@/components/ui/input";
+import { TickerInput } from "@/components/ticker-input";
 import {
   CollapsibleSection,
   DataRow,
@@ -111,10 +111,6 @@ export default function TrendlynePage() {
     }
   }
 
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter") handleSearch();
-  }
-
   function renderRows(fields: [string, string][], data: Record<string, number>) {
     return fields.map(([key, label]) => (
       <DataRow key={key} label={label} value={formatValue(key, data[key])} />
@@ -144,11 +140,11 @@ export default function TrendlynePage() {
               <label className="mb-1.5 block text-sm font-medium text-foreground">
                 Ticker
               </label>
-              <Input
-                placeholder="e.g. ITC, RELIANCE, INFY..."
+              <TickerInput
                 value={ticker}
-                onChange={(e) => setTicker(e.target.value.toUpperCase())}
-                onKeyDown={handleKeyDown}
+                onChange={setTicker}
+                onSubmit={handleSearch}
+                placeholder="e.g. ITC, RELIANCE, INFY..."
                 disabled={loading}
               />
             </div>

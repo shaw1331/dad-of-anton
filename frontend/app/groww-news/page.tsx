@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
+import { TickerInput } from "@/components/ticker-input";
 import { Input } from "@/components/ui/input";
 
 export default function GrowwNewsPage() {
@@ -35,10 +36,6 @@ export default function GrowwNewsPage() {
     } finally {
       setLoading(false);
     }
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter") handleSearch();
   }
 
   function formatDate(dateStr: string): string {
@@ -73,11 +70,11 @@ export default function GrowwNewsPage() {
               <label className="mb-1.5 block text-sm font-medium text-foreground">
                 Ticker
               </label>
-              <Input
-                placeholder="e.g. ITC, DELHIVERY, INFY..."
+              <TickerInput
                 value={ticker}
-                onChange={(e) => setTicker(e.target.value.toUpperCase())}
-                onKeyDown={handleKeyDown}
+                onChange={setTicker}
+                onSubmit={handleSearch}
+                placeholder="e.g. ITC, DELHIVERY, INFY..."
                 disabled={loading}
               />
             </div>
