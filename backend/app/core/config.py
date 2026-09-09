@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str = "ollama"
     LLM_MODEL: str = "llama3"
     LLM_TEMPERATURE: float = 0.3
+    LLM_NUM_CTX: int = 8192
     LLM_TIMEOUT: int = 120
     
     GOOGLE_API_KEY: str = ""

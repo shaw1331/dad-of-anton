@@ -48,6 +48,7 @@ class AgentFactory:
             "model": settings.LLM_MODEL,
             "model_provider": settings.LLM_PROVIDER,
             "temperature": settings.LLM_TEMPERATURE,
+            "num_ctx": settings.LLM_NUM_CTX,
         }
 
         if settings.LLM_PROVIDER == "google_genai":

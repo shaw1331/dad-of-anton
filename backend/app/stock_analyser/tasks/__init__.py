@@ -1,10 +1,20 @@
-__all__ = ["AnalyzeNewsTask", "AnalyzeStocksTask", "ScrapeNewsTask", "ScrapeStocksTask", "ScrapeTrendlyneTask"]
+__all__ = [
+    "AnalyzeNewsTask",
+    "AnalyzeStocksTask",
+    "ScrapeSingleStockTask",
+    "ScrapeNewsTask",
+    "ScrapeStocksTask",
+    "ScrapeTrendlyneTask",
+]
 
 
 def __getattr__(name: str):
     if name == "ScrapeStocksTask":
         from app.stock_analyser.tasks.scrape_stocks import ScrapeStocksTask
         return ScrapeStocksTask
+    if name == "ScrapeSingleStockTask":
+        from app.stock_analyser.tasks.scrape_single_stock import ScrapeSingleStockTask
+        return ScrapeSingleStockTask
     if name == "ScrapeTrendlyneTask":
         from app.stock_analyser.tasks.scrape_trendlyne import ScrapeTrendlyneTask
         return ScrapeTrendlyneTask
