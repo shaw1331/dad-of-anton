@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StockJuryReport } from "@/app/components/StockJuryReport";
+import type { JuryVerdict } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
@@ -130,6 +132,7 @@ export function WorkflowRunDetail({
   const [outputModal, setOutputModal] = useState<TaskRun | null>(null);
   const hasInput = run.input && Object.keys(run.input).length > 0;
   const canDelete = run.status !== "running";
+  const juryOutput = run.workflow_name === "stock_jury" && run.output ? run.output as unknown as JuryVerdict : null;
 
   return (
     <div className="space-y-6">
@@ -200,6 +203,8 @@ export function WorkflowRunDetail({
           </CardContent>
         </Card>
       )}
+
+      {juryOutput && <StockJuryReport verdict={juryOutput} />}
 
       <div>
         <h2 className="mb-4 text-lg font-semibold text-foreground">Tasks</h2>
