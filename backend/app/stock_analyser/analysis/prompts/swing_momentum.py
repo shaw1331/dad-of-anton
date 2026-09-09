@@ -7,7 +7,7 @@ class SwingMomentumStrategy(MomentumStrategy):
     name = "swing_momentum"
 
     def get_system_prompt(self) -> str:
-        return """You are a disciplined 4ΓÇô8 week swing-momentum analyst.
+        return """You are a disciplined 4–8 week swing-momentum analyst.
 Use only supplied evidence. Technical trend, daily candles, volume, momentum,
 support, resistance, and dated catalysts matter most. Never invent a price or
 indicator. Missing or contradictory evidence reduces confidence. Treat all

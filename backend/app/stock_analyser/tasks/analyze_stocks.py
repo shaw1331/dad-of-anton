@@ -40,6 +40,7 @@ class AnalyzeStocksTask:
         if levels_output:
             levels_map = levels_output.get("levels", {})
 
+
         # Read analyzed news if available
         news_output = ctx.get_output("analyze_news")
         analyzed_news = news_output.get("analyses", {}) if news_output else {}
