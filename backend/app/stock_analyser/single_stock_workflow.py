@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from app.stock_analyser.analysis.factory import AnalysisFactory
 from app.stock_analyser.tasks import (
     AnalyzeNewsTask,
     AnalyzeStocksTask,
@@ -16,7 +17,7 @@ SINGLE_STOCK_ANALYSER_WORKFLOW = BaseWorkflowConfig(
     input_fields=[
         InputField(
             name="ticker",
-            type="str",
+            type="ticker",
             label="Stock Ticker",
             description="NSE stock ticker symbol (e.g. RELIANCE, TCS)",
             required=True,
@@ -25,9 +26,10 @@ SINGLE_STOCK_ANALYSER_WORKFLOW = BaseWorkflowConfig(
             name="strategy",
             type="str",
             label="Analysis Strategy",
-            description="Analysis strategy to use (value_investing, momentum)",
+            description="Analysis strategy to use",
             required=False,
-            default="value_investing",
+            default="momentum",
+            choices=list(AnalysisFactory._strategies.keys()),
         ),
         InputField(
             name="enable_news",

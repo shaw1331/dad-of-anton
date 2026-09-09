@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Spinner } from "@/components/ui/spinner";
+import { TickerInput } from "@/components/ticker-input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
@@ -186,6 +187,14 @@ export default function WorkflowsPage() {
             value={value}
             onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
             rows={3}
+          />
+        );
+      case "ticker":
+        return (
+          <TickerInput
+            value={value}
+            onChange={(v) => setFormData({ ...formData, [field.name]: v })}
+            placeholder={field.description || "e.g. ITC, RELIANCE, INFY..."}
           />
         );
       default:

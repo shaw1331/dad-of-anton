@@ -1,6 +1,6 @@
 export interface InputField {
   name: string;
-  type: "str" | "int" | "float" | "bool" | "text";
+  type: "str" | "int" | "float" | "bool" | "text" | "ticker";
   label: string;
   description: string;
   required: boolean;

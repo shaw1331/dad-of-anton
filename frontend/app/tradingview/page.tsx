@@ -6,6 +6,7 @@ import { getCandles, Candle } from "@/lib/api/tradingview";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { TickerInput } from "@/components/ticker-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -63,13 +64,11 @@ export default function TradingViewPage() {
           <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-4">
             <div className="min-w-[200px] flex-1">
               <Label htmlFor="symbol" className="mb-1.5">Stock Symbol</Label>
-              <Input
-                id="symbol"
-                type="text"
+              <TickerInput
                 value={symbol}
-                onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+                onChange={setSymbol}
                 placeholder="e.g. INOXINDIA"
-                required
+                disabled={loading}
               />
             </div>
             <div className="min-w-[140px]">
