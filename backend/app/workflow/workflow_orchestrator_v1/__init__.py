@@ -11,7 +11,12 @@ def _register_stock_analyser() -> None:
     import app.stock_analyser.single_stock_workflow  # noqa: F401
 
 
+def _register_stock_jury() -> None:
+    import app.stock_jury.workflow  # noqa: F401
+
+
 _register_stock_analyser()
+_register_stock_jury()
 
 __all__ = [
     "WorkflowOrchestrator",

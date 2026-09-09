@@ -94,7 +94,9 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
 
         run = await asyncio.to_thread(self.run_repo.get, run_id)
         config = self.resolve_config(run.workflow_name)
-        ctx = BaseWorkflowContext(input=run.input or {})
+        workflow_input = dict(run.input or {})
+        workflow_input["_run_id"] = run_id
+        ctx = BaseWorkflowContext(input=workflow_input)
 
         try:
             for index, task_cls in enumerate(config.tasks):

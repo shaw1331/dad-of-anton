@@ -21,6 +21,19 @@ class ScrapeStocksTask:
         self.source = source
 
     def run(self, ctx: Any) -> None:
+        direct_ticker = ctx.get_input("ticker")
+        if direct_ticker:
+            ticker = str(direct_ticker).strip().upper()
+            stock_scraper = ScraperFactory.get_stock_scraper(self.source)
+            technical_result = stock_scraper.get_multiple([ticker])
+            if not technical_result.success:
+                raise Exception(technical_result.error)
+            ctx.set_output(self.name, {
+                "index": "MANUAL",
+                "stocks": [s.model_dump(mode="json") for s in technical_result.data],
+            })
+            return
+
         index = ctx.get_input("index")
         num_stocks = ctx.get_input("num_stocks")
         selection_criteria = ctx.get_input("selection_criteria") or "all"
