@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal
 
 from app.workflow.base_workflow_task import BaseWorkflowTask
+
+
+InputFieldType = Literal["str", "int", "float", "bool", "text", "ticker"]
 
 
 @dataclass
 class InputField:
     name: str
-    type: str
+    type: InputFieldType
     label: str
     description: str = ""
     required: bool = True

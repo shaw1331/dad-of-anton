@@ -16,7 +16,7 @@ SINGLE_STOCK_ANALYSER_WORKFLOW = BaseWorkflowConfig(
     input_fields=[
         InputField(
             name="ticker",
-            type="str",
+            type="ticker",
             label="Stock Ticker",
             description="NSE stock ticker symbol (e.g. RELIANCE, TCS)",
             required=True,
