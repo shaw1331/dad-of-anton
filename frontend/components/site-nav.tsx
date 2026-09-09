@@ -14,6 +14,7 @@ const LINKS = [
   { href: "/groww-news", label: "Groww News" },
   { href: "/trendlyne", label: "Trendlyne" },
   { href: "/tradingview", label: "TradingView" },
+  { href: "/stock-jury", label: "Stock Jury" },
 ] as const;
 
 export function SiteNav() {
