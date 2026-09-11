@@ -8,6 +8,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import END, StateGraph
 from pydantic import BaseModel
 
+from app.ai.audit import build_audit, invocation_started
 from app.ai.factory import AgentFactory
 from app.ai.interfaces import AgentGraph
 from app.ai.models import AgentResult
@@ -64,15 +65,47 @@ class StockAnalysisAgent(AgentGraph):
             "parsed_analysis": None,
         }
 
-        result = self._graph.invoke(initial_state)
-
-        parsed = result["parsed_analysis"]
-        return AgentResult(
-            success=parsed is not None,
-            data=parsed.model_dump() if parsed else {"raw": result["raw_response"]},
-            error=None if parsed else "Failed to parse LLM response",
-            graph_name=self.name,
-        )
+        started_at = invocation_started()
+        try:
+            result = self._graph.invoke(initial_state)
+            parsed = result["parsed_analysis"]
+            data = parsed.model_dump() if parsed else {"raw": result["raw_response"]}
+            error = None if parsed else "Failed to parse LLM response"
+            return AgentResult(
+                success=parsed is not None,
+                data=data,
+                error=error,
+                graph_name=self.name,
+                audits=[build_audit(
+                    agent_name=self.name,
+                    context=getattr(self, "audit_context", None),
+                    prompt_version=input_data.get("prompt_version", "unversioned"),
+                    schema_version=self.output_model.__name__,
+                    system_prompt=initial_state["system_prompt"],
+                    analysis_prompt=initial_state["analysis_prompt"],
+                    started_at=started_at,
+                    output=data,
+                    error=error,
+                )],
+            )
+        except Exception as error:
+            message = str(error)
+            return AgentResult(
+                success=False,
+                data=None,
+                error=message,
+                graph_name=self.name,
+                audits=[build_audit(
+                    agent_name=self.name,
+                    context=getattr(self, "audit_context", None),
+                    prompt_version=input_data.get("prompt_version", "unversioned"),
+                    schema_version=self.output_model.__name__,
+                    system_prompt=initial_state["system_prompt"],
+                    analysis_prompt=initial_state["analysis_prompt"],
+                    started_at=started_at,
+                    error=message,
+                )],
+            )
 
 
 AgentFactory.register("stock_analysis", StockAnalysisAgent)
