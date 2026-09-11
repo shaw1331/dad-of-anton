@@ -34,6 +34,12 @@ class AnalyzeStocksTask:
 
         tradingview_map = (ctx.get_output("scrape_tradingview") or {}).get("candles", {})
 
+        # Read pre-computed levels if available
+        levels_output = ctx.get_output("calculate_levels")
+        levels_map: dict[str, dict] = {}
+        if levels_output:
+            levels_map = levels_output.get("levels", {})
+
         # Read analyzed news if available
         news_output = ctx.get_output("analyze_news")
         analyzed_news = news_output.get("analyses", {}) if news_output else {}
@@ -52,6 +58,7 @@ class AnalyzeStocksTask:
                 **stock,
                 "trendlyne": trendlyne_map.get(ticker),
                 "tradingview": tradingview_map.get(ticker, []),
+                "levels": levels_map.get(ticker),
             }
             logger.info("[%d/%d] Analyzing %s...", i, len(stocks), ticker)
 

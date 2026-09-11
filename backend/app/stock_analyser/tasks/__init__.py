@@ -1,6 +1,7 @@
 __all__ = [
     "AnalyzeNewsTask",
     "AnalyzeStocksTask",
+    "CalculateLevelsTask",
     "ScrapeSingleStockTask",
     "ScrapeNewsTask",
     "ScrapeStocksTask",
@@ -31,4 +32,7 @@ def __getattr__(name: str):
     if name == "ScrapeTradingViewTask":
         from app.stock_analyser.tasks.scrape_tradingview import ScrapeTradingViewTask
         return ScrapeTradingViewTask
+    if name == "CalculateLevelsTask":
+        from app.stock_analyser.tasks.calculate_levels import CalculateLevelsTask
+        return CalculateLevelsTask
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

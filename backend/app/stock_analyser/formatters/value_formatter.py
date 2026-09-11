@@ -55,6 +55,38 @@ class ValueInvestingFormatter(BaseStockFormatter):
                 summary = article.get("detailed_summary") or article.get("raw_summary", "")
                 lines.append(f"- [{sentiment.upper()}] {summary}")
 
+        lines.append("")
+        lines.append("## PRE-COMPUTED TECHNICAL LEVELS")
+        lines.append("")
+        levels = stock_data.get("levels")
+        if levels and levels.get("recommendation"):
+            l = levels
+            lr = l.get("level_reasoning", "")
+            entry = str(l.get("entry_above", "N/A"))
+            slv = str(l.get("stop_loss", "N/A"))
+            targets = ", ".join([str(t) for t in l.get("targets", [])]) if l.get("targets") else "N/A"
+            rec = l.get("recommendation", "N/A")
+            conv = l.get("conviction", "N/A")
+            lines.append(f"- Recommendation: {rec}")
+            lines.append(f"- Conviction: {conv}")
+            lines.append(f"- Entry Above: {entry}")
+            lines.append(f"- Stop-Loss: {slv}")
+            lines.append(f"- Targets: {targets}")
+            lines.append(f"- Level Reasoning: {lr}")
+            vm = l.get("volume_metrics")
+            if vm:
+                lines.append("")
+                lines.append("### Volume Metrics")
+                lines.append(f"- 10D Avg Volume: {vm['avg_volume_10d']:.0f}")
+                lines.append(f"- 20D Avg Volume: {vm['avg_volume_20d']:.0f}")
+                lines.append(f"- Current Volume: {vm['current_volume']:.0f}")
+                lines.append(f"- Volume Spike: {'YES' if vm['volume_spike'] else 'NO'}")
+                lines.append(f"- Volume Trend: {vm['volume_trend']}")
+        else:
+            lines.append("No levels data available (insufficient technical data).")
+        lines.append("")
+        lines.append("These levels were derived from EMA alignment, support/resistance, RSI, ADX, ATR, and volume data. Validate or challenge them in your analysis.")
+
         return "\n".join(lines)
 
 

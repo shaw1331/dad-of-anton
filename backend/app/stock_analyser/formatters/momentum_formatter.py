@@ -190,6 +190,46 @@ class MomentumFormatter(BaseStockFormatter):
         else:
             news_section = "No analyzed news articles available for this stock.\n"
 
+        # Levels section
+        levels = stock_data.get("levels")
+        if levels and levels.get("recommendation"):
+            l = levels
+            lr = l.get("level_reasoning", "")
+            entry = _fmt_num(l.get("entry_above"))
+            sl = _fmt_num(l.get("stop_loss"))
+            targets = ", ".join([_fmt_num(t) for t in l.get("targets", [])]) if l.get("targets") else "N/A"
+            rec = l.get("recommendation", "N/A")
+            conv = l.get("conviction", "N/A")
+            vm = l.get("volume_metrics")
+            vol_section = ""
+            if vm:
+                vol_section = (
+                    f"| 10D Avg Volume | {vm['avg_volume_10d']:.0f} |\n"
+                    f"| 20D Avg Volume | {vm['avg_volume_20d']:.0f} |\n"
+                    f"| Current Volume | {vm['current_volume']:.0f} |\n"
+                    f"| Volume Spike | {'YES' if vm['volume_spike'] else 'NO'} |\n"
+                    f"| Volume Trend | {vm['volume_trend']} |\n"
+                )
+            levels_section = (
+                f"\n## PRE-COMPUTED TECHNICAL LEVELS\n\n"
+                f"These levels were derived from EMA alignment, support/resistance, "
+                f"RSI, ADX, ATR, and volume data (not LLM-generated). The LLM analysis "
+                f"below should validate or challenge them with specific evidence.\n\n"
+                f"| Metric | Value |\n"
+                f"|---|---:|\n"
+                f"| Recommendation | {rec} |\n"
+                f"| Conviction | {conv} |\n"
+                f"| Entry Above | {entry} |\n"
+                f"| Stop-Loss | {sl} |\n"
+                f"| Targets | {targets} |\n"
+                f"| Level Reasoning | {lr} |\n"
+            )
+            if vol_section:
+                levels_section += f"\n### Volume Metrics\n\n| Metric | Value |\n|---|---:|\n{vol_section}"
+            levels_section += "\n"
+        else:
+            levels_section = "\n## PRE-COMPUTED TECHNICAL LEVELS\n\nNo levels data available (insufficient technical data).\n\n"
+
         template = (_PROMPT_DIR / "momentum_prompt.md").read_text()
 
         return template.format(
@@ -258,6 +298,8 @@ class MomentumFormatter(BaseStockFormatter):
             borrowings=borrowings,
             # News
             news_section=news_section,
+            # Pre-computed levels
+            levels_section=levels_section,
         )
 
 
