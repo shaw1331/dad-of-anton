@@ -97,6 +97,12 @@ export default function RootLayout({
                   >
                     Stock Jury
                   </Link>
+                  <Link
+                    href="/evaluation"
+                    className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                  >
+                    Evaluation
+                  </Link>
                   <div className="ml-2">
                     <ThemeToggle />
                   </div>
