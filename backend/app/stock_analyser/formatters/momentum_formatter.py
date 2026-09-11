@@ -147,6 +147,7 @@ class MomentumFormatter(BaseStockFormatter):
         s2 = tl_data.get("s2")
         s3 = tl_data.get("s3")
         pivot = tl_data.get("pivot")
+        return_1w = tl_data.get("return_1w")
         return_1m = tl_data.get("return_1m")
         return_3m = tl_data.get("return_3m")
         return_6m = tl_data.get("return_6m")
@@ -190,45 +191,21 @@ class MomentumFormatter(BaseStockFormatter):
         else:
             news_section = "No analyzed news articles available for this stock.\n"
 
-        # Levels section
-        levels = stock_data.get("levels")
-        if levels and levels.get("recommendation"):
-            l = levels
-            lr = l.get("level_reasoning", "")
-            entry = _fmt_num(l.get("entry_above"))
-            sl = _fmt_num(l.get("stop_loss"))
-            targets = ", ".join([_fmt_num(t) for t in l.get("targets", [])]) if l.get("targets") else "N/A"
-            rec = l.get("recommendation", "N/A")
-            conv = l.get("conviction", "N/A")
-            vm = l.get("volume_metrics")
-            vol_section = ""
-            if vm:
-                vol_section = (
-                    f"| 10D Avg Volume | {vm['avg_volume_10d']:.0f} |\n"
-                    f"| 20D Avg Volume | {vm['avg_volume_20d']:.0f} |\n"
-                    f"| Current Volume | {vm['current_volume']:.0f} |\n"
-                    f"| Volume Spike | {'YES' if vm['volume_spike'] else 'NO'} |\n"
-                    f"| Volume Trend | {vm['volume_trend']} |\n"
-                )
-            levels_section = (
-                f"\n## PRE-COMPUTED TECHNICAL LEVELS\n\n"
-                f"These levels were derived from EMA alignment, support/resistance, "
-                f"RSI, ADX, ATR, and volume data (not LLM-generated). The LLM analysis "
-                f"below should validate or challenge them with specific evidence.\n\n"
-                f"| Metric | Value |\n"
-                f"|---|---:|\n"
-                f"| Recommendation | {rec} |\n"
-                f"| Conviction | {conv} |\n"
-                f"| Entry Above | {entry} |\n"
-                f"| Stop-Loss | {sl} |\n"
-                f"| Targets | {targets} |\n"
-                f"| Level Reasoning | {lr} |\n"
-            )
-            if vol_section:
-                levels_section += f"\n### Volume Metrics\n\n| Metric | Value |\n|---|---:|\n{vol_section}"
-            levels_section += "\n"
-        else:
-            levels_section = "\n## PRE-COMPUTED TECHNICAL LEVELS\n\nNo levels data available (insufficient technical data).\n\n"
+        # TradeView calculated levels
+        levels = stock_data.get("levels") or {}
+        tv_entry_above = _fmt_num(levels.get("entry_above"))
+        tv_stop_loss = _fmt_num(levels.get("stop_loss"))
+        tv_targets = levels.get("targets") or []
+        tv_target_1 = _fmt_num(tv_targets[0]) if tv_targets else "N/A"
+        tv_conviction = levels.get("conviction", "N/A")
+        tv_recommendation = levels.get("recommendation", "N/A")
+        tv_level_reasoning = levels.get("level_reasoning", "N/A")
+        vm = levels.get("volume_metrics") or {}
+        tv_volume_spike = "YES" if vm.get("volume_spike") else "NO"
+        tv_volume_trend = vm.get("volume_trend", "N/A")
+        tv_avg_volume_10d = f"{vm['avg_volume_10d']:.0f}" if vm.get("avg_volume_10d") is not None else "N/A"
+        tv_avg_volume_20d = f"{vm['avg_volume_20d']:.0f}" if vm.get("avg_volume_20d") is not None else "N/A"
+        tv_current_volume = f"{vm['current_volume']:.0f}" if vm.get("current_volume") is not None else "N/A"
 
         template = (_PROMPT_DIR / "momentum_prompt.md").read_text()
 
@@ -240,6 +217,7 @@ class MomentumFormatter(BaseStockFormatter):
             data_as_of=data_as_of,
             # Technical — Price
             current_price=current_price,
+            return_1w=_fmt_pct(return_1w),
             return_1m=_fmt_pct(return_1m),
             return_3m=_fmt_pct(return_3m),
             return_6m=_fmt_pct(return_6m),
@@ -282,6 +260,19 @@ class MomentumFormatter(BaseStockFormatter):
             distance_from_support=distance_from_support,
             # Technical — Volatility
             atr=_fmt_num(atr),
+            atr_percent="N/A",
+            # TradeView calculated levels
+            tradeview_entry_above=tv_entry_above,
+            tradeview_stop_loss=tv_stop_loss,
+            tradeview_target_1=tv_target_1,
+            tradeview_conviction=tv_conviction,
+            tradeview_recommendation=tv_recommendation,
+            tradeview_volume_spike=tv_volume_spike,
+            tradeview_volume_trend=tv_volume_trend,
+            tradeview_avg_volume_10d=tv_avg_volume_10d,
+            tradeview_avg_volume_20d=tv_avg_volume_20d,
+            tradeview_current_volume=tv_current_volume,
+            tradeview_level_reasoning=tv_level_reasoning,
             # Fundamental
             market_cap=market_cap,
             pe=pe,
@@ -298,8 +289,6 @@ class MomentumFormatter(BaseStockFormatter):
             borrowings=borrowings,
             # News
             news_section=news_section,
-            # Pre-computed levels
-            levels_section=levels_section,
         )
 
 
