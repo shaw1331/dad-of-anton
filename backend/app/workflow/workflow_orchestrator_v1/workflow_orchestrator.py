@@ -48,7 +48,8 @@ class WorkflowOrchestrator(BaseWorkflowOrchestrator):
         validated: dict = {}
         for field in config.input_fields:
             if field.name in input_data:
-                validated[field.name] = _coerce_type(input_data[field.name], field.type)
+                value = input_data[field.name]
+                validated[field.name] = _coerce_type(value, field.type) if value is not None else None
             elif field.required and field.default is None:
                 raise ValueError(f"Missing required field: {field.name}")
             elif field.default is not None:
