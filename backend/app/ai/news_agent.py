@@ -12,6 +12,7 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel
 
+from app.ai.audit import build_audit, invocation_started
 from app.ai.factory import AgentFactory
 from app.ai.interfaces import AgentGraph
 from app.ai.models import AgentResult, AnalyzedNewsArticle
@@ -95,24 +96,26 @@ class NewsAnalysisAgent(AgentGraph):
             return self._fetch_pdf(url)
         return self._fetch_html(url)
 
-    def _analyze_single(self, article: dict, ticker: str, system_prompt: str) -> dict:
-        """Analyze a single article by fetching content and calling LLM."""
+    def _build_analysis_prompt(self, article: dict, ticker: str) -> str:
+        """Fetch article content and format the untrusted-data prompt."""
         full_content = self._fetch_content(article.get("url", ""))
         summary = article.get("summary", "")
-
         content_text = full_content if full_content else "[Could not extract content]"
+        return (
+            f"Analyze this news article for {ticker}:\n\n"
+            f"Source: {article.get('source', 'Unknown')}\n"
+            f"Date: {article.get('pub_date', 'Unknown')}\n"
+            f"URL: {article.get('url', 'N/A')}\n"
+            f"Summary: {summary}\n"
+            f"Full Content: {content_text}"
+        )
 
+    def _analyze_single(self, analysis_prompt: str, system_prompt: str) -> dict:
+        """Analyze one prepared article prompt with the LLM."""
         structured_llm = self.llm.with_structured_output(AnalyzedNewsArticle)
         messages = [
             SystemMessage(content=system_prompt),
-            HumanMessage(content=(
-                f"Analyze this news article for {ticker}:\n\n"
-                f"Source: {article.get('source', 'Unknown')}\n"
-                f"Date: {article.get('pub_date', 'Unknown')}\n"
-                f"URL: {article.get('url', 'N/A')}\n"
-                f"Summary: {summary}\n"
-                f"Full Content: {content_text}"
-            )),
+            HumanMessage(content=analysis_prompt),
         ]
         result = structured_llm.invoke(messages)
         return result.model_dump()
@@ -123,13 +126,36 @@ class NewsAnalysisAgent(AgentGraph):
         system_prompt = input_data["system_prompt"]
 
         analyzed = []
+        audits = []
         for article in articles:
+            analysis_prompt = self._build_analysis_prompt(article, ticker)
+            started_at = invocation_started()
             try:
-                result = self._analyze_single(article, ticker, system_prompt)
+                result = self._analyze_single(analysis_prompt, system_prompt)
                 analyzed.append(result)
-            except Exception:
+                audits.append(build_audit(
+                    agent_name=self.name,
+                    context=getattr(self, "audit_context", None),
+                    prompt_version=input_data.get("prompt_version", "unversioned"),
+                    schema_version=AnalyzedNewsArticle.__name__,
+                    system_prompt=system_prompt,
+                    analysis_prompt=analysis_prompt,
+                    started_at=started_at,
+                    output=result,
+                ))
+            except Exception as error:
                 logger.warning("Failed to analyze article %s for %s",
                                article.get("url", ""), ticker)
+                audits.append(build_audit(
+                    agent_name=self.name,
+                    context=getattr(self, "audit_context", None),
+                    prompt_version=input_data.get("prompt_version", "unversioned"),
+                    schema_version=AnalyzedNewsArticle.__name__,
+                    system_prompt=system_prompt,
+                    analysis_prompt=analysis_prompt,
+                    started_at=started_at,
+                    error=str(error),
+                ))
 
         return AgentResult(
             success=True,
@@ -137,6 +163,7 @@ class NewsAnalysisAgent(AgentGraph):
                   "total_articles": len(analyzed)},
             error=None,
             graph_name=self.name,
+            audits=audits,
         )
 
 

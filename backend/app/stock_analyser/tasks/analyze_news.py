@@ -35,6 +35,7 @@ class AnalyzeNewsTask:
         system_prompt = (_PROMPT_DIR / "news_analysis.md").read_text()
 
         all_analyses: dict[str, list[dict]] = {}
+        audits: list[dict] = []
         total = 0
 
         for i, (ticker, articles) in enumerate(news.items(), 1):
@@ -50,7 +51,9 @@ class AnalyzeNewsTask:
                     "ticker": ticker,
                     "articles": articles,
                     "system_prompt": system_prompt,
+                    "prompt_version": "news_analysis:v1",
                 })
+                audits.extend(audit.model_dump() for audit in result.audits)
 
                 if result.success:
                     analyzed = result.data.get("articles", [])
@@ -72,4 +75,5 @@ class AnalyzeNewsTask:
         ctx.set_output(self.name, {
             "analyses": all_analyses,
             "total_analyzed": total,
+            "audits": audits,
         })

@@ -3,9 +3,34 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any, Generic, TypeVar
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 T = TypeVar("T")
+
+
+class AgentAuditContext(BaseModel):
+    """Static LLM configuration attached by AgentFactory."""
+
+    provider: str
+    model: str
+    temperature: float
+
+
+class AgentAudit(BaseModel):
+    """Traceable record for one LLM invocation."""
+
+    agent_name: str
+    provider: str
+    model: str
+    temperature: float
+    prompt_version: str
+    schema_version: str
+    latency_ms: int
+    retry_count: int = 0
+    system_prompt: str
+    analysis_prompt: str
+    output_citations: list[str] = Field(default_factory=list)
+    error: str | None = None
 
 
 class AgentResult(BaseModel, Generic[T]):
@@ -15,6 +40,7 @@ class AgentResult(BaseModel, Generic[T]):
     data: T | None = None
     error: str | None = None
     graph_name: str
+    audits: list[AgentAudit] = Field(default_factory=list)
 
 
 class AgentConfig(BaseModel):

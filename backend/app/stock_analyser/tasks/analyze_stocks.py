@@ -67,6 +67,7 @@ class AnalyzeStocksTask:
                     "stock_data": stock_with_tl,
                     "system_prompt": strategy.get_system_prompt(),
                     "analysis_prompt": strategy.get_analysis_prompt(stock_with_tl, stock_news),
+                    "prompt_version": f"{strategy.name}:v1",
                 })
 
                 if result.success:
@@ -79,6 +80,7 @@ class AnalyzeStocksTask:
                         "ticker": ticker,
                         "name": stock.get("name", ""),
                         "evidence_records": _evidence_records(ticker, stock, stock_with_tl, stock_news),
+                        "audits": [audit.model_dump() for audit in result.audits],
                     }
                     analyses.append(analysis)
                 else:
@@ -88,6 +90,7 @@ class AnalyzeStocksTask:
                         "ticker": ticker,
                         "name": stock.get("name", ""),
                         "error": result.error,
+                        "audits": [audit.model_dump() for audit in result.audits],
                     })
             except Exception as e:
                 logger.error("[%d/%d] Analysis error for %s: %s",

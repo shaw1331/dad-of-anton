@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from app.ai.exceptions import ConfigError
 from app.ai.interfaces import AgentGraph
+from app.ai.models import AgentAuditContext
 
 
 class AgentFactory:
@@ -64,6 +65,12 @@ class AgentFactory:
                 f"Available graphs: {available}"
             )
 
-        if output_model is not None:
-            return graph_cls(llm=llm, output_model=output_model)
-        return graph_cls(llm=llm)
+        graph = graph_cls(llm=llm, output_model=output_model) if output_model is not None else graph_cls(llm=llm)
+        graph.configure_audit(
+            AgentAuditContext(
+                provider=settings.LLM_PROVIDER,
+                model=settings.LLM_MODEL,
+                temperature=settings.LLM_TEMPERATURE,
+            )
+        )
+        return graph
