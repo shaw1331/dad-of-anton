@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from app.stock_jury.evaluation import HistoricalCase, evaluate_cases
-from app.stock_jury.models import CandidateVerdict, JuryVerdict
+from app.stock_jury.evaluation import HistoricalCase, evaluate_cases, validate_dataset
+from app.stock_jury.models import CandidateVerdict, JuryVerdict, TradePlan
 from app.stock_jury.validation import JuryValidationError, validate_verdict
 
 
@@ -16,7 +16,9 @@ def candidate(ticker: str, status: str = "NOT_SELECTED", allocation: float = 0) 
         conviction=0.8,
         outlook="BEARISH",
         summary="Supported bearish setup.",
-        evidence_refs=["REPORT.REASONING"],
+        evidence_refs=[f"{ticker}.REPORT.REASONING"],
+        counter_evidence_refs=[f"{ticker}.REPORT.REASONING"],
+        trade_plan=TradePlan(entry_mode="IMMEDIATE", entry_low=100, entry_high=100, stop_price=90) if status == "SELECTED" else TradePlan(),
     )
 
 
@@ -28,7 +30,7 @@ def test_all_candidates_can_be_bad_with_cash() -> None:
         candidates=[candidate("AAA"), candidate("BBB")],
         cash_allocation_pct=100,
     )
-    validate_verdict(verdict, {"AAA", "BBB"}, {"REPORT.REASONING"})
+    validate_verdict(verdict, {"AAA", "BBB"}, {"AAA.REPORT.REASONING", "BBB.REPORT.REASONING"})
 
 
 def test_allocations_are_validated_without_rating_quotas() -> None:
@@ -40,7 +42,7 @@ def test_allocations_are_validated_without_rating_quotas() -> None:
         cash_allocation_pct=50,
     )
     verdict.candidates[0].rating = "BUY_NOW"
-    validate_verdict(verdict, {"AAA", "BBB"}, {"REPORT.REASONING"})
+    validate_verdict(verdict, {"AAA", "BBB"}, {"AAA.REPORT.REASONING", "BBB.REPORT.REASONING"})
 
 
 def test_unknown_evidence_is_rejected() -> None:
@@ -52,7 +54,7 @@ def test_unknown_evidence_is_rejected() -> None:
         cash_allocation_pct=100,
     )
     with pytest.raises(JuryValidationError, match="Unknown evidence"):
-        validate_verdict(verdict, {"AAA"}, {"REPORT.OTHER"})
+        validate_verdict(verdict, {"AAA"}, {"AAA.REPORT.OTHER"})
 
 
 def test_evaluation_reports_direction_and_returns() -> None:
@@ -62,3 +64,12 @@ def test_evaluation_reports_direction_and_returns() -> None:
     ])
     assert metrics["directional_accuracy_40d"] == 1
     assert metrics["actionable_mean_return_40d_pct"] == 8
+
+
+def test_historical_dataset_requires_minimum_and_no_leakage() -> None:
+    cases = [HistoricalCase("AAA", "BUY_NOW", 0.8, 100, 3, 8, case_id="case-1")]
+    with pytest.raises(ValueError, match="at least 100"):
+        validate_dataset(cases)
+    leaked = [HistoricalCase("AAA", "BUY_NOW", 0.8, 100, 3, 8, case_id=f"case-{i}", leakage_detected=i == 1) for i in range(100)]
+    with pytest.raises(ValueError, match="Future-data"):
+        validate_dataset(leaked)
