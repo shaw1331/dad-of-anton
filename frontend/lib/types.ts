@@ -58,6 +58,8 @@ export interface JuryCandidate {
   summary: string;
   supporting_evidence: string[];
   counter_evidence: string[];
+  evidence_refs: string[];
+  counter_evidence_refs: string[];
   catalysts: string[];
   key_risks: string[];
   success_scenario: string;
@@ -71,7 +73,7 @@ export interface JuryCandidate {
   better_than: string[];
   lost_to: string[];
   data_quality_warnings: string[];
-  trade_plan?: { entry_low?: number | null; entry_high?: number | null; stop_price?: number | null; profit_targets?: number[] };
+  trade_plan?: { entry_mode?: "IMMEDIATE" | "TRIGGERED" | "NONE"; entry_low?: number | null; entry_high?: number | null; trigger_expiry_sessions?: number | null; stop_price?: number | null; profit_targets?: number[]; max_holding_sessions?: number; expected_return_direction?: string };
 }
 
 export interface JuryVerdict {
@@ -88,4 +90,12 @@ export interface JuryVerdict {
   prompt_version?: string;
   jury_audit?: { successful_ballots?: string[]; challenges?: string[]; failures?: { agent: string; error: string }[] };
   candidate_runs?: { ticker: string; status: string; run_id?: string; error?: string }[];
+}
+
+export interface EvaluationSummary {
+  status: "ready" | "not_loaded";
+  required_cases: number;
+  dataset: string;
+  metrics?: Record<string, number | null | Record<string, number | null>>;
+  release_gate?: { passed: boolean; checks: Record<string, boolean> };
 }

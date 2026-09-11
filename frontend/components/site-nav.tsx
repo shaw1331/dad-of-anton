@@ -15,6 +15,7 @@ const LINKS = [
   { href: "/trendlyne", label: "Trendlyne" },
   { href: "/tradingview", label: "TradingView" },
   { href: "/stock-jury", label: "Stock Jury" },
+  { href: "/evaluation", label: "Evaluation" },
 ] as const;
 
 export function SiteNav() {
