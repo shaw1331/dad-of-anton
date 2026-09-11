@@ -108,6 +108,7 @@ Use fundamentals only as secondary context. Do not treat them as direct momentum
 The following are analyzed news articles for this stock.
 
 {news_section}
+{levels_section}
 # ANALYSIS REQUIREMENTS
 
 - Use only the supplied data.

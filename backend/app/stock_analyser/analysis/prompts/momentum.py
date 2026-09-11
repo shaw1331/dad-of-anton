@@ -18,6 +18,7 @@ class KeyFactor(BaseModel):
 
 class MomentumAnalysis(BaseModel):
     recommendation: Literal["BUY", "HOLD", "SELL"]
+    conviction: str
     confidence: float = Field(ge=0.0, le=1.0)
     momentum_score: float = Field(ge=-1.0, le=1.0)
     timeframe: Literal["short_term", "medium_term", "long_term"]
@@ -26,6 +27,7 @@ class MomentumAnalysis(BaseModel):
     key_factors: list[KeyFactor]
     risks: list[str]
     missing_data: list[str]
+    levels: dict | None = None
 
 
 class MomentumStrategy(AnalysisStrategy):

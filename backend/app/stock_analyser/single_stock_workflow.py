@@ -4,8 +4,10 @@ from app.stock_analyser.analysis.factory import AnalysisFactory
 from app.stock_analyser.tasks import (
     AnalyzeNewsTask,
     AnalyzeStocksTask,
-        ScrapeSingleStockTask,
+    CalculateLevelsTask,
+    ScrapeSingleStockTask,
     ScrapeNewsTask,
+    ScrapeTradingViewTask,
     ScrapeTrendlyneTask,
 )
 from app.workflow.base_workflow_config import BaseWorkflowConfig, InputField
@@ -49,8 +51,10 @@ SINGLE_STOCK_ANALYSER_WORKFLOW = BaseWorkflowConfig(
         ),
     ],
     tasks=[
-    ScrapeSingleStockTask,
+        ScrapeSingleStockTask,
         ScrapeTrendlyneTask,
+        ScrapeTradingViewTask,
+        CalculateLevelsTask,
         ScrapeNewsTask,
         AnalyzeNewsTask,
         AnalyzeStocksTask,

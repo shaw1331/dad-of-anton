@@ -9,11 +9,13 @@ from app.stock_analyser.analysis.interfaces import AnalysisStrategy
 
 class ValueInvestingAnalysis(BaseModel):
     recommendation: Literal["BUY", "HOLD", "SELL"]
+    conviction: str
     confidence: float = Field(ge=0.0, le=1.0)
     reasoning: str
     key_factors: list[str]
     risks: list[str]
     margin_of_safety: str | None = None
+    levels: dict | None = None
 
 
 class ValueInvestingStrategy(AnalysisStrategy):
