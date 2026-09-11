@@ -16,8 +16,6 @@ class Settings(BaseSettings):
     LLM_TEMPERATURE: float = 0.3
     LLM_NUM_CTX: int = 8192
     LLM_TIMEOUT: int = 120
-    STOCK_JURY_EVALUATION_DATASET: str = "data/stock_jury_evaluation.json"
-    STOCK_JURY_APPROVED_METRICS: str = "data/stock_jury_approved_metrics.json"
     
     GOOGLE_API_KEY: str = ""
     
