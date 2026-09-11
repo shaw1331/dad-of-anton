@@ -5,6 +5,7 @@ import { Play, LayoutDashboard } from "lucide-react";
 import { WorkflowRunList } from "@/app/components/WorkflowRunList";
 import { getWorkflows, getWorkflowRuns, triggerWorkflow, deleteWorkflowRun } from "@/lib/api/workflows";
 import type { WorkflowConfig, WorkflowRun, InputField } from "@/lib/types";
+import { formatWorkflowName } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -209,17 +210,19 @@ export default function WorkflowsPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Workflows</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          Workflows
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Trigger and monitor your workflows
+          Start a workflow, then follow progress and output from recent runs.
         </p>
       </div>
 
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-foreground">
-          Available Workflows
+        <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
+          Available workflows
         </h2>
         {error && (
           <Card className="mb-4 border-destructive bg-destructive/10">
@@ -244,7 +247,7 @@ export default function WorkflowsPage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12 text-center">
               <LayoutDashboard className="mb-3 h-10 w-10 text-muted-foreground/50" />
-              <p className="text-sm text-muted-foreground">No workflows found</p>
+              <p className="text-sm text-muted-foreground">No workflows yet</p>
             </CardContent>
           </Card>
         ) : (
@@ -256,7 +259,9 @@ export default function WorkflowsPage() {
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                       <LayoutDashboard className="h-4 w-4" />
                     </div>
-                    <CardTitle className="text-base">{wf.name}</CardTitle>
+                    <CardTitle className="text-base font-medium tracking-tight">
+                      {formatWorkflowName(wf.name)}
+                    </CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col gap-4">
@@ -299,7 +304,9 @@ export default function WorkflowsPage() {
       <Dialog open={showModal} onOpenChange={(v) => !v && handleModalCancel()}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Trigger {selectedWorkflow?.name}</DialogTitle>
+            <DialogTitle>
+              Trigger {selectedWorkflow ? formatWorkflowName(selectedWorkflow.name) : ""}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             {selectedWorkflow?.input_fields.map((field) => (

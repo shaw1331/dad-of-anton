@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { formatLabel, formatWorkflowName } from "@/lib/utils";
 
 function StatusBadge({ status }: { status: string }) {
   const variant =
@@ -26,7 +27,7 @@ function StatusBadge({ status }: { status: string }) {
           ? "warning"
           : "muted";
 
-  return <Badge variant={variant}>{status}</Badge>;
+  return <Badge variant={variant}>{formatLabel(status)}</Badge>;
 }
 
 function TriggerTypeBadge({ triggerType }: { triggerType: TriggerType }) {
@@ -37,7 +38,7 @@ function TriggerTypeBadge({ triggerType }: { triggerType: TriggerType }) {
         ? "orange"
         : "info";
 
-  return <Badge variant={variant}>{triggerType}</Badge>;
+  return <Badge variant={variant}>{formatLabel(triggerType)}</Badge>;
 }
 
 function ProgressBar({
@@ -99,7 +100,7 @@ function OutputModal({
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="flex max-h-[85vh] max-w-2xl flex-col">
         <DialogHeader>
-          <DialogTitle>{task.task_name} — Output</DialogTitle>
+          <DialogTitle>{formatWorkflowName(task.task_name)} — Output</DialogTitle>
         </DialogHeader>
         <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-muted p-4 text-sm font-mono text-foreground">
           {json}
@@ -134,8 +135,8 @@ export function WorkflowRunDetail({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <h1 className="text-2xl font-bold text-foreground">
-          {run.workflow_name}
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          {formatWorkflowName(run.workflow_name)}
         </h1>
         <TriggerTypeBadge triggerType={run.trigger_type} />
         <StatusBadge status={run.status} />
@@ -233,8 +234,8 @@ export function WorkflowRunDetail({
                     >
                       {task.task_index + 1}
                     </div>
-                    <span className="text-sm font-medium text-foreground">
-                      {task.task_name}
+                    <span className="text-sm font-medium tracking-tight text-foreground">
+                      {formatWorkflowName(task.task_name)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">

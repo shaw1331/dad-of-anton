@@ -55,7 +55,12 @@ export default function RootLayout({
                   </span>
                 </Link>
                 <div className="flex items-center gap-1">
-                  
+                  <Link
+                    href="/trades"
+                    className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                  >
+                    Trades
+                  </Link>
                   <Link
                     href="/workflows"
                     className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"

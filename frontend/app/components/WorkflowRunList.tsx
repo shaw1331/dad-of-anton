@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { formatLabel, formatWorkflowName } from "@/lib/utils";
 
 function StatusBadge({ status }: { status: string }) {
   const variant =
@@ -17,7 +18,7 @@ function StatusBadge({ status }: { status: string }) {
           ? "warning"
           : "muted";
 
-  return <Badge variant={variant}>{status}</Badge>;
+  return <Badge variant={variant}>{formatLabel(status)}</Badge>;
 }
 
 function TriggerTypeBadge({ triggerType }: { triggerType: TriggerType }) {
@@ -28,7 +29,7 @@ function TriggerTypeBadge({ triggerType }: { triggerType: TriggerType }) {
         ? "orange"
         : "info";
 
-  return <Badge variant={variant}>{triggerType}</Badge>;
+  return <Badge variant={variant}>{formatLabel(triggerType)}</Badge>;
 }
 
 export function WorkflowRunList({
@@ -44,7 +45,9 @@ export function WorkflowRunList({
 }) {
   return (
     <div>
-      <h2 className="mb-4 text-lg font-semibold text-foreground">Recent Runs</h2>
+      <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
+        Recent runs
+      </h2>
       {runs.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
@@ -65,11 +68,17 @@ export function WorkflowRunList({
                     <Play className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">
-                      {run.workflow_name}
+                    <p className="text-sm font-medium tracking-tight text-foreground">
+                      {formatWorkflowName(run.workflow_name)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(run.created_at).toLocaleString()}
+                      {new Date(run.created_at).toLocaleString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
                     </p>
                   </div>
                 </button>
