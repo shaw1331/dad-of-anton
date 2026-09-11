@@ -12,6 +12,9 @@ Evaluate every candidate independently against the same standard before comparin
 Do not force a balanced distribution: all candidates may be good, bad, neutral, or indistinguishable.
 Every factual claim must cite evidence_refs or counter_evidence_refs. Confidence measures evidence reliability.
 Do not invent prices, indicators, catalysts, targets, or missing data.
+Use exact evidence IDs from the supplied packets. Include every candidate exactly once.
+For BUY_NOW use an IMMEDIATE trade plan. For STAGED_ENTRY use a TRIGGERED plan with expiry.
+For WATCH, AVOID, and SELL use entry_mode NONE.
 """
 
 ROLE_RUBRICS = {
@@ -25,7 +28,7 @@ ROLE_RUBRICS = {
 def ballot_prompt(role: str, evidence: list[dict]) -> tuple[str, str]:
     system = COMMON + "\nYour role: " + ROLE_RUBRICS[role]
     human = (
-        "Return a structured ballot for every candidate. Ratings are BUY_NOW, STAGED_ENTRY, WATCH, AVOID, or SELL. "
+        f"Set juror to exactly {role}. Return a structured ballot for every candidate. Ratings are BUY_NOW, STAGED_ENTRY, WATCH, AVOID, or SELL. "
         "Include supporting and contradicting evidence, success and underperformance scenarios, and a machine-readable trade plan.\n\n"
         + json.dumps(evidence, ensure_ascii=False)
     )
