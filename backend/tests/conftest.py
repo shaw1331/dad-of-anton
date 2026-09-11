@@ -11,6 +11,10 @@ from tests.utils.context import make_context
 _FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
+def pytest_addoption(parser):
+    parser.addoption("--run-id", action="store", default=None, help="Workflow run ID for prompt reconstruction test")
+
+
 @pytest.fixture
 def sample_stocks() -> list[dict]:
     with open(_FIXTURES_DIR / "sample_stocks.json") as f:
