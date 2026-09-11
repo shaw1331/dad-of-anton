@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import type { RunDetail, TaskRun, TriggerType } from "@/lib/types";
 import { Trash2, X, FileText, Copy, Check } from "lucide-react";
+import JsonView from "@uiw/react-json-view";
+import { darkTheme } from "@uiw/react-json-view/dark";
+import { lightTheme } from "@uiw/react-json-view/light";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -88,6 +91,18 @@ function OutputModal({
   onClose: () => void;
 }) {
   const [copied, setCopied] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const el = document.documentElement;
+    setIsDark(el.classList.contains("dark"));
+    const observer = new MutationObserver(() => {
+      setIsDark(el.classList.contains("dark"));
+    });
+    observer.observe(el, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
   const json = JSON.stringify(task.output, null, 2);
 
   const handleCopy = async () => {
@@ -102,9 +117,16 @@ function OutputModal({
         <DialogHeader>
           <DialogTitle>{formatWorkflowName(task.task_name)} — Output</DialogTitle>
         </DialogHeader>
-        <pre className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-muted p-4 text-sm font-mono text-foreground">
-          {json}
-        </pre>
+        <div className="min-h-0 flex-1 overflow-auto rounded-lg border border-border p-4">
+          <JsonView
+            value={task.output as object}
+            style={isDark ? darkTheme : lightTheme}
+            collapsed={false}
+            displayObjectSize
+            displayDataTypes={false}
+            enableClipboard={false}
+          />
+        </div>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={handleCopy}>
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
