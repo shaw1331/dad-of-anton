@@ -151,8 +151,15 @@ export function WorkflowRunDetail({
   deleting?: boolean;
 }) {
   const [outputModal, setOutputModal] = useState<TaskRun | null>(null);
+  const [copiedRunId, setCopiedRunId] = useState(false);
   const hasInput = run.input && Object.keys(run.input).length > 0;
   const canDelete = run.status !== "running";
+
+  const handleCopyRunId = async () => {
+    await navigator.clipboard.writeText(run.id);
+    setCopiedRunId(true);
+    setTimeout(() => setCopiedRunId(false), 2000);
+  };
 
   return (
     <div className="space-y-6">
@@ -199,8 +206,20 @@ export function WorkflowRunDetail({
             <p className="text-sm text-foreground">
               {new Date(run.created_at).toLocaleString()}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Run ID: {run.id.slice(0, 8)}
+            <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+              Run ID:
+              <button
+                onClick={handleCopyRunId}
+                className="cursor-pointer font-mono hover:text-foreground"
+                title="Click to copy full Run ID"
+              >
+                {run.id}
+              </button>
+              {copiedRunId ? (
+                <Check className="h-3 w-3 text-emerald-500" />
+              ) : (
+                <Copy className="h-3 w-3 opacity-50 hover:opacity-100" />
+              )}
             </p>
           </CardContent>
         </Card>
