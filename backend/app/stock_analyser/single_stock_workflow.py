@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from app.stock_analyser.analysis.factory import AnalysisFactory
 from app.stock_analyser.tasks import (
-    AnalyzeNewsTask,
-    AnalyzeStocksTask,
+    SHARED_INPUT_FIELDS,
+    SHARED_TASKS,
     CalculateLevelsTask,
     ScrapeSingleStockTask,
-    ScrapeNewsTask,
     ScrapeTradingViewTask,
-    ScrapeTrendlyneTask,
 )
 from app.workflow.base_workflow_config import BaseWorkflowConfig, InputField
 from app.workflow.workflow_orchestrator_v1.workflow_registry import WORKFLOWS
@@ -24,40 +21,13 @@ SINGLE_STOCK_ANALYSER_WORKFLOW = BaseWorkflowConfig(
             description="NSE stock ticker symbol (e.g. RELIANCE, TCS)",
             required=True,
         ),
-        InputField(
-            name="strategy",
-            type="str",
-            label="Analysis Strategy",
-            description="Analysis strategy to use",
-            required=False,
-            default="momentum",
-            choices=list(AnalysisFactory._strategies.keys()),
-        ),
-        InputField(
-            name="enable_news",
-            type="bool",
-            label="Enable News Analysis",
-            description="Scrape and analyze news for the stock",
-            required=False,
-            default=False,
-        ),
-        InputField(
-            name="news_lookback_days",
-            type="int",
-            label="News Lookback Days",
-            description="How many days back to look for news articles",
-            required=False,
-            default=15,
-        ),
+        *SHARED_INPUT_FIELDS,
     ],
     tasks=[
         ScrapeSingleStockTask,
-        ScrapeTrendlyneTask,
         ScrapeTradingViewTask,
         CalculateLevelsTask,
-        ScrapeNewsTask,
-        AnalyzeNewsTask,
-        AnalyzeStocksTask,
+        *SHARED_TASKS,
     ],
 )
 

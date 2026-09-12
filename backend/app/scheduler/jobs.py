@@ -13,7 +13,7 @@ SCHEDULED_INDICES: list[dict[str, object]] = [
         "num_stocks": None,
         "selection_criteria": "all",
         "enable_news": True,
-        "news_lookback_days": 3,
+        "num_news_articles": 3,
     },
     {
         "index": "1186",
@@ -21,7 +21,7 @@ SCHEDULED_INDICES: list[dict[str, object]] = [
         "num_stocks": None,
         "selection_criteria": "all",
         "enable_news": True,
-        "news_lookback_days": 3,
+        "num_news_articles": 3,
     },
 ]
 

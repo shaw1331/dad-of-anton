@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-from app.stock_analyser.analysis.factory import AnalysisFactory
 from app.stock_analyser.tasks import (
-    AnalyzeNewsTask,
-    AnalyzeStocksTask,
-    ScrapeNewsTask,
+    SHARED_INPUT_FIELDS,
+    SHARED_TASKS,
     ScrapeStocksTask,
-    ScrapeTrendlyneTask,
 )
 from app.workflow.base_workflow_config import BaseWorkflowConfig, InputField
 from app.workflow.workflow_orchestrator_v1.workflow_registry import WORKFLOWS
@@ -21,15 +18,6 @@ STOCK_ANALYSER_WORKFLOW = BaseWorkflowConfig(
             label="Stock Index",
             description="The stock index to analyze (e.g. NIFTY50, SENSEX)",
             required=True,
-        ),
-        InputField(
-            name="strategy",
-            type="str",
-            label="Analysis Strategy",
-            description="Analysis strategy to use",
-            required=False,
-            default="momentum",
-            choices=list(AnalysisFactory._strategies.keys()),
         ),
         InputField(
             name="num_stocks",
@@ -48,24 +36,9 @@ STOCK_ANALYSER_WORKFLOW = BaseWorkflowConfig(
             default="all",
             choices=["top", "bottom", "random", "all"],
         ),
-        InputField(
-            name="enable_news",
-            type="bool",
-            label="Enable News Analysis",
-            description="Scrape and analyze news for each stock",
-            required=False,
-            default=False,
-        ),
-        InputField(
-            name="news_lookback_days",
-            type="int",
-            label="News Lookback Days",
-            description="How many days back to look for news articles",
-            required=False,
-            default=15,
-        ),
+        *SHARED_INPUT_FIELDS,
     ],
-    tasks=[ScrapeStocksTask, ScrapeTrendlyneTask, ScrapeNewsTask, AnalyzeNewsTask, AnalyzeStocksTask],
+    tasks=[ScrapeStocksTask, *SHARED_TASKS],
 )
 
 WORKFLOWS["stock_analyser"] = STOCK_ANALYSER_WORKFLOW
