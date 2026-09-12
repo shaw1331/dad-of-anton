@@ -255,7 +255,14 @@ IMPORTANT:
 
 * If a dimension is missing, do NOT assign it 0 merely because it is missing.
 * If the required score cannot be calculated reliably because critical dimensions are unavailable, do not fabricate a score.
-* If a deterministic score is supplied by the input, treat that score as authoritative and do NOT recalculate it.
+* If a deterministic score, level, signal, target, stop-loss, conviction,
+  or other calculated metric is supplied by the input, treat it as an
+  authoritative supplied value and do NOT recalculate or modify it.
+* Deterministic calculated data may be used as technical evidence, but a
+  pre-existing recommendation must not automatically determine the final
+  recommendation unless the decision rules explicitly require it.
+* If deterministic calculated data conflicts with other supplied technical
+  evidence, explicitly identify the conflict and reduce confidence.
 
 ### SCORE INTERPRETATION
 
