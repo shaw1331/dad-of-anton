@@ -27,10 +27,11 @@ class ScrapeNewsTask:
             raise Exception("No scraped stocks found. Run ScrapeStocksTask first.")
 
         stocks = stocks_output["stocks"]
-        lookback_days = ctx.get_input("news_lookback_days") or 15
+        num_articles = ctx.get_input("num_news_articles") or 3
+        scrape_limit = num_articles + 2
 
-        logger.info("Scraping news for %d stocks (lookback: %d days)",
-                     len(stocks), lookback_days)
+        logger.info("Scraping news for %d stocks (target: %d articles, scraping %d)",
+                     len(stocks), num_articles, scrape_limit)
 
         scraper = GrowwNewsScraper()
         all_news: dict[str, list[dict]] = {}
@@ -41,7 +42,7 @@ class ScrapeNewsTask:
             logger.info("[%d/%d] Fetching news for %s...", i, len(stocks), ticker)
 
             try:
-                result = scraper.get_news(ticker, lookback_days)
+                result = scraper.get_news(ticker, limit=scrape_limit)
                 if result.success and result.data:
                     articles = [a.model_dump(mode="json") for a in result.data]
                     all_news[ticker] = articles

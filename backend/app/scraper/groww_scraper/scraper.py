@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 from app.scraper.groww_scraper.config import (
-    NEWS_LOOKBACK_DAYS,
     NEWS_PAGE_SIZE,
     NEWS_URL,
     SEARCH_URL,
@@ -46,11 +45,11 @@ class GrowwNewsScraper:
         return None
 
     def get_news(
-        self, ticker: str, lookback_days: int = NEWS_LOOKBACK_DAYS
+        self, ticker: str, limit: int = NEWS_PAGE_SIZE
     ) -> ScraperResult[list[NewsArticle]]:
         """Fetch news articles for a given stock ticker from Groww.
 
-        Returns articles from the last `lookback_days` days.
+        Returns up to `limit` most recent articles sorted by publication date descending.
         """
         result = self.search_ticker(ticker)
         if not result:
@@ -76,7 +75,6 @@ class GrowwNewsScraper:
             )
 
         raw_articles = data.get("results", [])
-        cutoff = datetime.now(timezone.utc) - timedelta(days=lookback_days)
 
         articles: list[NewsArticle] = []
         for item in raw_articles:
@@ -86,9 +84,6 @@ class GrowwNewsScraper:
                 if pub_date.tzinfo is None:
                     pub_date = pub_date.replace(tzinfo=timezone.utc)
             except (ValueError, AttributeError):
-                continue
-
-            if pub_date < cutoff:
                 continue
 
             articles.append(
@@ -103,6 +98,7 @@ class GrowwNewsScraper:
             )
 
         articles.sort(key=lambda a: a.pub_date, reverse=True)
+        articles = articles[:limit]
 
         return ScraperResult(
             success=True,

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Spinner } from "@/components/ui/spinner";
 import { TickerInput } from "@/components/ticker-input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -67,7 +67,7 @@ export default function WorkflowsPage() {
     } else {
       const defaults: Record<string, any> = {};
       for (const f of wf.input_fields) {
-        defaults[f.name] = f.default ?? (f.type === "bool" ? false : "");
+        defaults[f.name] = f.default ?? (f.type === "bool" ? true : "");
       }
       setFormData(defaults);
       setSelectedWorkflow(wf);
@@ -147,15 +147,12 @@ export default function WorkflowsPage() {
     switch (field.type) {
       case "bool":
         return (
-          <div className="flex items-center gap-2">
-            <Checkbox
-              checked={!!value}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, [field.name]: !!checked })
-              }
-            />
-            <Label className="font-normal">{field.label}</Label>
-          </div>
+          <Switch
+            checked={!!value}
+            onCheckedChange={(checked) =>
+              setFormData({ ...formData, [field.name]: checked })
+            }
+          />
         );
       case "int":
         return (
@@ -311,7 +308,17 @@ export default function WorkflowsPage() {
           <div className="space-y-4">
             {selectedWorkflow?.input_fields.map((field) => (
               <div key={field.name}>
-                {field.type !== "bool" ? (
+                {field.type === "bool" ? (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>{field.label}</Label>
+                      {field.description && (
+                        <p className="text-xs text-muted-foreground">{field.description}</p>
+                      )}
+                    </div>
+                    {renderInputField(field)}
+                  </div>
+                ) : (
                   <>
                     <Label className="mb-1.5">
                       {field.label}
@@ -322,8 +329,6 @@ export default function WorkflowsPage() {
                     )}
                     {renderInputField(field)}
                   </>
-                ) : (
-                  renderInputField(field)
                 )}
               </div>
             ))}

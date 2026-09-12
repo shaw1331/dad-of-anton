@@ -16,12 +16,12 @@ import { Input } from "@/components/ui/input";
 
 export default function GrowwNewsPage() {
   const [ticker, setTicker] = useState("");
-  const [daysStr, setDaysStr] = useState("15");
+  const [limitStr, setLimitStr] = useState("5");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<GrowwNewsResult | null>(null);
 
-  const days = Math.min(90, Math.max(1, parseInt(daysStr, 10) || 15));
+  const limit = Math.min(20, Math.max(1, parseInt(limitStr, 10) || 5));
 
   async function handleSearch() {
     if (!ticker.trim()) return;
@@ -29,7 +29,7 @@ export default function GrowwNewsPage() {
     setError(null);
     setResult(null);
     try {
-      const data = await fetchGrowwNews(ticker.trim(), days);
+      const data = await fetchGrowwNews(ticker.trim(), limit);
       setResult(data);
     } catch (err: any) {
       setError(err.message || "Failed to fetch news");
@@ -59,7 +59,7 @@ export default function GrowwNewsPage() {
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Fetch recent stock news from Groww. Enter a ticker (e.g. ITC,
-          DELHIVERY) and set the lookback period.
+          DELHIVERY) and set the number of articles to return.
         </p>
       </div>
 
@@ -80,14 +80,14 @@ export default function GrowwNewsPage() {
             </div>
             <div className="w-[120px]">
               <label className="mb-1.5 block text-sm font-medium text-foreground">
-                Days
+                Limit
               </label>
               <Input
                 type="number"
                 min={1}
-                max={90}
-                value={daysStr}
-                onChange={(e) => setDaysStr(e.target.value)}
+                max={20}
+                value={limitStr}
+                onChange={(e) => setLimitStr(e.target.value)}
                 disabled={loading}
               />
             </div>
@@ -142,7 +142,7 @@ export default function GrowwNewsPage() {
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                 <Newspaper className="mb-3 h-10 w-10 text-muted-foreground/50" />
                 <p className="text-sm text-muted-foreground">
-                  No news found for {result.ticker} in the last 15 days.
+                  No news found for {result.ticker}.
                 </p>
               </CardContent>
             </Card>

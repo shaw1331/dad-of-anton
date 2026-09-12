@@ -21,7 +21,7 @@ def task():
 class TestScrapeNewsTask:
     def test_scrape_news_success(self, task, scrape_stocks_output):
         ctx = make_context(
-            input={"enable_news": True, "news_lookback_days": 7},
+            input={"enable_news": True, "num_news_articles": 3},
             outputs={"scrape_stocks": scrape_stocks_output},
         )
         task.run(ctx)
@@ -51,7 +51,7 @@ class TestScrapeNewsTask:
             "stocks": [{"ticker": "ZZZZZZ99", "name": "Fake Corp"}],
         }
         ctx = make_context(
-            input={"enable_news": True, "news_lookback_days": 7},
+            input={"enable_news": True, "num_news_articles": 3},
             outputs={"scrape_stocks": bad_stocks},
         )
         task.run(ctx)
@@ -71,7 +71,7 @@ class TestScrapeNewsTask:
             "stocks": [{"ticker": "TCS", "name": "Tata Consultancy Services"}],
         }
         ctx = make_context(
-            input={"enable_news": True, "news_lookback_days": 30},
+            input={"enable_news": True, "num_news_articles": 5},
             outputs={"scrape_stocks": stocks},
         )
         task.run(ctx)

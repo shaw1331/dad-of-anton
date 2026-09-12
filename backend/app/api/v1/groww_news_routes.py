@@ -17,7 +17,7 @@ scraper = GrowwNewsScraper()
 @router.get("")
 def get_groww_news(
     ticker: str,
-    days: int = Query(default=15, ge=1, le=90, description="Lookback days (1-90)"),
+    limit: int = Query(default=5, ge=1, le=20, description="Number of recent articles to return (1-20)"),
 ):
     """Fetch recent stock news from Groww for a given ticker."""
     if not ticker.strip():
@@ -33,7 +33,7 @@ def get_groww_news(
 
     groww_contract_id, company_name = result
 
-    news_result = scraper.get_news(ticker, lookback_days=days)
+    news_result = scraper.get_news(ticker, limit=limit)
     if not news_result.success:
         raise HTTPException(status_code=502, detail=news_result.error)
 
