@@ -20,9 +20,9 @@ export interface GrowwNewsResult {
 
 export function fetchGrowwNews(
   ticker: string,
-  days: number = 15
+  limit: number = 5
 ): Promise<GrowwNewsResult> {
   return request<GrowwNewsResult>(
-    `/groww-news?ticker=${encodeURIComponent(ticker)}&days=${days}`
+    `/groww-news?ticker=${encodeURIComponent(ticker)}&limit=${limit}`
   );
 }
