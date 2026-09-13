@@ -7,6 +7,7 @@ import {
   ArrowUpDown,
   CandlestickChart,
   Landmark,
+  LogOut,
   Loader2,
   Pencil,
   Plus,
@@ -97,10 +98,10 @@ function formatDate(iso: string | null): string {
 
 function formatDayMonth(iso: string | null): string {
   if (!iso) return "—";
-  const d = new Date(iso);
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  return `${dd}/${mm}`;
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+  });
 }
 
 function TradeActions({
@@ -114,8 +115,9 @@ function TradeActions({
   onClose: (trade: Trade) => void;
   onDelete: (trade: Trade) => void;
 }) {
+  const canClose = trade.status === "open" && trade.currentPrice != null;
   return (
-    <div className="flex shrink-0 items-center justify-center gap-1">
+    <div className="flex shrink-0 items-center justify-center">
       {trade.notes ? (
         <span
           title={trade.notes}
@@ -124,34 +126,39 @@ function TradeActions({
           <StickyNote className="h-3.5 w-3.5" />
         </span>
       ) : null}
-      <Button
-        size="sm"
-        variant="ghost"
-        title="Edit"
-        className="h-7 w-7 p-0 text-muted-foreground"
-        onClick={() => onEdit(trade)}
-      >
-        <Pencil className="h-3.5 w-3.5" />
-      </Button>
-      {trade.status === "open" && trade.currentPrice != null && (
+      <div className="inline-flex items-center rounded-md border border-border/60 p-0.5">
         <Button
           size="sm"
-          variant="outline"
-          className="h-7 px-2 text-xs"
-          onClick={() => onClose(trade)}
+          variant="ghost"
+          title="Edit"
+          className="h-7 w-7 p-0 text-muted-foreground"
+          onClick={() => onEdit(trade)}
         >
-          Close
+          <Pencil className="h-3.5 w-3.5" />
         </Button>
-      )}
-      <Button
-        size="sm"
-        variant="ghost"
-        title="Delete"
-        className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
-        onClick={() => onDelete(trade)}
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-      </Button>
+        {canClose ? (
+          <Button
+            size="sm"
+            variant="ghost"
+            title="Close position"
+            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+            onClick={() => onClose(trade)}
+          >
+            <LogOut className="h-3.5 w-3.5" />
+          </Button>
+        ) : (
+          <span className="inline-block h-7 w-7" aria-hidden />
+        )}
+        <Button
+          size="sm"
+          variant="ghost"
+          title="Delete"
+          className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+          onClick={() => onDelete(trade)}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
+      </div>
     </div>
   );
 }
@@ -656,7 +663,7 @@ export function TradesView() {
                         </dd>
                       </div>
                       <div>
-                        <dt className="text-muted-foreground">Mark</dt>
+                        <dt className="text-muted-foreground">Avg. price</dt>
                         <dd className="tabular-nums text-foreground">
                           {formatPrice(tradeMark(trade))}
                         </dd>
@@ -697,7 +704,7 @@ export function TradesView() {
                       [null, "Side", ""],
                       ["quantity", "Qty", ""],
                       ["entryPrice", "Entry", ""],
-                      [null, "Mark", ""],
+                      [null, "Avg. price", ""],
                       ["capital", "Capital", ""],
                       ["pnl", "P&L", ""],
                       [null, "Outcome", ""],
