@@ -16,8 +16,11 @@ export async function triggerWorkflow(
   });
 }
 
-export async function getWorkflowRuns(): Promise<WorkflowRun[]> {
-  return request("/workflows/runs");
+export async function getWorkflowRuns(
+  limit = 50,
+  offset = 0
+): Promise<WorkflowRun[]> {
+  return request(`/workflows/runs?limit=${limit}&offset=${offset}`);
 }
 
 export async function getWorkflowRun(runId: string): Promise<RunDetail> {
