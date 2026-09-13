@@ -117,7 +117,36 @@ function TradeActions({
 }) {
   const canClose = trade.status === "open" && trade.currentPrice != null;
   return (
-    <div className="flex shrink-0 items-center justify-center">
+    <div className="inline-flex items-center rounded-md border border-border/60 p-0.5">
+      <Button
+        size="sm"
+        variant="ghost"
+        title="Edit"
+        className="h-7 w-7 p-0 text-muted-foreground"
+        onClick={() => onEdit(trade)}
+      >
+        <Pencil className="h-3.5 w-3.5" />
+      </Button>
+      {canClose ? (
+        <Button
+          size="sm"
+          variant="ghost"
+          title="Close position"
+          className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+          onClick={() => onClose(trade)}
+        >
+          <LogOut className="h-3.5 w-3.5" />
+        </Button>
+      ) : null}
+      <Button
+        size="sm"
+        variant="ghost"
+        title="Delete"
+        className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+        onClick={() => onDelete(trade)}
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </Button>
       {trade.notes ? (
         <span
           title={trade.notes}
@@ -126,39 +155,6 @@ function TradeActions({
           <StickyNote className="h-3.5 w-3.5" />
         </span>
       ) : null}
-      <div className="inline-flex items-center rounded-md border border-border/60 p-0.5">
-        <Button
-          size="sm"
-          variant="ghost"
-          title="Edit"
-          className="h-7 w-7 p-0 text-muted-foreground"
-          onClick={() => onEdit(trade)}
-        >
-          <Pencil className="h-3.5 w-3.5" />
-        </Button>
-        {canClose ? (
-          <Button
-            size="sm"
-            variant="ghost"
-            title="Close position"
-            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-            onClick={() => onClose(trade)}
-          >
-            <LogOut className="h-3.5 w-3.5" />
-          </Button>
-        ) : (
-          <span className="inline-block h-7 w-7" aria-hidden />
-        )}
-        <Button
-          size="sm"
-          variant="ghost"
-          title="Delete"
-          className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
-          onClick={() => onDelete(trade)}
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </Button>
-      </div>
     </div>
   );
 }
@@ -226,6 +222,7 @@ export function TradesView() {
 
   // Add form state
   const [addTicker, setAddTicker] = useState("");
+  const [quoteTicker, setQuoteTicker] = useState("");
   const [quote, setQuote] = useState<TradeQuote | null>(null);
   const [addQty, setAddQty] = useState("");
   const [addSl, setAddSl] = useState("");
@@ -260,22 +257,22 @@ export function TradesView() {
     fetchTrades();
   }, [fetchTrades]);
 
-  // Quote on ticker select
   useEffect(() => {
-    if (!addTicker) {
+    if (!quoteTicker) {
       setQuote(null);
+      setQuoting(false);
       return;
     }
     let cancelled = false;
     setQuoting(true);
-    getTradeQuote(addTicker)
+    setAddError(null);
+    getTradeQuote(quoteTicker)
       .then((q) => {
         if (cancelled) return;
         setQuote(q);
         setAddQty(String(q.quantity));
         setAddSl(String(q.stopLoss));
         setAddTp(String(q.takeProfit));
-        setAddError(null);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -286,27 +283,28 @@ export function TradesView() {
         if (!cancelled) setQuoting(false);
       });
     return () => { cancelled = true; };
-  }, [addTicker]);
+  }, [quoteTicker]);
 
   async function handleAdd() {
     if (!addTicker || !quote) return;
     setAdding(true);
     setAddError(null);
     try {
-      await createTrade({
+      const created = await createTrade({
         ticker: addTicker,
         quantity: Number(addQty),
         stopLoss: Number(addSl),
         takeProfit: Number(addTp),
         notes: addNotes || undefined,
       });
+      setTrades((prev) => [created, ...prev.filter((t) => t.id !== created.id)]);
       setAddTicker("");
+      setQuoteTicker("");
       setQuote(null);
       setAddQty("");
       setAddSl("");
       setAddTp("");
       setAddNotes("");
-      await fetchTrades();
     } catch (err: any) {
       setAddError(err.message || "Create failed");
     } finally {
@@ -317,12 +315,12 @@ export function TradesView() {
   async function handleClose() {
     if (!closeTrade_ || closeTrade_.currentPrice == null) return;
     try {
-      await closeTrade(closeTrade_.id, {
+      const updated = await closeTrade(closeTrade_.id, {
         reason: "manual",
         exitPrice: closeTrade_.currentPrice,
       });
+      setTrades((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
       setCloseTrade(null);
-      await fetchTrades();
     } catch (err: any) {
       setError(err.message || "Close failed");
     }
@@ -331,9 +329,10 @@ export function TradesView() {
   async function handleDelete() {
     if (!deleteTrade_) return;
     try {
-      await deleteTrade(deleteTrade_.id);
+      const id = deleteTrade_.id;
+      await deleteTrade(id);
+      setTrades((prev) => prev.filter((t) => t.id !== id));
       setDeleteTrade(null);
-      await fetchTrades();
     } catch (err: any) {
       setError(err.message || "Delete failed");
     }
@@ -358,7 +357,7 @@ export function TradesView() {
     setSavingEdit(true);
     setEditError(null);
     try {
-      await updateTrade(editTrade.id, {
+      const updated = await updateTrade(editTrade.id, {
         notes: editNotes || null,
         ...(editTrade.status === "open"
           ? {
@@ -368,8 +367,8 @@ export function TradesView() {
             }
           : {}),
       });
+      setTrades((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
       setEditTrade(null);
-      await fetchTrades();
     } catch (err: any) {
       setEditError(err.message || "Update failed");
     } finally {
@@ -406,7 +405,7 @@ export function TradesView() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto w-full max-w-6xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
           Trades
@@ -433,7 +432,7 @@ export function TradesView() {
           <CardContent className="p-5">
             <div className="mb-3 flex items-center justify-between">
               <p className="text-sm font-medium text-muted-foreground">
-                Running P&amp;L
+                Unrealized P&amp;L
               </p>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </div>
@@ -441,7 +440,7 @@ export function TradesView() {
               {formatSignedInr(summary.runningPnl)}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Unrealized P&amp;L
+              Open positions
             </p>
           </CardContent>
         </Card>
@@ -509,7 +508,18 @@ export function TradesView() {
               <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Ticker</label>
               <TickerInput
                 value={addTicker}
-                onChange={setAddTicker}
+                onChange={(value) => {
+                  setAddTicker(value);
+                  if (value !== quoteTicker) {
+                    setQuoteTicker("");
+                    setQuote(null);
+                    setAddError(null);
+                  }
+                }}
+                onCommit={(symbol) => {
+                  setAddTicker(symbol);
+                  setQuoteTicker(symbol);
+                }}
                 placeholder="e.g. RELIANCE"
                 disabled={adding}
               />
@@ -694,7 +704,19 @@ export function TradesView() {
           </div>
 
           <Card className="hidden overflow-x-auto lg:block">
-            <table className="w-full min-w-[44rem] text-left text-sm">
+            <table className="w-full table-fixed text-left text-sm">
+              <colgroup>
+                <col />
+                <col className="w-[5.5rem]" />
+                <col className="w-[5rem]" />
+                <col className="w-[4.5rem]" />
+                <col className="w-[6rem]" />
+                <col className="w-[7rem]" />
+                <col className="w-[6.5rem]" />
+                <col className="w-[8.5rem]" />
+                <col className="w-[5.5rem]" />
+                <col className="w-[10.5rem]" />
+              </colgroup>
               <thead>
                 <tr className="border-b border-border">
                   {(
@@ -708,12 +730,12 @@ export function TradesView() {
                       ["capital", "Capital", ""],
                       ["pnl", "P&L", ""],
                       [null, "Outcome", ""],
-                      [null, "", ""],
+                      [null, "", "text-left"],
                     ] as [SortKey | null, string, string][]
                   ).map(([key, label, extra], i) => (
                     <th
                       key={`${label}-${i}`}
-                      className={`whitespace-nowrap px-2 py-2.5 text-center first:pl-4 last:pr-4 ${extra}`}
+                      className={`whitespace-nowrap px-2 py-2.5 first:pl-4 last:pr-4 ${extra || "text-center"}`}
                     >
                       {key ? (
                         <button
@@ -791,7 +813,7 @@ export function TradesView() {
                       <td className="px-2 py-2 text-center">
                         <OutcomeBadge trade={trade} />
                       </td>
-                      <td className="px-2 py-2 last:pr-4">
+                      <td className="px-2 py-2 text-left last:pr-4">
                         <TradeActions
                           trade={trade}
                           onEdit={openEdit}

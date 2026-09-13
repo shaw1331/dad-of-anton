@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 interface TickerInputProps {
   value: string;
   onChange: (value: string) => void;
+  onCommit?: (symbol: string) => void;
   onSubmit?: () => void;
   placeholder?: string;
   disabled?: boolean;
@@ -16,6 +17,7 @@ interface TickerInputProps {
 export function TickerInput({
   value,
   onChange,
+  onCommit,
   onSubmit,
   placeholder = "e.g. ITC, RELIANCE, INFY...",
   disabled = false,
@@ -70,17 +72,25 @@ export function TickerInput({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  function commit(symbol: string) {
+    const next = symbol.trim().toUpperCase();
+    if (!next) return;
+    onChange(next);
+    onCommit?.(next);
+  }
+
   function selectEntry(entry: StockEntry) {
-    onChange(entry.symbol);
     setOpen(false);
     inputRef.current?.focus();
+    commit(entry.symbol);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (!open || suggestions.length === 0) {
-      if (e.key === "Enter" && onSubmit) {
+      if (e.key === "Enter") {
         e.preventDefault();
-        onSubmit();
+        commit(value);
+        onSubmit?.();
       }
       return;
     }
@@ -100,6 +110,7 @@ export function TickerInput({
           selectEntry(suggestions[activeIndex]);
         } else {
           setOpen(false);
+          commit(value);
           onSubmit?.();
         }
         break;
