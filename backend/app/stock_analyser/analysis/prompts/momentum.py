@@ -16,18 +16,31 @@ class KeyFactor(BaseModel):
     evidence: str
 
 
+class TradeLevel(BaseModel):
+    price: float | None = None
+    trigger: str | None = None
+    reasoning: str
+
+
+class TradePlan(BaseModel):
+    entry: TradeLevel | None = None
+    stop_loss: TradeLevel | None = None
+    targets: list[TradeLevel] = Field(default_factory=list)
+    exit: TradeLevel | None = None
+
+
 class MomentumAnalysis(BaseModel):
     recommendation: Literal["BUY", "HOLD", "SELL"]
     conviction: str
     confidence: float = Field(ge=0.0, le=1.0)
-    momentum_score: float = Field(ge=-1.0, le=1.0)
+    momentum_score: float | None = Field(default=None, ge=-1.0, le=1.0)
     timeframe: Literal["short_term", "medium_term", "long_term"]
     data_quality: Literal["HIGH", "MEDIUM", "LOW"]
     reasoning: str
-    key_factors: list[KeyFactor]
-    risks: list[str]
-    missing_data: list[str]
-    levels: dict | None = None
+    key_factors: list[KeyFactor] = Field(default_factory=list)
+    risks: list[str] = Field(default_factory=list)
+    missing_data: list[str] = Field(default_factory=list)
+    trade_plan: TradePlan | None = None
 
 
 class MomentumStrategy(AnalysisStrategy):
