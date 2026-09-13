@@ -42,6 +42,10 @@ class TradeRepo:
             "ticker", ticker
         ).eq("status", "open").execute()
 
+    def update(self, trade_id: str, fields: dict) -> None:
+        supabase = get_supabase_client()
+        supabase.table("trades").update(fields).eq("id", trade_id).execute()
+
     def close(self, trade_id: str, reason: str, exit_price: float) -> None:
         supabase = get_supabase_client()
         supabase.table("trades").update({

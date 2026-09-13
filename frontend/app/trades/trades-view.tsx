@@ -8,6 +8,7 @@ import {
   CandlestickChart,
   Landmark,
   Loader2,
+  Pencil,
   Plus,
   StickyNote,
   Trash2,
@@ -25,6 +26,7 @@ import {
   getTradeQuote,
   createTrade,
   closeTrade,
+  updateTrade,
   deleteTrade,
   type Trade,
   type TradeStatus,
@@ -36,6 +38,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TickerInput } from "@/components/ticker-input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type StatusFilter = "all" | TradeStatus;
 type SortKey =
@@ -96,15 +105,17 @@ function formatDayMonth(iso: string | null): string {
 
 function TradeActions({
   trade,
+  onEdit,
   onClose,
   onDelete,
 }: {
   trade: Trade;
+  onEdit: (trade: Trade) => void;
   onClose: (trade: Trade) => void;
   onDelete: (trade: Trade) => void;
 }) {
   return (
-    <div className="flex shrink-0 items-center justify-end gap-1">
+    <div className="flex shrink-0 items-center justify-center gap-1">
       {trade.notes ? (
         <span
           title={trade.notes}
@@ -113,6 +124,15 @@ function TradeActions({
           <StickyNote className="h-3.5 w-3.5" />
         </span>
       ) : null}
+      <Button
+        size="sm"
+        variant="ghost"
+        title="Edit"
+        className="h-7 w-7 p-0 text-muted-foreground"
+        onClick={() => onEdit(trade)}
+      >
+        <Pencil className="h-3.5 w-3.5" />
+      </Button>
       {trade.status === "open" && trade.currentPrice != null && (
         <Button
           size="sm"
@@ -210,6 +230,13 @@ export function TradesView() {
 
   const [closeTrade_, setCloseTrade] = useState<Trade | null>(null);
   const [deleteTrade_, setDeleteTrade] = useState<Trade | null>(null);
+  const [editTrade, setEditTrade] = useState<Trade | null>(null);
+  const [editQty, setEditQty] = useState("");
+  const [editSl, setEditSl] = useState("");
+  const [editTp, setEditTp] = useState("");
+  const [editNotes, setEditNotes] = useState("");
+  const [editError, setEditError] = useState<string | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const fetchTrades = useCallback(async () => {
     try {
@@ -302,6 +329,44 @@ export function TradesView() {
       await fetchTrades();
     } catch (err: any) {
       setError(err.message || "Delete failed");
+    }
+  }
+
+  function openEdit(trade: Trade) {
+    setEditTrade(trade);
+    setEditQty(String(trade.quantity));
+    setEditSl(trade.stopLoss != null ? String(trade.stopLoss) : "");
+    setEditTp(trade.takeProfit != null ? String(trade.takeProfit) : "");
+    setEditNotes(trade.notes ?? "");
+    setEditError(null);
+  }
+
+  async function handleEditSave() {
+    if (!editTrade) return;
+    const qty = Number(editQty);
+    if (editTrade.status === "open" && (!Number.isInteger(qty) || qty < 1)) {
+      setEditError("Quantity must be a whole number ≥ 1");
+      return;
+    }
+    setSavingEdit(true);
+    setEditError(null);
+    try {
+      await updateTrade(editTrade.id, {
+        notes: editNotes || null,
+        ...(editTrade.status === "open"
+          ? {
+              quantity: qty,
+              stopLoss: editSl === "" ? null : Number(editSl),
+              takeProfit: editTp === "" ? null : Number(editTp),
+            }
+          : {}),
+      });
+      setEditTrade(null);
+      await fetchTrades();
+    } catch (err: any) {
+      setEditError(err.message || "Update failed");
+    } finally {
+      setSavingEdit(false);
     }
   }
 
@@ -565,6 +630,7 @@ export function TradesView() {
                         <OutcomeBadge trade={trade} />
                         <TradeActions
                           trade={trade}
+                          onEdit={openEdit}
                           onClose={setCloseTrade}
                           onDelete={setDeleteTrade}
                         />
@@ -626,7 +692,7 @@ export function TradesView() {
                 <tr className="border-b border-border">
                   {(
                     [
-                      ["ticker", "Ticker", "sticky left-0 z-10 bg-card"],
+                      ["ticker", "Ticker", ""],
                       ["openedAt", "Opened", ""],
                       [null, "Side", ""],
                       ["quantity", "Qty", ""],
@@ -635,7 +701,7 @@ export function TradesView() {
                       ["capital", "Capital", ""],
                       ["pnl", "P&L", ""],
                       [null, "Outcome", ""],
-                      [null, "", "sticky right-0 z-10 bg-card"],
+                      [null, "", ""],
                     ] as [SortKey | null, string, string][]
                   ).map(([key, label, extra], i) => (
                     <th
@@ -672,7 +738,7 @@ export function TradesView() {
                       key={trade.id}
                       className="group border-b border-border/50 transition-colors hover:bg-muted/50"
                     >
-                      <td className="sticky left-0 z-10 bg-card px-2 py-2 first:pl-4 group-hover:bg-muted/50">
+                      <td className="px-2 py-2 first:pl-4">
                         <p className="truncate font-medium text-foreground">
                           {trade.ticker}
                         </p>
@@ -680,10 +746,10 @@ export function TradesView() {
                           {trade.name}
                         </p>
                       </td>
-                      <td className="whitespace-nowrap px-2 py-2 text-muted-foreground">
+                      <td className="whitespace-nowrap px-2 py-2 text-center text-muted-foreground">
                         {formatDayMonth(trade.openedAt)}
                       </td>
-                      <td className="px-2 py-2">
+                      <td className="px-2 py-2 text-center">
                         <Badge
                           variant={
                             trade.side === "long" ? "success" : "destructive"
@@ -692,20 +758,20 @@ export function TradesView() {
                           {trade.side === "long" ? "Long" : "Short"}
                         </Badge>
                       </td>
-                      <td className="px-2 py-2 text-right tabular-nums text-muted-foreground">
+                      <td className="px-2 py-2 text-center tabular-nums text-muted-foreground">
                         {trade.quantity.toLocaleString("en-IN")}
                       </td>
-                      <td className="px-2 py-2 text-right tabular-nums text-muted-foreground">
+                      <td className="px-2 py-2 text-center tabular-nums text-muted-foreground">
                         {formatPrice(trade.entryPrice)}
                       </td>
-                      <td className="px-2 py-2 text-right tabular-nums text-muted-foreground">
+                      <td className="px-2 py-2 text-center tabular-nums text-muted-foreground">
                         {formatPrice(tradeMark(trade))}
                       </td>
-                      <td className="px-2 py-2 text-right tabular-nums text-muted-foreground">
+                      <td className="px-2 py-2 text-center tabular-nums text-muted-foreground">
                         {formatInr(tradeCapital(trade))}
                       </td>
                       <td
-                        className={`whitespace-nowrap px-2 py-2 text-right tabular-nums font-medium ${pnlClass(pnl)}`}
+                        className={`whitespace-nowrap px-2 py-2 text-center tabular-nums font-medium ${pnlClass(pnl)}`}
                       >
                         {pnl == null ? "—" : formatSignedInr(pnl)}
                         {pct != null && (
@@ -715,12 +781,13 @@ export function TradesView() {
                           </span>
                         )}
                       </td>
-                      <td className="px-2 py-2">
+                      <td className="px-2 py-2 text-center">
                         <OutcomeBadge trade={trade} />
                       </td>
-                      <td className="sticky right-0 z-10 bg-card px-2 py-2 last:pr-4 group-hover:bg-muted/50">
+                      <td className="px-2 py-2 last:pr-4">
                         <TradeActions
                           trade={trade}
+                          onEdit={openEdit}
                           onClose={setCloseTrade}
                           onDelete={setDeleteTrade}
                         />
@@ -759,6 +826,73 @@ export function TradesView() {
         confirmLabel="Delete"
         onConfirm={handleDelete}
       />
+      <Dialog
+        open={editTrade !== null}
+        onOpenChange={(open) => { if (!open) setEditTrade(null); }}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {editTrade ? `Edit ${editTrade.ticker}` : "Edit trade"}
+            </DialogTitle>
+          </DialogHeader>
+          {editTrade?.status === "open" ? (
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Qty</label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={editQty}
+                  onChange={(e) => setEditQty(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">SL</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={editSl}
+                  onChange={(e) => setEditSl(e.target.value)}
+                  placeholder="none"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">TP</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={editTp}
+                  onChange={(e) => setEditTp(e.target.value)}
+                  placeholder="none"
+                />
+              </div>
+            </div>
+          ) : null}
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Notes</label>
+            <Input
+              value={editNotes}
+              onChange={(e) => setEditNotes(e.target.value)}
+              placeholder="optional"
+            />
+          </div>
+          {editError ? (
+            <p className="text-xs text-destructive">{editError}</p>
+          ) : null}
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setEditTrade(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleEditSave} disabled={savingEdit}>
+              {savingEdit ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

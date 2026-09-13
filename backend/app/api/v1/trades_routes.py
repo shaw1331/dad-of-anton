@@ -35,6 +35,15 @@ class CloseTradeRequest(BaseModel):
     exit_price: float = Field(gt=0, alias="exitPrice")
 
 
+class PatchTradeRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    quantity: int | None = Field(default=None, ge=1)
+    stop_loss: float | None = Field(default=None, alias="stopLoss")
+    take_profit: float | None = Field(default=None, alias="takeProfit")
+    notes: str | None = None
+
+
 # --- Helpers ---
 
 
@@ -127,6 +136,22 @@ def close_trade(trade_id: str, body: CloseTradeRequest):
         raise HTTPException(status_code=409, detail="No current price to close at")
     exit_price = body.exit_price
     repo.close(trade_id, body.reason, exit_price)
+    updated = repo.get(trade_id)
+    return to_trade_json(updated)
+
+
+@router.patch("/{trade_id}")
+def patch_trade(trade_id: str, body: PatchTradeRequest):
+    row = repo.get(trade_id)
+    if not row:
+        raise HTTPException(status_code=404, detail=f"Trade not found: {trade_id}")
+    fields: dict = {"notes": body.notes}
+    if row["status"] == "open":
+        if body.quantity is not None:
+            fields["quantity"] = body.quantity
+        fields["stop_loss"] = body.stop_loss
+        fields["take_profit"] = body.take_profit
+    repo.update(trade_id, fields)
     updated = repo.get(trade_id)
     return to_trade_json(updated)
 

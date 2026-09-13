@@ -139,6 +139,22 @@ export async function closeTrade(
   });
 }
 
+export async function updateTrade(
+  id: string,
+  body: {
+    quantity?: number;
+    stopLoss?: number | null;
+    takeProfit?: number | null;
+    notes?: string | null;
+  },
+): Promise<Trade> {
+  return request(`/trades/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
 export async function deleteTrade(id: string): Promise<void> {
   const res = await fetch(`/api/v1/trades/${id}`, { method: "DELETE" });
   if (!res.ok) {
