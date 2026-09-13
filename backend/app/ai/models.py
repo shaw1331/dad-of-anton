@@ -29,6 +29,9 @@ class AgentAudit(BaseModel):
     retry_count: int = 0
     system_prompt: str
     analysis_prompt: str
+    input_tokens: int = 0
+    output_tokens: int = 0
+    total_tokens: int = 0
     output_citations: list[str] = Field(default_factory=list)
     error: str | None = None
 

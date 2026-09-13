@@ -21,6 +21,9 @@ def build_audit(
     started_at: float,
     output: Any = None,
     error: str | None = None,
+    input_tokens: int = 0,
+    output_tokens: int = 0,
+    total_tokens: int = 0,
 ) -> AgentAudit:
     metadata = context or AgentAuditContext(provider="unknown", model="unknown", temperature=0.0)
     return AgentAudit(
@@ -35,6 +38,9 @@ def build_audit(
         analysis_prompt=analysis_prompt,
         output_citations=extract_citations(output),
         error=error,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        total_tokens=total_tokens,
     )
 
 

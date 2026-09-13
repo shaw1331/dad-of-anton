@@ -12,6 +12,7 @@ from app.ai.audit import build_audit, invocation_started
 from app.ai.factory import AgentFactory
 from app.ai.interfaces import AgentGraph
 from app.ai.models import AgentResult
+from app.ai.usage import invoke_structured
 
 logger = logging.getLogger(__name__)
 
