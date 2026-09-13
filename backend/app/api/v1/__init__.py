@@ -5,6 +5,7 @@ from app.api.v1.nse_screener_routes import router as nse_screener_router
 from app.api.v1.trendlyne_routes import router as trendlyne_router
 from app.api.v1.tradingview_routes import router as tradingview_router
 from app.api.v1.stock_routes import router as stock_router
+from app.api.v1.trades_routes import router as trades_router
 from app.api.v1.workflow_routes import router as workflow_router
 
 api_router = APIRouter()
@@ -15,6 +16,7 @@ api_router.include_router(nse_screener_router)
 api_router.include_router(groww_news_router)
 api_router.include_router(trendlyne_router)
 api_router.include_router(stock_router)
+api_router.include_router(trades_router)
 
 
 @api_router.get("/health")
