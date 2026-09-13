@@ -8,12 +8,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import api_router
 from app.core.config import settings
+from app.core.timing import RequestTimingMiddleware, install_outbound_timing
 from app.scheduler import start_scheduler
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
+
+install_outbound_timing()
 
 
 @asynccontextmanager
@@ -36,6 +39,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(RequestTimingMiddleware)
 
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
