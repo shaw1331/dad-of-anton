@@ -40,3 +40,28 @@ async def run_scheduled_stock_analysis() -> None:
             logger.info("Completed workflow run %s for index %s", run_id, index_name)
         except Exception:
             logger.exception("Scheduled stock analysis failed for index %s", index_name)
+
+
+def refresh_open_trade_prices() -> None:
+    from app.trades.prices import fetch_ltp
+    from app.trades.repo import TradeRepo
+
+    repo = TradeRepo()
+    rows = repo.list_open()
+    prices: dict[str, float] = {}
+    for ticker in sorted({r["ticker"] for r in rows}):
+        price = fetch_ltp(ticker)
+        if price is None:
+            logger.warning("CMP fetch failed for %s", ticker)
+            continue
+        prices[ticker] = price
+        repo.update_open_price(ticker, price)
+    for row in rows:
+        cmp = prices.get(row["ticker"])
+        if cmp is None:
+            continue
+        sl, tp = row.get("stop_loss"), row.get("take_profit")
+        if sl is not None and cmp <= float(sl):
+            repo.close(row["id"], "sl", cmp)
+        elif tp is not None and cmp >= float(tp):
+            repo.close(row["id"], "tp", cmp)

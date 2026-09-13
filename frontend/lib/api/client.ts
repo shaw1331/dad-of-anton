@@ -4,7 +4,10 @@ export async function request<T>(
   path: string,
   options?: RequestInit
 ): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, options);
+  const res = await fetch(`${BASE_URL}${path}`, {
+    cache: "no-store",
+    ...options,
+  });
   if (!res.ok) {
     throw new Error(`API error: ${res.status}`);
   }

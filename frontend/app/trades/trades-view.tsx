@@ -1,14 +1,21 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import {
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
   CandlestickChart,
   Landmark,
+  LogOut,
+  Loader2,
+  Pencil,
+  Plus,
+  StickyNote,
+  Trash2,
   TrendingUp,
   Wallet,
+  XCircle,
 } from "lucide-react";
 import {
   summarizeTrades,
@@ -16,12 +23,29 @@ import {
   tradeMark,
   tradePnl,
   tradePnlPct,
+  getTrades,
+  getTradeQuote,
+  createTrade,
+  closeTrade,
+  updateTrade,
+  deleteTrade,
   type Trade,
   type TradeStatus,
+  type TradeQuote,
 } from "@/lib/api/trades";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { TickerInput } from "@/components/ticker-input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type StatusFilter = "all" | TradeStatus;
 type SortKey =
@@ -70,6 +94,69 @@ function formatDate(iso: string | null): string {
     month: "short",
     year: "numeric",
   });
+}
+
+function formatDayMonth(iso: string | null): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+  });
+}
+
+function TradeActions({
+  trade,
+  onEdit,
+  onClose,
+  onDelete,
+}: {
+  trade: Trade;
+  onEdit: (trade: Trade) => void;
+  onClose: (trade: Trade) => void;
+  onDelete: (trade: Trade) => void;
+}) {
+  const canClose = trade.status === "open" && trade.currentPrice != null;
+  return (
+    <div className="inline-flex items-center rounded-md border border-border/60 p-0.5">
+      <Button
+        size="sm"
+        variant="ghost"
+        title="Edit"
+        className="h-7 w-7 p-0 text-muted-foreground"
+        onClick={() => onEdit(trade)}
+      >
+        <Pencil className="h-3.5 w-3.5" />
+      </Button>
+      {canClose ? (
+        <Button
+          size="sm"
+          variant="ghost"
+          title="Close position"
+          className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+          onClick={() => onClose(trade)}
+        >
+          <LogOut className="h-3.5 w-3.5" />
+        </Button>
+      ) : null}
+      <Button
+        size="sm"
+        variant="ghost"
+        title="Delete"
+        className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+        onClick={() => onDelete(trade)}
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </Button>
+      {trade.notes ? (
+        <span
+          title={trade.notes}
+          className="inline-flex h-7 w-7 items-center justify-center text-muted-foreground"
+        >
+          <StickyNote className="h-3.5 w-3.5" />
+        </span>
+      ) : null}
+    </div>
+  );
 }
 
 function OutcomeBadge({ trade }: { trade: Trade }) {
@@ -125,10 +212,169 @@ function SortIcon({
   );
 }
 
-export function TradesView({ trades }: { trades: Trade[] }) {
+export function TradesView() {
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [sortCol, setSortCol] = useState<SortKey>("openedAt");
   const [sortAsc, setSortAsc] = useState(false);
+
+  // Add form state
+  const [addTicker, setAddTicker] = useState("");
+  const [quoteTicker, setQuoteTicker] = useState("");
+  const [quote, setQuote] = useState<TradeQuote | null>(null);
+  const [addQty, setAddQty] = useState("");
+  const [addSl, setAddSl] = useState("");
+  const [addTp, setAddTp] = useState("");
+  const [addNotes, setAddNotes] = useState("");
+  const [quoting, setQuoting] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+
+  const [closeTrade_, setCloseTrade] = useState<Trade | null>(null);
+  const [deleteTrade_, setDeleteTrade] = useState<Trade | null>(null);
+  const [editTrade, setEditTrade] = useState<Trade | null>(null);
+  const [editQty, setEditQty] = useState("");
+  const [editSl, setEditSl] = useState("");
+  const [editTp, setEditTp] = useState("");
+  const [editNotes, setEditNotes] = useState("");
+  const [editError, setEditError] = useState<string | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  const fetchTrades = useCallback(async () => {
+    try {
+      const data = await getTrades();
+      setTrades(data);
+    } catch (err: any) {
+      setError(err.message || "Failed to load trades");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTrades();
+  }, [fetchTrades]);
+
+  useEffect(() => {
+    if (!quoteTicker) {
+      setQuote(null);
+      setQuoting(false);
+      return;
+    }
+    let cancelled = false;
+    setQuoting(true);
+    setAddError(null);
+    getTradeQuote(quoteTicker)
+      .then((q) => {
+        if (cancelled) return;
+        setQuote(q);
+        setAddQty(String(q.quantity));
+        setAddSl(String(q.stopLoss));
+        setAddTp(String(q.takeProfit));
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setQuote(null);
+        setAddError(err.message || "Quote failed");
+      })
+      .finally(() => {
+        if (!cancelled) setQuoting(false);
+      });
+    return () => { cancelled = true; };
+  }, [quoteTicker]);
+
+  async function handleAdd() {
+    if (!addTicker || !quote) return;
+    setAdding(true);
+    setAddError(null);
+    try {
+      const created = await createTrade({
+        ticker: addTicker,
+        quantity: Number(addQty),
+        stopLoss: Number(addSl),
+        takeProfit: Number(addTp),
+        notes: addNotes || undefined,
+      });
+      setTrades((prev) => [created, ...prev.filter((t) => t.id !== created.id)]);
+      setAddTicker("");
+      setQuoteTicker("");
+      setQuote(null);
+      setAddQty("");
+      setAddSl("");
+      setAddTp("");
+      setAddNotes("");
+    } catch (err: any) {
+      setAddError(err.message || "Create failed");
+    } finally {
+      setAdding(false);
+    }
+  }
+
+  async function handleClose() {
+    if (!closeTrade_ || closeTrade_.currentPrice == null) return;
+    try {
+      const updated = await closeTrade(closeTrade_.id, {
+        reason: "manual",
+        exitPrice: closeTrade_.currentPrice,
+      });
+      setTrades((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+      setCloseTrade(null);
+    } catch (err: any) {
+      setError(err.message || "Close failed");
+    }
+  }
+
+  async function handleDelete() {
+    if (!deleteTrade_) return;
+    try {
+      const id = deleteTrade_.id;
+      await deleteTrade(id);
+      setTrades((prev) => prev.filter((t) => t.id !== id));
+      setDeleteTrade(null);
+    } catch (err: any) {
+      setError(err.message || "Delete failed");
+    }
+  }
+
+  function openEdit(trade: Trade) {
+    setEditTrade(trade);
+    setEditQty(String(trade.quantity));
+    setEditSl(trade.stopLoss != null ? String(trade.stopLoss) : "");
+    setEditTp(trade.takeProfit != null ? String(trade.takeProfit) : "");
+    setEditNotes(trade.notes ?? "");
+    setEditError(null);
+  }
+
+  async function handleEditSave() {
+    if (!editTrade) return;
+    const qty = Number(editQty);
+    if (editTrade.status === "open" && (!Number.isInteger(qty) || qty < 1)) {
+      setEditError("Quantity must be a whole number ≥ 1");
+      return;
+    }
+    setSavingEdit(true);
+    setEditError(null);
+    try {
+      const updated = await updateTrade(editTrade.id, {
+        notes: editNotes || null,
+        ...(editTrade.status === "open"
+          ? {
+              quantity: qty,
+              stopLoss: editSl === "" ? null : Number(editSl),
+              takeProfit: editTp === "" ? null : Number(editTp),
+            }
+          : {}),
+      });
+      setTrades((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+      setEditTrade(null);
+    } catch (err: any) {
+      setEditError(err.message || "Update failed");
+    } finally {
+      setSavingEdit(false);
+    }
+  }
 
   const summary = useMemo(() => summarizeTrades(trades), [trades]);
 
@@ -159,7 +405,7 @@ export function TradesView({ trades }: { trades: Trade[] }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto w-full max-w-6xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
           Trades
@@ -171,12 +417,22 @@ export function TradesView({ trades }: { trades: Trade[] }) {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {error && (
+        <Card className="border-destructive bg-destructive/10">
+          <CardContent className="flex items-center gap-2 p-4">
+            <XCircle className="h-4 w-4 text-destructive" />
+            <p className="text-sm text-destructive">{error}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <Card>
           <CardContent className="p-5">
             <div className="mb-3 flex items-center justify-between">
               <p className="text-sm font-medium text-muted-foreground">
-                Running P&amp;L
+                Unrealized P&amp;L
               </p>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </div>
@@ -184,7 +440,7 @@ export function TradesView({ trades }: { trades: Trade[] }) {
               {formatSignedInr(summary.runningPnl)}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Unrealized P&amp;L
+              Open positions
             </p>
           </CardContent>
         </Card>
@@ -244,6 +500,94 @@ export function TradesView({ trades }: { trades: Trade[] }) {
         </Card>
       </div>
 
+      {/* Add trade form */}
+      <Card>
+        <CardContent className="p-5">
+          <div className="grid grid-cols-2 items-end gap-3 xl:flex xl:flex-wrap">
+            <div className="col-span-2 min-w-0 xl:w-48">
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Ticker</label>
+              <TickerInput
+                value={addTicker}
+                onChange={(value) => {
+                  setAddTicker(value);
+                  if (value !== quoteTicker) {
+                    setQuoteTicker("");
+                    setQuote(null);
+                    setAddError(null);
+                  }
+                }}
+                onCommit={(symbol) => {
+                  setAddTicker(symbol);
+                  setQuoteTicker(symbol);
+                }}
+                placeholder="e.g. RELIANCE"
+                disabled={adding}
+              />
+            </div>
+            <div className="min-w-0 xl:w-24">
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Qty</label>
+              <Input
+                type="number"
+                min="1"
+                value={addQty}
+                onChange={(e) => setAddQty(e.target.value)}
+                disabled={adding || !quote}
+              />
+            </div>
+            <div className="min-w-0 xl:w-28">
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">SL</label>
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                value={addSl}
+                onChange={(e) => setAddSl(e.target.value)}
+                disabled={adding || !quote}
+              />
+            </div>
+            <div className="min-w-0 xl:w-28">
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">TP</label>
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                value={addTp}
+                onChange={(e) => setAddTp(e.target.value)}
+                disabled={adding || !quote}
+              />
+            </div>
+            <div className="col-span-2 min-w-0 xl:min-w-[120px] xl:flex-1">
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Notes</label>
+              <Input
+                value={addNotes}
+                onChange={(e) => setAddNotes(e.target.value)}
+                placeholder="optional"
+                disabled={adding}
+              />
+            </div>
+            <Button
+              className="col-span-2 xl:w-auto"
+              onClick={handleAdd}
+              disabled={!quote || adding}
+            >
+              {adding ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="mr-1 h-4 w-4" />
+              )}
+              Add
+            </Button>
+          </div>
+          {quoting && (
+            <p className="mt-2 text-xs text-muted-foreground">Fetching quote...</p>
+          )}
+          {addError && (
+            <p className="mt-2 text-xs text-destructive">{addError}</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Filter pills */}
       <div className="flex flex-wrap items-center gap-2">
         {(["all", "open", "closed"] as const).map((value) => (
           <Button
@@ -265,7 +609,14 @@ export function TradesView({ trades }: { trades: Trade[] }) {
         ))}
       </div>
 
-      {visible.length === 0 ? (
+      {loading ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="mb-3 h-8 w-8 animate-spin text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Loading trades...</p>
+          </CardContent>
+        </Card>
+      ) : visible.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <CandlestickChart className="mb-3 h-10 w-10 text-muted-foreground/50" />
@@ -275,120 +626,302 @@ export function TradesView({ trades }: { trades: Trade[] }) {
           </CardContent>
         </Card>
       ) : (
-        <Card className="overflow-hidden">
-          <table className="w-full table-fixed text-left text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                {(
-                  [
-                    ["ticker", "Ticker"],
-                    ["openedAt", "Opened"],
-                    [null, "Side"],
-                    ["quantity", "Qty"],
-                    ["entryPrice", "Entry"],
-                    [null, "SL"],
-                    [null, "TP"],
-                    [null, "Mark"],
-                    ["capital", "Capital"],
-                    ["pnl", "P&L"],
-                    [null, "Outcome"],
-                    [null, "Closed"],
-                  ] as [SortKey | null, string][]
-                ).map(([key, label]) => (
-                  <th key={label} className="px-2 py-2.5 first:pl-4 last:pr-4">
-                    {key ? (
-                      <button
-                        type="button"
-                        onClick={() => handleSort(key)}
-                        className="inline-flex items-center gap-1 font-medium text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        {label}
-                        <SortIcon
-                          active={sortCol === key}
-                          asc={sortAsc}
+        <>
+          <div className="space-y-3 lg:hidden">
+            {visible.map((trade) => {
+              const pnl = tradePnl(trade);
+              const pct = tradePnlPct(trade);
+              return (
+                <Card key={trade.id}>
+                  <CardContent className="space-y-3 p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-foreground">
+                          {trade.ticker}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {trade.name}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <OutcomeBadge trade={trade} />
+                        <TradeActions
+                          trade={trade}
+                          onEdit={openEdit}
+                          onClose={setCloseTrade}
+                          onDelete={setDeleteTrade}
                         />
-                      </button>
-                    ) : (
-                      <span className="font-medium text-muted-foreground">
-                        {label}
-                      </span>
-                    )}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {visible.map((trade) => {
-                const pnl = tradePnl(trade);
-                const pct = tradePnlPct(trade);
-                return (
-                  <tr
-                    key={trade.id}
-                    title={trade.notes ?? undefined}
-                    className="border-b border-border/50 transition-colors hover:bg-muted/50"
-                  >
-                    <td className="px-2 py-2 first:pl-4">
-                      <p className="truncate font-medium text-foreground">
-                        {trade.ticker}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {trade.name}
-                      </p>
-                    </td>
-                    <td className="px-2 py-2 text-muted-foreground">
-                      {formatDate(trade.openedAt)}
-                    </td>
-                    <td className="px-2 py-2">
-                      <Badge
-                        variant={trade.side === "long" ? "success" : "destructive"}
-                      >
-                        {trade.side === "long" ? "Long" : "Short"}
-                      </Badge>
-                    </td>
-                    <td className="px-2 py-2 tabular-nums text-muted-foreground">
-                      {trade.quantity.toLocaleString("en-IN")}
-                    </td>
-                    <td className="px-2 py-2 tabular-nums text-muted-foreground">
-                      {formatPrice(trade.entryPrice)}
-                    </td>
-                    <td className="px-2 py-2 tabular-nums text-muted-foreground">
-                      {formatPrice(trade.stopLoss)}
-                    </td>
-                    <td className="px-2 py-2 tabular-nums text-muted-foreground">
-                      {formatPrice(trade.takeProfit)}
-                    </td>
-                    <td className="px-2 py-2 tabular-nums text-muted-foreground">
-                      {formatPrice(tradeMark(trade))}
-                    </td>
-                    <td className="px-2 py-2 tabular-nums text-muted-foreground">
-                      {formatInr(tradeCapital(trade))}
-                    </td>
-                    <td
-                      className={`px-2 py-2 tabular-nums font-medium ${pnlClass(pnl)}`}
+                      </div>
+                    </div>
+                    <dl className="grid grid-cols-3 gap-x-3 gap-y-2 text-xs">
+                      <div>
+                        <dt className="text-muted-foreground">Opened</dt>
+                        <dd className="tabular-nums text-foreground">
+                          {formatDayMonth(trade.openedAt)}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">Qty</dt>
+                        <dd className="tabular-nums text-foreground">
+                          {trade.quantity.toLocaleString("en-IN")}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">Entry</dt>
+                        <dd className="tabular-nums text-foreground">
+                          {formatPrice(trade.entryPrice)}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">Avg. price</dt>
+                        <dd className="tabular-nums text-foreground">
+                          {formatPrice(tradeMark(trade))}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">Capital</dt>
+                        <dd className="tabular-nums text-foreground">
+                          {formatInr(tradeCapital(trade))}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">P&amp;L</dt>
+                        <dd className={`tabular-nums font-medium ${pnlClass(pnl)}`}>
+                          {pnl == null ? "—" : formatSignedInr(pnl)}
+                          {pct != null && (
+                            <span className="ml-1 font-normal">
+                              ({pct > 0 ? "+" : ""}
+                              {pct.toFixed(1)}%)
+                            </span>
+                          )}
+                        </dd>
+                      </div>
+                    </dl>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          <Card className="hidden overflow-x-auto lg:block">
+            <table className="w-full table-fixed text-left text-sm">
+              <colgroup>
+                <col />
+                <col className="w-[5.5rem]" />
+                <col className="w-[5rem]" />
+                <col className="w-[4.5rem]" />
+                <col className="w-[6rem]" />
+                <col className="w-[7rem]" />
+                <col className="w-[6.5rem]" />
+                <col className="w-[8.5rem]" />
+                <col className="w-[5.5rem]" />
+                <col className="w-[10.5rem]" />
+              </colgroup>
+              <thead>
+                <tr className="border-b border-border">
+                  {(
+                    [
+                      ["ticker", "Ticker", ""],
+                      ["openedAt", "Opened", ""],
+                      [null, "Side", ""],
+                      ["quantity", "Qty", ""],
+                      ["entryPrice", "Entry", ""],
+                      [null, "Avg. price", ""],
+                      ["capital", "Capital", ""],
+                      ["pnl", "P&L", ""],
+                      [null, "Outcome", ""],
+                      [null, "", "text-left"],
+                    ] as [SortKey | null, string, string][]
+                  ).map(([key, label, extra], i) => (
+                    <th
+                      key={`${label}-${i}`}
+                      className={`whitespace-nowrap px-2 py-2.5 first:pl-4 last:pr-4 ${extra || "text-center"}`}
                     >
-                      {pnl == null ? "—" : formatSignedInr(pnl)}
-                      {pct != null && (
-                        <span className="ml-1 text-xs font-normal">
-                          ({pct > 0 ? "+" : ""}
-                          {pct.toFixed(1)}%)
+                      {key ? (
+                        <button
+                          type="button"
+                          onClick={() => handleSort(key)}
+                          className="inline-flex items-center justify-center gap-1 font-medium text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          {label}
+                          <SortIcon
+                            active={sortCol === key}
+                            asc={sortAsc}
+                          />
+                        </button>
+                      ) : label ? (
+                        <span className="font-medium text-muted-foreground">
+                          {label}
                         </span>
-                      )}
-                    </td>
-                    <td className="px-2 py-2">
-                      <OutcomeBadge trade={trade} />
-                    </td>
-                    <td className="px-2 py-2 last:pr-4 text-muted-foreground">
-                      {trade.status === "closed"
-                        ? formatDate(trade.closedAt)
-                        : "—"}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </Card>
+                      ) : null}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {visible.map((trade) => {
+                  const pnl = tradePnl(trade);
+                  const pct = tradePnlPct(trade);
+                  return (
+                    <tr
+                      key={trade.id}
+                      className="group border-b border-border/50 transition-colors hover:bg-muted/50"
+                    >
+                      <td className="px-2 py-2 first:pl-4">
+                        <p className="truncate font-medium text-foreground">
+                          {trade.ticker}
+                        </p>
+                        <p className="max-w-[9rem] truncate text-xs text-muted-foreground">
+                          {trade.name}
+                        </p>
+                      </td>
+                      <td className="whitespace-nowrap px-2 py-2 text-center text-muted-foreground">
+                        {formatDayMonth(trade.openedAt)}
+                      </td>
+                      <td className="px-2 py-2 text-center">
+                        <Badge
+                          variant={
+                            trade.side === "long" ? "success" : "destructive"
+                          }
+                        >
+                          {trade.side === "long" ? "Long" : "Short"}
+                        </Badge>
+                      </td>
+                      <td className="px-2 py-2 text-center tabular-nums text-muted-foreground">
+                        {trade.quantity.toLocaleString("en-IN")}
+                      </td>
+                      <td className="px-2 py-2 text-center tabular-nums text-muted-foreground">
+                        {formatPrice(trade.entryPrice)}
+                      </td>
+                      <td className="px-2 py-2 text-center tabular-nums text-muted-foreground">
+                        {formatPrice(tradeMark(trade))}
+                      </td>
+                      <td className="px-2 py-2 text-center tabular-nums text-muted-foreground">
+                        {formatInr(tradeCapital(trade))}
+                      </td>
+                      <td
+                        className={`whitespace-nowrap px-2 py-2 text-center tabular-nums font-medium ${pnlClass(pnl)}`}
+                      >
+                        {pnl == null ? "—" : formatSignedInr(pnl)}
+                        {pct != null && (
+                          <span className="ml-1 text-xs font-normal">
+                            ({pct > 0 ? "+" : ""}
+                            {pct.toFixed(1)}%)
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-2 py-2 text-center">
+                        <OutcomeBadge trade={trade} />
+                      </td>
+                      <td className="px-2 py-2 text-left last:pr-4">
+                        <TradeActions
+                          trade={trade}
+                          onEdit={openEdit}
+                          onClose={setCloseTrade}
+                          onDelete={setDeleteTrade}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </Card>
+        </>
       )}
+
+      {/* Close confirm dialog */}
+      <ConfirmDialog
+        open={closeTrade_ !== null}
+        onOpenChange={(open) => { if (!open) setCloseTrade(null); }}
+        title="Close trade"
+        description={
+          closeTrade_
+            ? `Exit ${closeTrade_.ticker} at ₹${formatPrice(closeTrade_.currentPrice)} as manual?`
+            : ""
+        }
+        confirmLabel="Close"
+        onConfirm={handleClose}
+      />
+      <ConfirmDialog
+        open={deleteTrade_ !== null}
+        onOpenChange={(open) => { if (!open) setDeleteTrade(null); }}
+        title="Delete trade"
+        description={
+          deleteTrade_
+            ? `Remove ${deleteTrade_.ticker} from the journal? This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+      />
+      <Dialog
+        open={editTrade !== null}
+        onOpenChange={(open) => { if (!open) setEditTrade(null); }}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {editTrade ? `Edit ${editTrade.ticker}` : "Edit trade"}
+            </DialogTitle>
+          </DialogHeader>
+          {editTrade?.status === "open" ? (
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Qty</label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={editQty}
+                  onChange={(e) => setEditQty(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">SL</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={editSl}
+                  onChange={(e) => setEditSl(e.target.value)}
+                  placeholder="none"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">TP</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={editTp}
+                  onChange={(e) => setEditTp(e.target.value)}
+                  placeholder="none"
+                />
+              </div>
+            </div>
+          ) : null}
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Notes</label>
+            <Input
+              value={editNotes}
+              onChange={(e) => setEditNotes(e.target.value)}
+              placeholder="optional"
+            />
+          </div>
+          {editError ? (
+            <p className="text-xs text-destructive">{editError}</p>
+          ) : null}
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setEditTrade(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleEditSave} disabled={savingEdit}>
+              {savingEdit ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
