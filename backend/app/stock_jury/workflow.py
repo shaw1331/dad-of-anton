@@ -20,7 +20,7 @@ SWING_MOMENTUM_WORKFLOW = BaseWorkflowConfig(
     input_fields=[
         InputField(name="ticker", type="str", label="Ticker", required=True),
         InputField(name="exchange", type="str", label="Exchange", required=False, default="NSE"),
-        InputField(name="enable_news", type="bool", label="Enable News", required=False, default=True),
+        InputField(name="enable_news", type="bool", label="Enable News", required=False, default=False),
         InputField(name="news_lookback_days", type="int", label="News Lookback", required=False, default=15),
         InputField(name="strategy", type="str", label="Strategy", required=False, default="swing_momentum"),
     ],
