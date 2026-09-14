@@ -16,7 +16,13 @@ class RunCandidateStockWorkflowsTask:
     def run(self, ctx: Any) -> None:
         from app.workflow.workflow_orchestrator_v1.workflow_orchestrator import WorkflowOrchestrator
 
-        candidates = ctx.get_input("stocks") or []
+        raw_stocks = ctx.get_input("stocks") or ""
+        exchange = ctx.get_input("exchange") or "NSE"
+        if isinstance(raw_stocks, str):
+            tickers = [t.strip().upper() for t in raw_stocks.split(",") if t.strip()]
+            candidates = [{"ticker": t, "exchange": exchange} for t in tickers]
+        else:
+            candidates = raw_stocks
         if not 2 <= len(candidates) <= 10:
             raise ValueError("A jury run requires 2 to 10 stocks")
         workflow_name = ctx.get_input("analysis_workflow") or "swing_momentum"
@@ -74,11 +80,12 @@ class EvaluateStockJuryTask:
         candidate_output = ctx.get_output("run_candidate_workflows")
         if not candidate_output:
             raise Exception("No candidate workflow results found")
-        policy = ctx.get_input("policy") or {}
+        max_holdings = int(ctx.get_input("max_holdings") or 3)
+        max_allocation_pct = float(ctx.get_input("max_allocation_pct") or 50)
         verdict = StockJury().evaluate(
             candidate_output["reports"],
-            max_holdings=int(policy.get("max_holdings", 3)),
-            max_allocation_pct=float(policy.get("max_allocation_pct", 50)),
+            max_holdings=max_holdings,
+            max_allocation_pct=max_allocation_pct,
         )
         verdict["candidate_runs"] = candidate_output["children"]
         ctx.set_output(self.name, verdict)

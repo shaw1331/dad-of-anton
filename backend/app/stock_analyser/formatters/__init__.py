@@ -19,6 +19,7 @@ class StockDataFormatorFactory:
             return
         cls._imported = True
         from app.stock_analyser.formatters import momentum_formatter  # noqa: F401
+        from app.stock_analyser.formatters import swing_momentum_formatter  # noqa: F401
         from app.stock_analyser.formatters import value_formatter  # noqa: F401
 
     @classmethod

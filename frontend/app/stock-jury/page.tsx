@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { Plus, X, Play } from "lucide-react";
 import { triggerWorkflow } from "@/lib/api/workflows";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TickerInput } from "@/components/ticker-input";
 
 type Candidate = { ticker: string; exchange: string };
 
@@ -46,10 +46,11 @@ export default function StockJuryPage() {
     setBusy(true);
     setError(null);
     try {
+      const tickers = candidates.map((c) => c.ticker).join(",");
       const result = await triggerWorkflow("stock_jury", {
-        stocks: candidates,
+        stocks: tickers,
+        exchange: candidates[0]?.exchange || "NSE",
         analysis_workflow: workflow,
-        policy: { max_holdings: 3, max_allocation_pct: 50 },
       });
       router.push(`/workflows/${result.run_id}`);
     } catch (err: any) {
@@ -70,7 +71,7 @@ export default function StockJuryPage() {
           <div className="flex flex-wrap items-end gap-3">
             <div className="min-w-[220px] flex-1">
               <Label htmlFor="jury-symbol" className="mb-1.5">Stock Symbol</Label>
-              <Input id="jury-symbol" value={symbol} onChange={(event) => setSymbol(event.target.value.toUpperCase())} onKeyDown={(event) => event.key === "Enter" && (event.preventDefault(), addCandidate())} placeholder="e.g. RELIANCE" />
+              <TickerInput value={symbol} onChange={setSymbol} onSubmit={addCandidate} placeholder="e.g. RELIANCE" />
             </div>
             <div className="w-32">
               <Label className="mb-1.5">Exchange</Label>

@@ -16,6 +16,7 @@ from app.workflow.workflow_orchestrator_v1.workflow_registry import WORKFLOWS
 SWING_MOMENTUM_WORKFLOW = BaseWorkflowConfig(
     name="swing_momentum",
     description="Single-stock 4–8 week momentum analysis",
+    hidden=True,
     input_fields=[
         InputField(name="ticker", type="str", label="Ticker", required=True),
         InputField(name="exchange", type="str", label="Exchange", required=False, default="NSE"),
@@ -30,9 +31,11 @@ STOCK_JURY_WORKFLOW = BaseWorkflowConfig(
     name="stock_jury",
     description="Sequential stock analysis followed by parallel evidence-grounded jury",
     input_fields=[
-        InputField(name="stocks", type="json", label="Stocks", description="Ticker and exchange objects", required=True),
+        InputField(name="stocks", type="str", label="Stocks", description="Comma-separated tickers, e.g. TCS,RELIANCE,INFY", required=True),
+        InputField(name="exchange", type="str", label="Exchange", required=False, default="NSE", choices=["NSE", "BSE"]),
         InputField(name="analysis_workflow", type="str", label="Analysis Workflow", required=False, default="swing_momentum", choices=["swing_momentum"]),
-        InputField(name="policy", type="json", label="Jury Policy", required=False, default={}),
+        InputField(name="max_holdings", type="int", label="Max Holdings", required=False, default=3),
+        InputField(name="max_allocation_pct", type="int", label="Max Allocation %", required=False, default=50),
     ],
     tasks=[RunCandidateStockWorkflowsTask, EvaluateStockJuryTask],
 )
