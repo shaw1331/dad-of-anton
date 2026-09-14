@@ -92,10 +92,3 @@ export interface JuryVerdict {
   candidate_runs?: { ticker: string; status: string; run_id?: string; error?: string }[];
 }
 
-export interface EvaluationSummary {
-  status: "ready" | "not_loaded";
-  required_cases: number;
-  dataset: string;
-  metrics?: Record<string, number | null | Record<string, number | null>>;
-  release_gate?: { passed: boolean; checks: Record<string, boolean> };
-}
