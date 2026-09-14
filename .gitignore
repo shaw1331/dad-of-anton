@@ -5,6 +5,11 @@ frontend/node_modules/
 frontend/.next/
 frontend/next-env.d.ts
 *.pyc
+.env
 .env.local
 analysis-out/
 .claude/skills/stock-analyst/.venv/
+temp/
+.opencode
+.vscode/
+.gitignore

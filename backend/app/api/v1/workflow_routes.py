@@ -38,6 +38,7 @@ def list_workflows():
             ],
         }
         for config in WORKFLOWS.values()
+        if not config.hidden
     ]
 
 

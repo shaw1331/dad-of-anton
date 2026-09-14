@@ -26,3 +26,4 @@ class BaseWorkflowConfig:
     description: str
     tasks: list[type[BaseWorkflowTask]] = field(default_factory=list)
     input_fields: list[InputField] = field(default_factory=list)
+    hidden: bool = False
