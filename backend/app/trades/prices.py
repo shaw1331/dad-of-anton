@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 import time
 
-from app.scraper.tradingview_scraper import get_candles
-
 logger = logging.getLogger(__name__)
 
 _CACHE: dict[str, tuple[float, float]] = {}
@@ -17,16 +15,6 @@ def _parse_price(value: str) -> float | None:
         return price if price > 0 else None
     except (ValueError, AttributeError):
         return None
-
-
-def _from_tv(ticker: str) -> float | None:
-    result = get_candles(ticker, exchange="NSE", interval="1", bars=3)
-    if result is None or not result.candles:
-        return None
-    for candle in reversed(result.candles):
-        if candle.close > 0:
-            return float(candle.close)
-    return None
 
 
 def _from_screener(ticker: str) -> float | None:
@@ -52,7 +40,7 @@ def fetch_ltp(ticker: str) -> float | None:
     cached = _CACHE.get(key)
     if cached and time.monotonic() - cached[1] < _TTL:
         return cached[0]
-    price = _from_tv(key) or _from_screener(key)
+    price = _from_screener(key)
     if price is not None:
         _CACHE[key] = (price, time.monotonic())
     return price
