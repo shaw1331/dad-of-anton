@@ -151,7 +151,7 @@ class StockJury:
         verdict.decision = "ACTIONABLE" if verdict.selected else "NO_ACTION"
         evidence_ids = {item["id"] for packet in valid for item in packet["evidence"]}
         validate_verdict(verdict, tickers, evidence_ids=evidence_ids, max_holdings=max_holdings, max_allocation_pct=max_allocation_pct)
-        verdict.jury_audit = {
+        jury_audit = {
             "successful_ballots": [ballot.juror for ballot in ballots],
             "challenges": [challenge.challenger for challenge in challenges],
             "failures": failures,
@@ -160,10 +160,12 @@ class StockJury:
         }
         from app.core.config import settings
 
-        verdict.jury_audit["llm"] = {
+        jury_audit["llm"] = {
             "provider": settings.LLM_PROVIDER,
             "model": settings.LLM_MODEL,
             "temperature": settings.LLM_TEMPERATURE,
             "schema_version": verdict.schema_version,
         }
-        return verdict.model_dump(mode="json")
+        verdict_dict = verdict.model_dump(mode="json")
+        verdict_dict["jury_audit"] = jury_audit
+        return verdict_dict

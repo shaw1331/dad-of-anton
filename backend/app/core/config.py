@@ -20,6 +20,11 @@ class Settings(BaseSettings):
     STOCK_JURY_APPROVED_METRICS: str = "data/stock_jury_approved_metrics.json"
     
     GOOGLE_API_KEY: str = ""
+    OPENAI_API_KEY: str = ""
+    OPENAI_BASE_URL: str = ""
+    ANTHROPIC_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
+    OPENROUTER_API_KEY: str = ""
     
     class Config:
         case_sensitive = True

@@ -11,13 +11,11 @@ class StockDataFormatorFactory:
     """Factory for creating stock data formatters based on analysis strategy."""
 
     _registry: dict[type[AnalysisStrategy], type[BaseStockFormatter]] = {}
-    _imported = False
 
     @classmethod
     def _ensure_imports(cls) -> None:
-        if cls._imported:
+        if cls._registry:
             return
-        cls._imported = True
         from app.stock_analyser.formatters import momentum_formatter  # noqa: F401
         from app.stock_analyser.formatters import swing_momentum_formatter  # noqa: F401
         from app.stock_analyser.formatters import value_formatter  # noqa: F401

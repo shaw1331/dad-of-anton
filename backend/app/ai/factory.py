@@ -48,11 +48,23 @@ class AgentFactory:
             "model": settings.LLM_MODEL,
             "model_provider": settings.LLM_PROVIDER,
             "temperature": settings.LLM_TEMPERATURE,
-            "num_ctx": settings.LLM_NUM_CTX,
         }
+
+        if settings.LLM_PROVIDER == "ollama":
+            kwargs["num_ctx"] = settings.LLM_NUM_CTX
 
         if settings.LLM_PROVIDER == "google_genai":
             kwargs["google_api_key"] = settings.GOOGLE_API_KEY
+        elif settings.LLM_PROVIDER == "openai" and settings.OPENAI_API_KEY:
+            kwargs["api_key"] = settings.OPENAI_API_KEY
+            if settings.OPENAI_BASE_URL:
+                kwargs["base_url"] = settings.OPENAI_BASE_URL
+        elif settings.LLM_PROVIDER == "anthropic":
+            kwargs["api_key"] = settings.ANTHROPIC_API_KEY
+        elif settings.LLM_PROVIDER == "groq":
+            kwargs["api_key"] = settings.GROQ_API_KEY
+        elif settings.LLM_PROVIDER == "openrouter":
+            kwargs["api_key"] = settings.OPENROUTER_API_KEY
 
         llm = init_chat_model(**kwargs)
 

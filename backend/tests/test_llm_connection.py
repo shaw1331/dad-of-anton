@@ -17,6 +17,16 @@ def llm():
     }
     if settings.LLM_PROVIDER == "google_genai":
         kwargs["google_api_key"] = settings.GOOGLE_API_KEY
+    elif settings.LLM_PROVIDER == "openai":
+        kwargs["api_key"] = settings.OPENAI_API_KEY
+        if settings.OPENAI_BASE_URL:
+            kwargs["base_url"] = settings.OPENAI_BASE_URL
+    elif settings.LLM_PROVIDER == "anthropic":
+        kwargs["api_key"] = settings.ANTHROPIC_API_KEY
+    elif settings.LLM_PROVIDER == "groq":
+        kwargs["api_key"] = settings.GROQ_API_KEY
+    elif settings.LLM_PROVIDER == "openrouter":
+        kwargs["api_key"] = settings.OPENROUTER_API_KEY
     return init_chat_model(**kwargs)
 
 

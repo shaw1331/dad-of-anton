@@ -13,3 +13,8 @@ temp/
 .opencode
 .vscode/
 .gitignore
+*.sh
+*.bat
+tsconfig.tsbuildinfo
+.claude/*
+

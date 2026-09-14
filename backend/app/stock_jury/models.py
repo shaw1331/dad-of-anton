@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 Rating = Literal["BUY_NOW", "STAGED_ENTRY", "WATCH", "AVOID", "SELL"]
@@ -10,6 +10,7 @@ PortfolioStatus = Literal["SELECTED", "NOT_SELECTED", "INSUFFICIENT_DATA"]
 
 
 class TradePlan(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     entry_mode: Literal["IMMEDIATE", "TRIGGERED", "NONE"] = "NONE"
     entry_low: float | None = None
     entry_high: float | None = None
@@ -21,6 +22,8 @@ class TradePlan(BaseModel):
 
 
 class CandidateVerdict(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     ticker: str
     name: str = ""
     rank: int | None = Field(default=None, ge=1)
@@ -51,6 +54,8 @@ class CandidateVerdict(BaseModel):
 
 
 class JuryBallot(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     juror: str
     candidates: list[CandidateVerdict]
     reasoning: str = ""
@@ -58,6 +63,8 @@ class JuryBallot(BaseModel):
 
 
 class JuryChallenge(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     challenger: Literal["BULL", "BEAR"]
     challenged_tickers: list[str] = Field(default_factory=list)
     arguments: list[str] = Field(default_factory=list)
@@ -66,6 +73,8 @@ class JuryChallenge(BaseModel):
 
 
 class JuryVerdict(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     schema_version: str = "stock_jury.v1"
     decision: Literal["ACTIONABLE", "NO_ACTION"]
     market_view: str
@@ -77,4 +86,3 @@ class JuryVerdict(BaseModel):
     concentration_risks: list[str] = Field(default_factory=list)
     data_quality_warnings: list[str] = Field(default_factory=list)
     prompt_version: str = "stock_jury.v1"
-    jury_audit: dict = Field(default_factory=dict)

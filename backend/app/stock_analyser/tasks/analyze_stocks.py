@@ -79,7 +79,6 @@ class AnalyzeStocksTask:
                         **result.data,
                         "ticker": ticker,
                         "name": stock.get("name", ""),
-                        "evidence_records": _evidence_records(ticker, stock, stock_with_tl, stock_news),
                     }
                     analyses.append(analysis)
                 else:
@@ -108,18 +107,3 @@ class AnalyzeStocksTask:
             "analyses": analyses,
             "total_analyzed": len(analyses),
         })
-
-
-def _evidence_records(ticker: str, stock: dict, stock_with_tl: dict, stock_news: list[dict]) -> list[dict]:
-    records = []
-    for namespace, value in {
-        "PRICE": stock.get("data", {}).get("price"),
-        "FUNDAMENTAL": stock.get("data", {}),
-        "TECH": stock_with_tl.get("trendlyne"),
-        "CANDLES": stock_with_tl.get("tradingview"),
-        "NEWS": stock_news,
-    }.items():
-        if value in (None, {}, []):
-            continue
-        records.append({"id": f"{ticker}.{namespace}", "value": value})
-    return records

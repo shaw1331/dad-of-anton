@@ -38,7 +38,7 @@ class RunCandidateStockWorkflowsTask:
             try:
                 child_id = orchestrator.create_run(
                     workflow_name,
-                    {"ticker": ticker, "exchange": exchange, "enable_news": True, "news_lookback_days": 15},
+                    {"ticker": ticker, "exchange": exchange},
                     trigger_type="manual",
                 )
                 asyncio.run(orchestrator.run_workflow(child_id))
