@@ -26,10 +26,17 @@ class WorkflowRunRepository:
             data["error"] = error
         supabase.table("workflow_runs").update(data).eq("id", run_id).execute()
 
-    def list_all(self) -> list[WorkflowRun]:
+    def list_page(self, limit: int, offset: int) -> list[WorkflowRun]:
         supabase = get_supabase_client()
-        result = supabase.table("workflow_runs").select("*").order("created_at", desc=True).execute()
-        return [WorkflowRun.model_validate(row) for row in result.data]
+        result = (
+            supabase.table("workflow_runs")
+            .select("id,workflow_name,status,trigger_type,current_task_index,total_tasks,error,created_at,updated_at")
+            .order("created_at", desc=True)
+            .range(offset, offset + limit - 1)
+            .execute()
+        )
+        rows = result.data or []
+        return [WorkflowRun.model_validate(row) for row in rows]
 
     def update_progress(self, run_id: str, current_task_index: int) -> None:
         supabase = get_supabase_client()

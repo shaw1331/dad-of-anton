@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from datetime import datetime, timedelta, timezone
 
 from app.scraper.tradingview_scraper.config import DEFAULT_BARS, DEFAULT_EXCHANGE, DEFAULT_INTERVAL
@@ -50,14 +51,27 @@ def get_candles(
         start_date = _estimate_start_date(bars, interval)
         end_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
-        df = tv.get(
-            symbol=symbol.upper(),
-            exchange=exchange.upper(),
-            interval=interval,
-            start=start_date,
-            end=end_date,
-            output_format="dict",
-        )
+        start = time.time()
+        status = "ok"
+        try:
+            df = tv.get(
+                symbol=symbol.upper(),
+                exchange=exchange.upper(),
+                interval=interval,
+                start=start_date,
+                end=end_date,
+                output_format="dict",
+            )
+        except Exception:
+            status = "err"
+            raise
+        finally:
+            logger.info(
+                "downstream kind=tv_scraper method=get host=- path=%s status=%s duration_ms=%s",
+                symbol.upper(),
+                status,
+                round((time.time() - start) * 1000),
+            )
 
         if df is None or len(df) == 0:
             return None

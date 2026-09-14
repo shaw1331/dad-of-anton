@@ -1,14 +1,17 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 from pydantic import BaseModel
 
 from app.workflow.workflow_orchestrator_v1.workflow_orchestrator import WorkflowOrchestrator
 from app.workflow.workflow_orchestrator_v1.workflow_registry import WORKFLOWS
 
 router = APIRouter(prefix="/workflows", tags=["workflows"])
+
+logger = logging.getLogger(__name__)
 
 orchestrator = WorkflowOrchestrator()
 
@@ -54,12 +57,22 @@ def trigger_workflow(name: str, background_tasks: BackgroundTasks, request: Trig
 
 
 @router.get("/runs")
-def list_runs():
+def list_runs(
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+):
     from app.workflow.repositories import WorkflowRunRepository
 
     repo = WorkflowRunRepository()
-    runs = repo.list_all()
-    return [run.model_dump() for run in runs]
+    runs = repo.list_page(limit=limit, offset=offset)
+    payload = [run.model_dump(exclude={"input", "output"}) for run in runs]
+    logger.info(
+        "list_runs limit=%s offset=%s row_count=%s",
+        limit,
+        offset,
+        len(runs),
+    )
+    return payload
 
 
 @router.get("/runs/{run_id}")

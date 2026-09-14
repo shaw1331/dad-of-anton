@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatLabel, formatWorkflowName } from "@/lib/utils";
 
 function StatusBadge({ status }: { status: string }) {
@@ -37,18 +38,30 @@ export function WorkflowRunList({
   onSelect,
   onDelete,
   deletingId,
+  loading,
 }: {
   runs: WorkflowRun[];
   onSelect: (runId: string) => void;
   onDelete?: (runId: string) => void;
   deletingId?: string | null;
+  loading?: boolean;
 }) {
   return (
     <div>
       <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
         Recent runs
       </h2>
-      {runs.length === 0 ? (
+      {loading ? (
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardContent className="p-4">
+                <Skeleton className="h-9 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : runs.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <Clock className="mb-3 h-10 w-10 text-muted-foreground/50" />

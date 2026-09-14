@@ -113,6 +113,8 @@ def fetch_stock_data(
     for i in range(0, len(tickers), chunk_size):
         chunk = tickers[i : i + chunk_size]
         chunk_syms = symbols[i : i + chunk_size]
+        start = time.time()
+        status = "ok"
         try:
             raw = yf.download(
                 chunk,
@@ -131,7 +133,15 @@ def fetch_stock_data(
                 except KeyError:
                     continue
         except Exception as e:
+            status = "err"
             logger.warning("Failed to download chunk %d-%d: %s", i, i + chunk_size, e)
+        finally:
+            logger.info(
+                "downstream kind=yfinance method=download host=- path=- status=%s duration_ms=%s count=%s",
+                status,
+                round((time.time() - start) * 1000),
+                len(chunk),
+            )
 
         if i + chunk_size < len(tickers):
             time.sleep(0.5)

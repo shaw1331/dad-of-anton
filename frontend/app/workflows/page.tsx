@@ -34,7 +34,8 @@ import {
 export default function WorkflowsPage() {
   const [workflows, setWorkflows] = useState<WorkflowConfig[]>([]);
   const [runs, setRuns] = useState<WorkflowRun[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [workflowsLoading, setWorkflowsLoading] = useState(true);
+  const [runsLoading, setRunsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [triggering, setTriggering] = useState<string | null>(null);
   const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowConfig | null>(null);
@@ -44,21 +45,15 @@ export default function WorkflowsPage() {
   const [deleteRunId, setDeleteRunId] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const [wfData, runsData] = await Promise.all([
-          getWorkflows(),
-          getWorkflowRuns(),
-        ]);
-        setWorkflows(wfData);
-        setRuns(runsData);
-      } catch (err: any) {
-        setError(err.message || "Failed to load data");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
+    getWorkflows()
+      .then(setWorkflows)
+      .catch((err: any) => setError(err.message || "Failed to load data"))
+      .finally(() => setWorkflowsLoading(false));
+
+    getWorkflowRuns(50, 0)
+      .then(setRuns)
+      .catch((err: any) => setError(err.message || "Failed to load data"))
+      .finally(() => setRunsLoading(false));
   }, []);
 
   const handleTriggerClick = (wf: WorkflowConfig) => {
@@ -228,7 +223,7 @@ export default function WorkflowsPage() {
             </CardContent>
           </Card>
         )}
-        {loading ? (
+        {workflowsLoading ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
               <Card key={i}>
@@ -293,6 +288,7 @@ export default function WorkflowsPage() {
 
       <WorkflowRunList
         runs={runs}
+        loading={runsLoading}
         onSelect={(runId) => (window.location.href = `/workflows/${runId}`)}
         onDelete={(runId) => setDeleteRunId(runId)}
         deletingId={deletingId}
